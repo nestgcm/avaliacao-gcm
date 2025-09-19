@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Avaliação de Desempenho Realizado pela Chefia da GUARDA CIVIL MUNICIPAL DE SALVADOR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71;
+            --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937;
+            --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444;
+            --warning: #f59e0b; --gray: #6b7280; --border-color: #e5e7eb;
+            --border-radius: 8px; --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f5f7fa; color: var(--dark); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(to right, var(--primary), var(--primary-dark)); color: white; padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo h1 { font-size: 1.5rem; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--light); flex-wrap: wrap; gap: 10px;}
+        .hidden { display: none; }
+        .btn { padding: 10px 15px; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn:disabled { background-color: var(--gray); cursor: not-allowed; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-secondary { background-color: var(--gray); color: white; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 16px; }
+        .toolbar { display: flex; gap: 15px; margin-top: 15px; margin-bottom: 15px; }
+        .search-container { position: relative; flex-grow: 1; }
+        .search-container input { padding-left: 35px; }
+        .search-container .fa-search { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray); }
+        .btn-sort { background-color: #fff; color: var(--primary); border: 1px solid var(--primary); }
+        .btn-sort.active { background-color: var(--primary); color: #fff; }
+        .servidores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .servidor-card { border: 1px solid #e5e7eb; border-radius: var(--border-radius); padding: 15px; cursor: pointer; transition: all 0.3s; }
+        .servidor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+        .servidor-card.concluido { background-color: #f9fafb; cursor: not-allowed; }
+        .servidor-card.concluido:hover { transform: none; box-shadow: none; }
+        .servidor-card h3 { color: var(--primary); margin-bottom: 10px; }
+        .servidor-card.concluido h3 { color: var(--gray); }
+        .servidor-info { font-size: 0.9rem; color: var(--gray); }
+        .status-badge { margin-top: 10px; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; display: inline-block; }
+        .status-pendente { background-color: #fef3c7; color: #92400e; }
+        .status-concluido { background-color: #d1fae5; color: #065f46; }
+        .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
+        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; }
+        .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
+        .questao { padding: 20px; background: white; transition: all 0.4s ease; border-left: 4px solid transparent; }
+        .questao + .questao { border-top: 1px solid var(--border-color); }
+        .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
+        .questao.invalid-question { background-color: #fee2e2; border-left-color: var(--danger); }
+        .opcoes-avaliacao { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
+        .opcao { text-align: center; padding: 10px; border: 1px solid #e5e7eb; border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; }
+        .opcao:hover { background-color: #f9fafb; }
+        .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .declaracao-container { margin-top: 30px; border-top: 2px solid #e5e7eb; padding-top: 20px; background-color: #f9fafb; padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
+        .declaracao-container.invalid-question { border-color: var(--danger); }
+        .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
+        .declaracao-box input[type="checkbox"] { width: auto; margin-top: 5px; flex-shrink: 0; }
+        .declaracao-box label { font-weight: normal; font-style: italic; color: var(--gray); line-height: 1.5; }
+        .declaracao-box label strong { font-style: normal; color: var(--dark); }
+        .alert { padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; }
+        .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-error { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .resumo-pontuacao { background-color: #eff6ff; padding: 15px; border-radius: var(--border-radius); margin: 20px 0; }
+        .progress-bar { height: 10px; background-color: #e5e7eb; border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: all 0.5s ease; }
+        .instructions-panel {
+            background-color: var(--primary-light); border: 1px solid var(--primary);
+            border-radius: var(--border-radius); padding: 15px;
+            margin-bottom: 20px; color: var(--primary-dark);
+        }
+        .instructions-panel h3 {
+            font-size: 1.1rem; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .instructions-panel ul { list-style-position: inside; padding-left: 5px; }
+        .instructions-panel li + li { margin-top: 5px; }
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .stat-card { background-color: #f3f4f6; border-radius: var(--border-radius); padding: 15px; text-align: center; border-left: 5px solid var(--gray); }
+        .stat-card h4 { font-size: 0.9rem; color: var(--gray); margin-bottom: 5px; }
+        .stat-card p { font-size: 2rem; font-weight: 600; color: var(--dark); }
+        .stat-card.stat-success { border-left-color: var(--success); }
+        .stat-card.stat-warning { border-left-color: var(--warning); }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: none;
+            justify-content: center; align-items: center; z-index: 200;
+        }
+        .modal-content {
+            background-color: white; padding: 30px; border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center;
+            max-width: 450px; width: 90%;
+        }
+        .modal-content h3 { color: var(--primary-dark); margin-top: 0; margin-bottom: 15px; }
+        .modal-content p { margin-bottom: 25px; font-size: 1.1rem; }
+        .modal-content #modalScore { font-weight: bold; font-size: 1.2rem; color: var(--primary); }
+        .modal-buttons { display: flex; justify-content: center; gap: 15px; }
+        .review-container {
+            max-height: 40vh; overflow-y: auto;
+            border: 1px solid var(--border-color); border-radius: var(--border-radius);
+            padding: 15px; background-color: #f9fafb;
+        }
+        .review-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
+        .review-item:last-child { border-bottom: none; }
+        .review-item p { margin: 0; font-size: 0.9rem; }
+        .review-item span {
+            font-weight: 600; color: var(--primary); background-color: var(--primary-light);
+            padding: 2px 8px; border-radius: 10px; font-size: 1rem;
+        }
+        
+        body.dark-theme {
+            --light: #34495e; --dark: #ecf0f1;
+            --border-color: #4a627a; background-color: #2c3e50;
+        }
+        body.dark-theme .card, body.dark-theme .modal-content {
+            background-color: #2c3e50; border: 1px solid var(--border-color);
+        }
+        body.dark-theme .servidor-card:not(.concluido):hover { background-color: #34495e; }
+        body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .declaracao-container, body.dark-theme .servidor-card.concluido {
+            background-color: #2c3e50; border-color: var(--border-color);
+        }
+        body.dark-theme input, body.dark-theme select, body.dark-theme textarea, body.dark-theme .opcao:hover {
+            background-color: #34495e; border-color: #4a627a; color: var(--dark);
+        }
+        body.dark-theme .status-pendente { background-color: #8e44ad; color: white; }
+        body.dark-theme .status-concluido { background-color: #27ae60; color: white; }
+        body.dark-theme .instructions-panel, body.dark-theme .stat-card, body.dark-theme .review-container {
+            background-color: var(--light); border-color: var(--primary); color: var(--dark);
+        }
+        body.dark-theme .stat-card p { color: var(--dark); }
+        body.dark-theme .review-item span { color: white; background-color: var(--primary); }
+        body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
+
+        @media (max-width: 768px) {
+            .servidores-grid { grid-template-columns: 1fr; }
+            .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
+            .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+            .toolbar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo"><i class="fas fa-shield-alt fa-2x"></i><h1>Avaliação de Chefia - GCM Salvador</h1></div>
+            <div id="userInfo" class="user-info hidden">
+                <span id="userName"></span>
+                <button id="themeToggle" class="btn btn-secondary" style="background-color: transparent; border: 1px solid white;">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="btnLogout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="loginScreen" class="card">
+            <h2>Login da Chefia</h2>
+            <div class="instructions-panel">
+                <h3><i class="fas fa-info-circle"></i> Instruções Importantes</h3>
+                <ul>
+                    <li>A avaliação, uma vez enviada, <strong>não poderá ser editada</strong>.</li>
+                    <li>Revise todas as respostas com atenção antes de finalizar.</li>
+                    <li>Em caso de dúvidas, entre em contato com o setor responsável.</li>
+                </ul>
+            </div>
+            <div id="loginAlert" class="alert alert-error hidden"></div>
+            <div class="form-group"><label for="matricula">Matrícula:</label><input type="text" id="matricula" placeholder="Digite sua matrícula"></div>
+            <div class="form-group"><label for="senha">Senha (CPF Somente Números):</label><input type="password" id="senha" placeholder="Digite sua senha"></div>
+            <button id="btnLogin" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+        </div>
+
+        <div id="servidoresScreen" class="card hidden">
+            <div class="card-header">
+                <div>
+                    <h2>Servidores sob sua supervisão</h2>
+                    <p>Selecione um servidor para iniciar a avaliação.</p>
+                </div>
+                <div id="progressoContador" class="resumo-pontuacao" style="margin: 0; padding: 10px;"></div>
+            </div>
+            <div id="dashboard" style="margin-bottom: 25px;">
+                <div class="dashboard-stats">
+                    <div class="stat-card"><h4>Total de Servidores</h4><p id="statTotal">0</p></div>
+                    <div class="stat-card stat-success"><h4>Avaliados</h4><p id="statAvaliados">0</p></div>
+                    <div class="stat-card stat-warning"><h4>Pendentes</h4><p id="statPendentes">0</p></div>
+                </div>
+            </div>
+            <div class="toolbar">
+                <div class="search-container"><i class="fas fa-search"></i><input type="text" id="searchServidor" placeholder="Pesquisar por nome ou matrícula..."></div>
+                <button id="btnSortStatus" class="btn btn-sort"><i class="fas fa-filter"></i> Ordenar por Pendentes</button>
+            </div>
+            <div id="servidoresList" class="servidores-grid"></div>
+        </div>
+
+        <div id="avaliacaoScreen" class="card avaliacao-form hidden">
+            <div class="card-header"><h2>Avaliação de Desempenho</h2><button id="btnVoltarLista" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Voltar</button></div>
+            <div style="margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px;">
+                <p><b>Avaliado:</b> <strong id="avaliadoNome"></strong></p>
+                <p><b>Matrícula:</b> <strong id="avaliadoMatricula"></strong></p>
+                <p><b>Lotação:</b> <strong id="avaliadoLotacao"></strong></p>
+            </div>
+            <div id="avaliacaoAlert" class="alert alert-error hidden"></div>
+            <form id="formAvaliacao">
+                <input type="hidden" id="matriculaAvaliado"><input type="hidden" id="nomeAvaliado">
+                <div class="criterio"><h3>PRODUTIVIDADE E METAS</h3><div class="questao" id="q-1"><p>1- Procura novos conhecimentos que contribuam para o desenvolvimento dos trabalhos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao1"></div><div class="questao" id="q-2"><p>2- Coloca-se à disposição da chefia, espontaneamente, para aprender novas técnicas e auxiliar os colegas.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao2"></div><div class="questao" id="q-3"><p>3- É hábil em identificar e apresentar soluções para os problemas que surjam no trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao3"></div><div class="questao" id="q-4"><p>4- Zela pelo próprio preparo profissional e incentiva os companheiros a fazerem o mesmo, em prol do cumprimento da missão comum.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao4"></div><div class="questao" id="q-5"><p>5- Quando ofertado, participa de cursos, palestras, atividades, dinâmicas que contribuam para o seu desenvolvimento profissional na instituição.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao5"></div></div>
+                <div class="criterio"><h3>RESPONSABILIDADE</h3><div class="questao" id="q-6"><p>6- É comprometido com o seu trabalho, atuando com prudência, firmeza e efetividade na sua área de responsabilidade.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao6"></div><div class="questao" id="q-7"><p>7- Cumpre as normas, as regras e os regulamentos das legislações vigentes.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao7"></div><div class="questao" id="q-8"><p>8- Respeita a hierarquia, obedecendo fielmente as ordens de seus superiores, desde que legais.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao8"></div><div class="questao" id="q-9"><p>9- Mantem sigilo sobre os assuntos internos da Guarda Municipal ou de matéria confidencial que possam de alguma forma expor o outro.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao9"></div><div class="questao" id="q-10"><p>10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao10"></div></div>
+                <div class="criterio"><h3>PONTUALIDADE</h3><div class="questao" id="q-11"><p>11- Cumpre o horário de trabalho, respeitando o horário de entrada e saída.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="3.0">3,0</div><div class="opcao" data-value="4.0">4,0</div><div class="opcao" data-value="5.0">5,0</div></div><input type="hidden" id="questao11"></div></div>
+                <div class="criterio"><h3>ASSIDUIDADE</h3><div class="questao" id="q-12"><p>12- Comparece regularmente ao local de trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao12"></div><div class="questao" id="q-13"><p>13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao13"></div><div class="questao" id="q-14"><p>14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao14"></div><div class="questao" id="q-15"><p>15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao15"></div><div class="questao" id="q-16"><p>16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao16"></div></div>
+                <div class="criterio"><h3>USO ADEQUADO DOS EQUIPAMENTOS</h3><div class="questao" id="q-17"><p>17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5">0,5</div><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="1.5">1,5</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="2.5">2,5</div></div><input type="hidden" id="questao17"></div><div class="questao" id="q-18"><p>18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5">0,5</div><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="1.5">1,5</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="2.5">2,5</div></div><input type="hidden" id="questao18"></div></div>
+                <div class="resumo-pontuacao">
+                    <h3>Resumo de Pontuação</h3>
+                    <div class="progress-bar"><div id="progressBar" class="progress" style="width: 0%"></div></div>
+                    <p>Pontuação Atual: <strong id="pontuacaoAtual">0.0</strong> pts</p>
+                    <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
+                </div>
+                <div class="declaracao-container">
+                    <h3>Declaração de Veracidade</h3>
+                    <div class="declaracao-box">
+                        <input type="checkbox" id="checkDeclaracao">
+                        <label for="checkDeclaracao">
+                            Eu, <strong><span id="declaracaoNome"></span></strong>, matrícula nº <strong><span id="declaracaoMatricula"></span></strong>, 
+                            declaro sob as penas da lei que as informações prestadas nesta avaliação do servidor <strong><span id="declaracaoNomeAvaliado"></span></strong>, matrícula nº <strong><span id="declaracaoMatriculaAvaliado"></span></strong>, são verdadeiras e correspondem à minha justa observação de seu desempenho.
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top: 30px;"><button type="submit" id="btnSalvarAvaliacao" class="btn btn-success"><i class="fas fa-check-circle"></i> Finalizar Avaliação</button></div>
+            </form>
+        </div>
+    </div>
+    <div id="reviewModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 700px; text-align: left;">
+            <h3>Revisão Final da Avaliação</h3>
+            <p>Por favor, confira todas as respostas abaixo. Após a confirmação, a avaliação não poderá ser alterada.</p>
+            <div id="reviewContent" class="review-container"></div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button id="modalCloseReview" class="btn btn-secondary"><i class="fas fa-edit"></i> Voltar e Corrigir</button>
+                <button id="modalConfirmReview" class="btn btn-success"><i class="fas fa-check"></i> Confirmar e Enviar</button>
+            </div>
+        </div>
+    </div>
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Confirmar Envio</h3>
+            <p>A pontuação final do servidor é de <span id="modalScore"></span> pontos.</p>
+            <p>Deseja confirmar o envio desta avaliação?</p>
+            <div class="modal-buttons">
+                <button id="modalCancel" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
+                <button id="modalConfirm" class="btn btn-success"><i class="fas fa-check"></i> Confirmar Envio</button>
+            </div>
+        </div>
+    </div>
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Atenção</h3>
+            <p id="infoModalMessage"></p>
+            <div class="modal-buttons">
+                <button id="infoModalClose" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- CONSTANTES E VARIÁVEIS ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRl3kqgG_qsGsj_NTVoRHZQjwQMpQooPmzzMYhEEmsOAtLHd0Co1nMkmF7RRAavp20gw/exec";
+        
+        const loginScreen = document.getElementById('loginScreen');
+        const servidoresScreen = document.getElementById('servidoresScreen');
+        const avaliacaoScreen = document.getElementById('avaliacaoScreen');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const servidoresList = document.getElementById('servidoresList');
+        const loginAlert = document.getElementById('loginAlert');
+        const avaliacaoAlert = document.getElementById('avaliacaoAlert');
+        const progressBar = document.getElementById('progressBar');
+        const pontuacaoAtual = document.getElementById('pontuacaoAtual');
+        const faixaDesempenho = document.getElementById('faixaDesempenho');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const infoModal = document.getElementById('infoModal');
+        const reviewModal = document.getElementById('reviewModal');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        let currentUser = null, servidores = [], avaliacoes = [], sortByPending = false;
+        const moonIcon = '<i class="fas fa-moon"></i>';
+        const sunIcon = '<i class="fas fa-sun"></i>';
+        
+        // --- FUNÇÕES ---
+        function showAlert(el, msg, type) { el.textContent = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
+        function hideAlert(el) { el.classList.add('hidden'); }
+        function showScreen(el) { el.classList.remove('hidden'); }
+        function hideScreen(el) { el.classList.add('hidden'); }
+        
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeToggle.innerHTML = sunIcon;
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeToggle.innerHTML = moonIcon;
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function showLoginScreen() {
+            [servidoresScreen, avaliacaoScreen, userInfo].forEach(hideScreen);
+            showScreen(loginScreen);
+            document.getElementById('matricula').value = '';
+            document.getElementById('senha').value = '';
+            hideAlert(loginAlert);
+        }
+
+        function showServidoresScreen() {
+            [loginScreen, avaliacaoScreen].forEach(hideScreen);
+            [servidoresScreen, userInfo].forEach(showScreen);
+            userName.textContent = currentUser.nome;
+            const searchInput = document.getElementById('searchServidor');
+            if (searchInput) searchInput.value = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('avaliacao_user');
+            showLoginScreen();
+        }
+
+        function login() {
+            const m = document.getElementById('matricula'), s = document.getElementById('senha'), b = document.getElementById('btnLogin');
+            if (!m.value || !s.value) return showAlert(loginAlert, 'Preencha todos os campos.', 'error');
+            b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+            
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', matricula: m.value, senha: s.value }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('avaliacao_user', JSON.stringify(currentUser));
+                    showServidoresScreen();
+                    loadServidores();
+                } else {
+                    showAlert(loginAlert, data.error, 'error');
+                }
+            })
+            .catch(err => showAlert(loginAlert, 'Erro de comunicação.', 'error'))
+            .finally(() => {
+                b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            });
+        }
+
+        function loadServidores() {
+            servidoresList.innerHTML = '<p>Carregando servidores...</p>';
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getServidores', matriculaAvaliador: currentUser.matricula }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    servidores = data.servidores;
+                    avaliacoes = data.avaliacoes;
+                    renderServidores();
+                    updateDashboard();
+                } else {
+                    servidoresList.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                }
+            })
+            .catch(err => servidoresList.innerHTML = '<p style="color: red;">Erro de comunicação.</p>');
+        }
+        
+        function updateDashboard() {
+            const total = servidores.length;
+            const avaliados = avaliacoes.length;
+            const pendentes = total - avaliados;
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statAvaliados').textContent = avaliados;
+            document.getElementById('statPendentes').textContent = pendentes;
+        }
+
+        function renderServidores() {
+            const searchTerm = document.getElementById('searchServidor').value.toLowerCase().trim();
+            let servidoresFiltrados = servidores.filter(s => s.nome.toLowerCase().includes(searchTerm) || s.matricula.toString().includes(searchTerm));
+            if (sortByPending) {
+                servidoresFiltrados.sort((a, b) => {
+                    const aAvaliado = avaliacoes.some(av => av.matriculaAvaliado === a.matricula);
+                    const bAvaliado = avaliacoes.some(av => av.matriculaAvaliado === b.matricula);
+                    return aAvaliado - bAvaliado;
+                });
+            }
+            
+            servidoresList.innerHTML = '';
+            document.getElementById('progressoContador').innerHTML = `<strong>${avaliacoes.length} de ${servidores.length}</strong> avaliados`;
+            if (servidoresFiltrados.length === 0) {
+                servidoresList.innerHTML = '<p>Nenhum servidor encontrado.</p>';
+                return;
+            }
+            servidoresFiltrados.forEach(servidor => {
+                const avaliacao = avaliacoes.find(av => av.matriculaAvaliado === servidor.matricula);
+                const status = avaliacao ? 'concluido' : 'pendente';
+                const card = document.createElement('div');
+                card.className = `servidor-card ${status}`;
+                card.innerHTML = `<h3>${servidor.nome}</h3><div class="servidor-info"><p>Matrícula: ${servidor.matricula}</p><p>Lotação: ${servidor.lotacao}</p></div><div class="status-badge status-${status}">${avaliacao ? 'Avaliado' : 'Pendente'}</div>`;
+                card.addEventListener('click', () => {
+                    if (avaliacao) { showInfoModal("Esta avaliação já foi concluída e não pode ser editada."); }
+                    else { showAvaliacaoScreen(servidor, null); }
+                });
+                servidoresList.appendChild(card);
+            });
+        }
+        
+        function showAvaliacaoScreen(servidor, avaliacaoExistente) {
+            document.getElementById('avaliadoNome').textContent = servidor.nome; 
+            document.getElementById('avaliadoMatricula').textContent = servidor.matricula; 
+            document.getElementById('avaliadoLotacao').textContent = servidor.lotacao;
+            document.getElementById('matriculaAvaliado').value = servidor.matricula; 
+            document.getElementById('nomeAvaliado').value = servidor.nome;
+            document.getElementById('formAvaliacao').reset();
+            document.getElementById('checkDeclaracao').checked = false;
+            for (let i = 1; i <= 18; i++) {
+                const hiddenInput = document.getElementById(`questao${i}`);
+                if (hiddenInput) hiddenInput.value = '';
+            }
+            document.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+            document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
+            document.querySelectorAll('.invalid-question').forEach(el => el.classList.remove('invalid-question'));
+            hideAlert(avaliacaoAlert);
+            document.getElementById('declaracaoNome').textContent = currentUser.nome; 
+            document.getElementById('declaracaoMatricula').textContent = currentUser.matricula;
+            document.getElementById('declaracaoNomeAvaliado').textContent = servidor.nome;
+            document.getElementById('declaracaoMatriculaAvaliado').textContent = servidor.matricula;
+            calcularPontuacao(); 
+            hideScreen(servidoresScreen); 
+            showScreen(avaliacaoScreen);
+        }
+
+        function calcularPontuacao() {
+            let total = 0; 
+            for (let i = 1; i <= 18; i++) { 
+                const input = document.getElementById(`questao${i}`); 
+                if (input && input.value) total += parseFloat(input.value); 
+            }
+            pontuacaoAtual.textContent = total.toFixed(1);
+            const pMax = 25.0;
+            progressBar.style.width = ((total / pMax) * 100) + '%';
+            if (total < 16) {
+                progressBar.style.backgroundColor = 'var(--danger)';
+                faixaDesempenho.textContent = "Abaixo do esperado";
+            } else if (total < 20) {
+                progressBar.style.backgroundColor = 'var(--primary)';
+                faixaDesempenho.textContent = "Regular";
+            } else if (total < 23) {
+                progressBar.style.backgroundColor = 'var(--success)';
+                faixaDesempenho.textContent = "Bom";
+            } else {
+                progressBar.style.backgroundColor = 'var(--success)';
+                faixaDesempenho.textContent = "Excelente";
+            }
+            return total;
+        }
+
+        function validateForm() {
+            let isFormValid = true;
+            const declarationContainer = document.querySelector('.declaracao-container');
+            document.querySelectorAll('.invalid-question').forEach(el => el.classList.remove('invalid-question'));
+            declarationContainer.classList.remove('invalid-question');
+            for (let i = 1; i <= 18; i++) {
+                const input = document.getElementById(`questao${i}`);
+                if (!input || !input.value) {
+                    isFormValid = false;
+                    const questaoDiv = document.getElementById(`q-${i}`);
+                    if (questaoDiv) questaoDiv.classList.add('invalid-question');
+                }
+            }
+            if (!document.getElementById('checkDeclaracao').checked) {
+                isFormValid = false;
+                declarationContainer.classList.add('invalid-question');
+            }
+            return isFormValid;
+        }
+
+        function handleFormSubmitAttempt(e) {
+            e.preventDefault();
+            hideAlert(avaliacaoAlert);
+            if (!validateForm()) {
+                showAlert(avaliacaoAlert, 'Responda todas as questões e marque a declaração para finalizar.', 'error');
+                const firstInvalid = document.querySelector('.invalid-question');
+                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            showReview();
+        }
+        
+        function showReview() {
+            const reviewContent = document.getElementById('reviewContent');
+            reviewContent.innerHTML = ''; 
+            const avaliadoNome = document.getElementById('avaliadoNome').textContent;
+            const avaliadoMatricula = document.getElementById('avaliadoMatricula').textContent;
+            const header = document.createElement('div');
+            header.innerHTML = `<p style="margin-bottom:15px; text-align:center;"><strong>Servidor:</strong> ${avaliadoNome} | <strong>Matrícula:</strong> ${avaliadoMatricula}</p>`;
+            reviewContent.appendChild(header);
+            for (let i = 1; i <= 18; i++) {
+                const questaoDiv = document.getElementById(`q-${i}`);
+                const questaoTexto = questaoDiv.querySelector('p').textContent;
+                const respostaValor = document.getElementById(`questao${i}`).value;
+                const item = document.createElement('div');
+                item.className = 'review-item';
+                item.innerHTML = `<p>${questaoTexto}</p><p>Sua nota: <span>${respostaValor.replace('.',',')}</span></p>`;
+                reviewContent.appendChild(item);
+            }
+            reviewModal.style.display = 'flex';
+        }
+
+        function submitEvaluation() {
+            confirmationModal.style.display = 'none';
+            const pontuacaoTotal = calcularPontuacao();
+            const respostas = {};
+            for (let i = 1; i <= 18; i++) {
+                respostas[`questao${i}`] = parseFloat(document.getElementById(`questao${i}`).value) || 0;
+            }
+            const avaliacaoData = {
+                matriculaAvaliador: currentUser.matricula, nomeAvaliador: currentUser.nome,
+                matriculaAvaliado: document.getElementById('matriculaAvaliado').value, nomeAvaliado: document.getElementById('nomeAvaliado').value,
+                pontuacao: pontuacaoTotal.toFixed(1), declaracao: `Confirmado por ${currentUser.nome} em ${new Date().toLocaleString('pt-BR')}`, respostas: respostas
+            };
+            const btnSalvar = document.getElementById('btnSalvarAvaliacao');
+            btnSalvar.disabled = true; btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'salvarAvaliacao', avaliacao: avaliacaoData }) })
+                .then(res => res.json()).then(data => {
+                    if (data.success) {
+                        showAlert(avaliacaoAlert, data.message || 'Avaliação salva com sucesso!', 'success');
+                        setTimeout(() => { loadServidores(); showServidoresScreen(); }, 2000);
+                    } else { showAlert(avaliacaoAlert, data.error, 'error'); }
+                })
+                .catch(err => showAlert(avaliacaoAlert, 'Erro de comunicação com o servidor.', 'error'))
+                .finally(() => { btnSalvar.disabled = false; btnSalvar.innerHTML = '<i class="fas fa-check-circle"></i> Finalizar Avaliação'; });
+        }
+        
+        function showInfoModal(message) {
+            document.getElementById('infoModalMessage').textContent = message;
+            infoModal.style.display = 'flex';
+        }
+
+        // --- INICIALIZAÇÃO ---
+        const savedUser = localStorage.getItem('avaliacao_user');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            showServidoresScreen();
+            loadServidores();
+        }
+        
+        document.getElementById('btnLogin').addEventListener('click', login);
+        document.getElementById('btnLogout').addEventListener('click', logout);
+        document.getElementById('btnVoltarLista').addEventListener('click', () => showServidoresScreen());
+        document.getElementById('formAvaliacao').addEventListener('submit', handleFormSubmitAttempt);
+        document.getElementById('searchServidor').addEventListener('keyup', renderServidores);
+        document.getElementById('btnSortStatus').addEventListener('click', function() { sortByPending = !sortByPending; this.classList.toggle('active'); renderServidores(); });
+        document.getElementById('modalConfirm').addEventListener('click', submitEvaluation);
+        document.getElementById('modalCancel').addEventListener('click', () => confirmationModal.style.display = 'none');
+        document.getElementById('infoModalClose').addEventListener('click', () => infoModal.style.display = 'none');
+        document.getElementById('modalCloseReview').addEventListener('click', () => reviewModal.style.display = 'none');
+        document.getElementById('modalConfirmReview').addEventListener('click', () => {
+            reviewModal.style.display = 'none';
+            const pontuacaoTotal = calcularPontuacao();
+            document.getElementById('modalScore').textContent = pontuacaoTotal.toFixed(1);
+            confirmationModal.style.display = 'flex';
+        });
+        document.querySelectorAll('.opcoes-avaliacao .opcao').forEach(opcao => {
+            opcao.addEventListener('click', function() {
+                const questaoDiv = this.closest('.questao');
+                const value = this.getAttribute('data-value');
+                const hiddenInput = questaoDiv.querySelector('input[type=hidden]');
+                if (hiddenInput) hiddenInput.value = value;
+                this.parentNode.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+                this.classList.add('selecionada');
+                questaoDiv.classList.add('questao-respondida');
+                questaoDiv.classList.remove('invalid-question');
+                calcularPontuacao();
+            });
+        });
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+        });
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+    });
+    </script>
+</body>
+</html>

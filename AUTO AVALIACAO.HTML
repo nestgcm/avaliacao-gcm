@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Avaliação de Desempenho - GCM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71; 
+            --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937; 
+            --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444; 
+            --warning: #f59e0b; --gray: #6b7280; --border-color: #e5e7eb;
+            --border-radius: 8px; --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f5f7fa; color: var(--dark); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(to right, var(--primary), var(--primary-dark)); color: white; padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo h1 { font-size: 1.5rem; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--light); flex-wrap: wrap; gap: 10px;}
+        .hidden { display: none; }
+        .btn { padding: 10px 15px; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn:disabled { background-color: var(--gray); cursor: not-allowed; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-secondary { background-color: var(--gray); color: white; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 16px; transition: all 0.3s ease; }
+        .alert { padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; }
+        .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-error { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .alert-warning { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+        .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
+        .info-avaliado { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background-color: var(--light); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
+        .info-avaliado p { margin: 0; }
+        
+        .criterio { 
+            margin-bottom: 25px; 
+            background-color: white; 
+            border-radius: var(--border-radius); 
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            padding: 0;
+        }
+        .criterio h3 { 
+            color: white; 
+            background-color: var(--primary-dark);
+            padding: 12px 20px;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        .questao { 
+            padding: 20px; 
+            background: white; 
+            transition: background-color 0.4s ease, border-left-color 0.4s ease;
+            border-left: 4px solid transparent;
+        }
+        .questao + .questao {
+            border-top: 1px solid var(--border-color);
+        }
+        .questao p { margin-bottom: 15px; }
+        .questao.invalid-question { border-left-color: var(--danger); background-color: #fee2e2; }
+        .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
+
+        .opcoes-avaliacao { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
+        .opcao { text-align: center; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; }
+        .opcao:hover { background-color: var(--light); }
+        .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .declaracao-container { margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 20px; background-color: var(--light); padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
+        .declaracao-container.invalid { border-color: var(--danger); }
+        .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
+        .declaracao-box input[type="checkbox"] { width: auto; margin-top: 5px; flex-shrink: 0; }
+        .declaracao-box label { font-weight: normal; font-style: italic; color: var(--gray); line-height: 1.5; }
+        .declaracao-box label strong { font-style: normal; color: var(--dark); }
+        .resumo-pontuacao { background-color: var(--primary-light); padding: 15px; border-radius: var(--border-radius); margin: 20px 0; border: 1px solid var(--primary); }
+        .progress-bar { height: 10px; background-color: var(--border-color); border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: all 0.5s ease; }
+
+        .instructions-panel {
+            background-color: var(--primary-light); border: 1px solid var(--primary);
+            border-radius: var(--border-radius); padding: 15px;
+            margin-bottom: 20px; color: var(--primary-dark);
+        }
+        .instructions-panel h3 {
+            font-size: 1.1rem; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .instructions-panel ul { list-style-position: inside; padding-left: 5px; }
+        .instructions-panel li + li { margin-top: 5px; }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: none;
+            justify-content: center; align-items: center; z-index: 200;
+        }
+        .modal-content {
+            background-color: white; padding: 30px; border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center;
+            max-width: 450px; width: 90%;
+        }
+        .modal-content h3 { color: var(--primary-dark); margin-top: 0; margin-bottom: 15px; }
+        .modal-content p { margin-bottom: 25px; font-size: 1.1rem; }
+        .modal-content #modalScore { font-weight: bold; font-size: 1.2rem; color: var(--primary); }
+        .modal-buttons { display: flex; justify-content: center; gap: 15px; }
+        
+        .review-container {
+            max-height: 40vh; overflow-y: auto;
+            border: 1px solid var(--border-color); border-radius: var(--border-radius);
+            padding: 15px; background-color: #f9fafb; text-align: left;
+        }
+        .review-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
+        .review-item:last-child { border-bottom: none; }
+        .review-item p { margin: 0; font-size: 0.9rem; }
+        .review-item span {
+            font-weight: 600; color: var(--primary); background-color: var(--primary-light);
+            padding: 2px 8px; border-radius: 10px; font-size: 1rem;
+        }
+
+        body.dark-theme {
+            --light: #34495e; --dark: #ecf0f1;
+            --border-color: #4a627a; background-color: #2c3e50;
+        }
+        body.dark-theme .card,
+        body.dark-theme .modal-content,
+        body.dark-theme .criterio,
+        body.dark-theme .questao,
+        body.dark-theme .info-avaliado,
+        body.dark-theme .declaracao-container,
+        body.dark-theme .resumo-pontuacao {
+            background-color: #2c3e50;
+            border-color: var(--border-color);
+        }
+        body.dark-theme input, body.dark-theme select, body.dark-theme textarea {
+            background-color: #34495e; border-color: #4a627a; color: var(--dark);
+        }
+        body.dark-theme .instructions-panel, body.dark-theme .review-container {
+            background-color: var(--light); border-color: var(--primary); color: var(--dark);
+        }
+        body.dark-theme .review-item span { color: white; background-color: var(--primary); }
+        body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
+
+        @media (max-width: 768px) {
+            .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
+            .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+            .info-avaliado { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-shield-alt fa-2x"></i>
+                <h1>Sistema de Avaliação de Desempenho - GCM Salvador</h1>
+            </div>
+            <div id="userInfo" class="user-info hidden">
+                <span id="userName"></span>
+                <button id="themeToggle" class="btn btn-secondary" style="background-color: transparent; border: 1px solid white;">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="btnLogout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="loginSection" class="card">
+            <h2>Acesso Restrito</h2>
+            <div class="instructions-panel">
+                <h3><i class="fas fa-info-circle"></i> Instruções Importantes</h3>
+                <ul>
+                    <li>Sua autoavaliação, uma vez enviada, <strong>não poderá ser editada</strong>.</li>
+                    <li>Revise suas respostas com atenção antes de finalizar o processo.</li>
+                    <li>Em caso de dúvidas, entre em contato com o setor responsável.</li>
+                </ul>
+            </div>
+            <div id="loginAlert" class="alert alert-error hidden"></div>
+            <div class="form-group">
+                <label for="username">Matrícula:</label>
+                <input type="text" id="username" placeholder="Digite sua matrícula do SIGP">
+            </div>
+            <div class="form-group">
+                <label for="password">Senha (CPF s/ pontos):</label>
+                <input type="password" id="password" placeholder="Digite seu CPF (apenas números)">
+            </div>
+            <button id="loginButton" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+        </div>
+
+        <div id="evaluationSection" class="card avaliacao-form hidden">
+            <div class="card-header">
+                <h2>Avaliação de Desempenho - <span id="anoAvaliacao"></span></h2>
+                <button id="logoutButtonEval" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+            <div class="info-avaliado">
+                <p><b>Nome:</b> <strong id="nome"></strong></p>
+                <p><b>Matrícula:</b> <strong id="matricula"></strong></p>
+                <p><b>Admissão:</b> <strong id="admissao"></strong></p>
+                <p><b>Graduação:</b> <strong id="posto"></strong></p>
+                <p><b>Cargo:</b> <strong id="cargo"></strong></p>
+                <p><b>Lotação:</b> <strong id="lotacao"></strong></p>
+            </div>
+            <div id="avaliacaoAlert" class="alert alert-error hidden"></div>
+            <form id="formAvaliacao"></form>
+            <div class="resumo-pontuacao">
+                <h3>Resumo de Pontuação</h3>
+                <div class="progress-bar"><div id="progressBar" class="progress" style="width: 0%"></div></div>
+                <p>Pontuação Atual: <strong id="pontuacaoAtual">0,0 / 25 pts</strong></p>
+                <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
+            </div>
+            <div class="declaracao-container" id="declarationBox">
+                <h3>Declaração de Veracidade</h3>
+                <div class="declaracao-box">
+                    <input type="checkbox" id="declaracaoCiente">
+                    <label for="declaracaoCiente">
+                        Eu, <strong><span id="nomeDeclaracao"></span></strong>, matrícula nº <strong><span id="matriculaDeclaracao"></span></strong>, 
+                        declaro, sob minha responsabilidade, que todas as informações prestadas nesta avaliação são verdadeiras e correspondem à realidade.
+                    </label>
+                </div>
+            </div>
+            <div style="margin-top: 30px;">
+                <button type="button" id="sendButton" class="btn btn-success"><i class="fas fa-check-circle"></i> Enviar Avaliação</button>
+            </div>
+        </div>
+
+        <div id="successSection" class="card hidden">
+             <div class="alert alert-success"><h2>Avaliação Enviada com Sucesso!</h2></div>
+            <p>Sua auto-avaliação foi registrada em nosso sistema.</p>
+            <p><strong>Pontuação Final:</strong> <span id="finalScore"></span></p>
+            <p>Você pode baixar uma cópia do seu comprovante em PDF.</p>
+            <a href="#" id="pdfLink" target="_blank" class="btn btn-primary" style="text-decoration: none;"><i class="fas fa-file-pdf"></i> Baixar Comprovante</a>
+            <button id="logoutButtonSuccess" class="btn btn-secondary">Sair</button>
+        </div>
+
+        <div id="alreadySubmittedSection" class="card hidden">
+            <div class="alert alert-warning"><h2>Avaliação já Concluída</h2></div>
+            <p>Nosso sistema indica que você já enviou sua auto-avaliação para o período atual.</p>
+            <p>Em caso de dúvidas, entre em contato com o setor responsável.</p>
+            <button id="logoutButtonSubmitted" class="btn btn-secondary">Sair</button>
+        </div>
+    </div>
+    
+    <div id="reviewModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 700px;">
+            <h3>Revisão Final da Avaliação</h3>
+            <p>Confira suas respostas. Após o envio, a avaliação não poderá ser alterada.</p>
+            <div id="reviewContent" class="review-container"></div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button id="modalCloseReview" class="btn btn-secondary"><i class="fas fa-edit"></i> Voltar e Corrigir</button>
+                <button id="modalConfirmReview" class="btn btn-success"><i class="fas fa-check"></i> Confirmar e Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Confirmar Envio</h3>
+            <p>Sua pontuação final calculada é de <span id="modalScore"></span> pontos.</p>
+            <p>Deseja confirmar o envio da sua avaliação?</p>
+            <div class="modal-buttons">
+                <button id="modalCancel" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
+                <button id="modalConfirm" class="btn btn-success"><i class="fas fa-check"></i> Confirmar Envio</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const config = {
+                WEBAPP_URL: "https://script.google.com/macros/s/AKfycby8hpyN8wIDjKHbAT4YToirgoh1-KkjjEY-F0QmI59ub3SVRqo23bjkgssYKAX2OP07/exec",
+            };
+        
+            const sections = [
+                { title: 'Produtividade e Metas', questions: [ { id: 'c1', text: '1- Procura novos conhecimentos visando o aperfeiçoamento profissional e a melhoria contínua dos processos de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c2', text: '2- Coloca-se à disposição da chefia e dos demais colegas para a realização de novas tarefas, além das suas atribuições de rotina.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c3', text: '3- É hábil em identificar soluções para problemas e/ou situações inusitadas, em tempo hábil.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c4', text: '4- Zela pelo preparo profissional, mantendo os conhecimentos e a aptidão física e mental em níveis adequados ao exercício da função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c5', text: '5- Participa de cursos e atividades de aperfeiçoamento ou atualização profissional, dentro ou fora do serviço.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
+                { title: 'Responsabilidade', questions: [ { id: 'c6', text: '6- É comprometido com seu trabalho, cumprindo suas tarefas com qualidade, nos prazos estabelecidos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c7', text: '7- Cumpre normas e regulamentos estabelecidos, inclusive quanto ao uso dos uniformes e equipamentos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c8', text: '8- Respeita a hierarquia, a disciplina, a cooperação, o espírito de corpo e a lealdade para com a instituição.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c9', text: '9- Mantém sigilo sobre assuntos internos da Instituição dos quais tenha conhecimento em razão do cargo ou função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c10', text: '10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
+                { title: 'Pontualidade', questions: [ { id: 'c11', text: '11- Cumpre o horário de trabalho, evitando atrasos na chegada e na saída para o intervalo.', values: ['1.0', '2.0', '3.0', '4.0', '5.0'] } ] },
+                { title: 'Assiduidade', questions: [ { id: 'c12', text: '12- Comparece regularmente ao local de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c13', text: '13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c14', text: '14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c15', text: '15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c16', text: '16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
+                { title: 'Uso Adequado dos Equipamentos', questions: [ { id: 'c17', text: '17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] }, { id: 'c18', text: '18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] } ] }
+            ];
+            const TOTAL_QUESTIONS = sections.reduce((acc, section) => acc + section.questions.length, 0);
+        
+            const dom = {
+                login: { section: document.getElementById('loginSection'), user: document.getElementById('username'), pass: document.getElementById('password'), button: document.getElementById('loginButton'), alert: document.getElementById('loginAlert') },
+                eval: { section: document.getElementById('evaluationSection'), form: document.getElementById('formAvaliacao'), sendButton: document.getElementById('sendButton'), declarationBox: document.getElementById('declarationBox'), declarationCheck: document.getElementById('declaracaoCiente'), alert: document.getElementById('avaliacaoAlert') },
+                success: { section: document.getElementById('successSection'), finalScore: document.getElementById('finalScore'), pdfLink: document.getElementById('pdfLink'), logoutButton: document.getElementById('logoutButtonSuccess') },
+                submitted: { section: document.getElementById('alreadySubmittedSection'), logoutButton: document.getElementById('logoutButtonSubmitted') },
+                userInfo: { container: document.getElementById('userInfo'), name: document.getElementById('userName') },
+                logoutButtonEval: document.getElementById('logoutButtonEval'),
+                progressBar: document.getElementById('progressBar'),
+                pontuacaoAtual: document.getElementById('pontuacaoAtual'),
+                faixaDesempenho: document.getElementById('faixaDesempenho'),
+                modal: {
+                    review: document.getElementById('reviewModal'),
+                    confirmation: document.getElementById('confirmationModal'),
+                    score: document.getElementById('modalScore'),
+                    confirmBtn: document.getElementById('modalConfirm'),
+                    cancelBtn: document.getElementById('modalCancel'),
+                    closeReviewBtn: document.getElementById('modalCloseReview'),
+                    confirmReviewBtn: document.getElementById('modalConfirmReview')
+                }
+            };
+        
+            let currentUser = null;
+            function showAlert(el, msg, type) { el.textContent = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
+            function hideAlert(el) { el.classList.add('hidden'); }
+        
+            function generateFormHTML() {
+                let html = '';
+                sections.forEach(section => {
+                    html += `<div class="criterio"><h3>${section.title}</h3>`;
+                    section.questions.forEach(q => {
+                        html += `<div class="questao" id="questao-${q.id}"><p>${q.text}</p><div class="opcoes-avaliacao">`;
+                        q.values.forEach(val => { html += `<div class="opcao" data-value="${val}">${val.replace('.',',')}</div>`; });
+                        html += `</div><input type="hidden" id="${q.id}"></div>`;
+                    });
+                    html += `</div>`;
+                });
+                dom.eval.form.innerHTML = html;
+                addOptionListeners();
+            }
+            
+            function addOptionListeners() {
+                document.querySelectorAll('.opcoes-avaliacao .opcao').forEach(opcao => {
+                    opcao.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        const hiddenInput = this.closest('.questao').querySelector('input[type=hidden]');
+                        const questaoDiv = this.closest('.questao');
+                        if (hiddenInput) {
+                            hiddenInput.value = value;
+                            hiddenInput.dispatchEvent(new Event('change')); 
+                        }
+                        this.parentNode.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+                        this.classList.add('selecionada');
+                        if(questaoDiv) questaoDiv.classList.add('questao-respondida');
+                        calculateScore();
+                    });
+                });
+            }
+        
+            function showSection(sectionToShow) {
+                [dom.login.section, dom.eval.section, dom.success.section, dom.submitted.section].forEach(s => s.classList.add('hidden'));
+                if (sectionToShow) sectionToShow.classList.remove('hidden');
+                
+                const mainUserInfo = document.getElementById('userInfo');
+                if (sectionToShow !== dom.login.section) {
+                    mainUserInfo.classList.remove('hidden');
+                    document.getElementById('btnLogout').onclick = logout;
+                } else {
+                    mainUserInfo.classList.add('hidden');
+                }
+            }
+        
+            async function login() {
+                hideAlert(dom.login.alert);
+                const btn = dom.login.button;
+                if (!dom.login.user.value || !dom.login.pass.value) return showAlert(dom.login.alert, 'Preencha todos os campos.', 'error');
+                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+                try {
+                    const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "login", matricula: dom.login.user.value, senha: dom.login.pass.value }) });
+                    const result = await response.json();
+                    if (result.success) {
+                        currentUser = result.user;
+                        populateUserInfo(currentUser);
+                        showSection(dom.eval.section);
+                    } else {
+                        if(result.error === 'ALREADY_SUBMITTED') showSection(dom.submitted.section);
+                        else showAlert(dom.login.alert, result.error, 'error');
+                    }
+                } catch (error) {
+                    showAlert(dom.login.alert, "Erro de conexão. Verifique sua internet.", 'error');
+                } finally {
+                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                }
+            }
+        
+            function handleSendEvaluation() {
+                if (!validateForm()) {
+                    showAlert(dom.eval.alert, "Responda todas as questões e marque a declaração de veracidade.", 'error');
+                    const firstInvalid = document.querySelector('.invalid-question, .invalid');
+                    if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+                hideAlert(dom.eval.alert);
+                showReview();
+            }
+
+            function showReview() {
+                const reviewContent = document.getElementById('reviewContent');
+                reviewContent.innerHTML = ''; 
+                sections.forEach(section => {
+                    const sectionTitle = document.createElement('h4');
+                    sectionTitle.textContent = section.title;
+                    sectionTitle.style.marginTop = '10px';
+                    reviewContent.appendChild(sectionTitle);
+
+                    section.questions.forEach(q => {
+                        const questaoTexto = q.text;
+                        const respostaValor = document.getElementById(q.id).value;
+                        if(respostaValor) {
+                            const item = document.createElement('div');
+                            item.className = 'review-item';
+                            item.innerHTML = `<p>${questaoTexto}</p><p>Sua nota: <span>${respostaValor.replace('.',',')}</span></p>`;
+                            reviewContent.appendChild(item);
+                        }
+                    });
+                });
+                dom.modal.review.style.display = 'flex';
+            }
+
+            async function submitEvaluation() {
+                dom.modal.confirmation.style.display = 'none';
+                const totalScore = calculateScore();
+                const btn = dom.eval.sendButton;
+                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        
+                const answers = {};
+                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                    const input = document.getElementById(`c${i}`);
+                    answers["criterio" + i] = input ? input.value : null;
+                }
+        
+                const submissionData = {
+                    matricula: document.getElementById("matricula").textContent,
+                    nome: document.getElementById("nome").textContent,
+                    graduacao: document.getElementById("posto").textContent,
+                    pontuacao: totalScore,
+                    respostas: answers,
+                    declaracaoCiente: dom.eval.declarationCheck.checked
+                };
+                
+                try {
+                    const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "salvarResposta", resposta: submissionData }) });
+                    const result = await response.json();
+                    if (result.success) {
+                        dom.success.finalScore.textContent = totalScore.toFixed(1);
+                        dom.success.pdfLink.href = result.pdfUrl || '#';
+                        if (!result.pdfUrl) dom.success.pdfLink.classList.add('hidden');
+                        showSection(dom.success.section);
+                    } else {
+                        showAlert(dom.eval.alert, "Erro ao enviar: " + result.error, 'error');
+                    }
+                } catch (error) {
+                    showAlert(dom.eval.alert, "Erro de conexão ao enviar. Tente novamente.", 'error');
+                } finally {
+                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Enviar Avaliação';
+                }
+            }
+        
+            function logout() {
+                currentUser = null;
+                dom.login.user.value = '';
+                dom.login.pass.value = '';
+                hideAlert(dom.login.alert);
+                showSection(dom.login.section);
+                if (dom.eval.form.reset) dom.eval.form.reset();
+                document.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+                document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
+                document.querySelectorAll('input[type=hidden]').forEach(input => input.value = '');
+                dom.eval.declarationCheck.checked = false;
+                document.title = 'Avaliação de Desempenho - GCM';
+                calculateScore();
+            }
+        
+            function populateUserInfo(user) {
+                dom.userInfo.name.textContent = user.nome;
+                document.getElementById("nome").textContent = user.nome;
+                document.getElementById("matricula").textContent = user.matricula;
+                document.getElementById("admissao").textContent = new Date(user.admissao).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+                document.getElementById("posto").textContent = user.posto;
+                document.getElementById("cargo").textContent = user.cargo;
+                document.getElementById("lotacao").textContent = user.lotacao;
+                document.getElementById("nomeDeclaracao").textContent = user.nome;
+                document.getElementById("matriculaDeclaracao").textContent = user.matricula;
+                document.getElementById("anoAvaliacao").textContent = new Date().getFullYear();
+            }
+        
+            function calculateScore() {
+                let sum = 0;
+                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                    const input = document.getElementById(`c${i}`);
+                    if (input && input.value) sum += parseFloat(input.value);
+                }
+                
+                const finalScore = parseFloat(sum.toFixed(1));
+
+                const pMax = 25.0;
+                dom.pontuacaoAtual.textContent = `${finalScore.toString().replace('.', ',')} / ${pMax.toFixed(0)} pts`;
+                const percentage = (finalScore / pMax) * 100;
+                dom.progressBar.style.width = percentage + '%';
+
+                if (percentage < 64) {
+                    dom.progressBar.style.backgroundColor = 'var(--danger)';
+                    dom.faixaDesempenho.textContent = "Abaixo do esperado";
+                } else if (percentage < 80) {
+                    dom.progressBar.style.backgroundColor = 'var(--primary)';
+                    dom.faixaDesempenho.textContent = "Regular";
+                } else if (percentage < 92) {
+                    dom.progressBar.style.backgroundColor = 'var(--success)';
+                    dom.faixaDesempenho.textContent = "Bom";
+                } else {
+                    dom.progressBar.style.backgroundColor = 'var(--success)';
+                    dom.faixaDesempenho.textContent = "Excelente";
+                }
+                const answeredQuestions = document.querySelectorAll('.questao input[type=hidden][value]:not([value=""])').length;
+                if (answeredQuestions > 0 && !dom.eval.section.classList.contains('hidden')) {
+                    document.title = `(${answeredQuestions}/${TOTAL_QUESTIONS}) Avaliação de Desempenho`;
+                } else {
+                    document.title = 'Avaliação de Desempenho - GCM';
+                }
+                return finalScore;
+            }
+        
+            function validateForm() {
+                let isFormValid = true;
+                document.querySelectorAll('.questao.invalid-question').forEach(q => q.classList.remove('invalid-question'));
+                dom.eval.declarationBox.classList.remove('invalid');
+                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                    const input = document.getElementById(`c${i}`);
+                    if (!input || !input.value) {
+                        isFormValid = false;
+                        const questaoDiv = document.getElementById(`questao-c${i}`);
+                        if (questaoDiv) questaoDiv.classList.add('invalid-question');
+                    }
+                }
+                if (!dom.eval.declarationCheck.checked) {
+                    isFormValid = false;
+                    dom.eval.declarationBox.classList.add('invalid');
+                }
+                return isFormValid;
+            }
+        
+            const themeToggle = document.getElementById('themeToggle');
+            const moonIcon = '<i class="fas fa-moon"></i>';
+            const sunIcon = '<i class="fas fa-sun"></i>';
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    themeToggle.innerHTML = sunIcon;
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    themeToggle.innerHTML = moonIcon;
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = localStorage.getItem('theme') || 'light';
+                applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+            });
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+
+            generateFormHTML();
+            dom.eval.form.addEventListener('change', calculateScore);
+            dom.login.button.addEventListener("click", login);
+            dom.eval.sendButton.addEventListener("click", handleSendEvaluation);
+            dom.modal.confirmBtn.addEventListener("click", submitEvaluation);
+            dom.modal.cancelBtn.addEventListener("click", () => dom.modal.confirmation.style.display = 'none');
+            dom.modal.closeReviewBtn.addEventListener('click', () => dom.modal.review.style.display = 'none');
+            dom.modal.confirmReviewBtn.addEventListener('click', () => {
+                dom.modal.review.style.display = 'none';
+                const totalScore = calculateScore();
+                dom.modal.score.textContent = totalScore.toString().replace('.', ',');
+                dom.modal.confirmation.style.display = 'flex';
+            });
+            [dom.logoutButtonEval, dom.success.logoutButton, dom.submitted.logoutButton, document.getElementById('btnLogout')].forEach(btn => {
+                if(btn) btn.addEventListener('click', logout)
+            });
+            showSection(dom.login.section);
+            calculateScore();
+        });
+    </script>
+</body>
+</html>
