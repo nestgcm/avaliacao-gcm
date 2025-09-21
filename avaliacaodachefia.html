@@ -55,16 +55,20 @@
         .status-pendente { background-color: #fef3c7; color: #92400e; }
         .status-concluido { background-color: #d1fae5; color: #065f46; }
         .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
-        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; }
+        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out; }
+        .criterio.active-criterio { box-shadow: 0 8px 25px rgba(26, 86, 219, 0.2); border-color: var(--primary); }
         .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
         .questao { padding: 20px; background: white; transition: all 0.4s ease; border-left: 4px solid transparent; }
         .questao + .questao { border-top: 1px solid var(--border-color); }
         .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
         .questao.invalid-question { background-color: #fee2e2; border-left-color: var(--danger); }
         .opcoes-avaliacao { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
-        .opcao { text-align: center; padding: 10px; border: 1px solid #e5e7eb; border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; }
+        .opcao { text-align: center; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80px; }
+        .opcao .valor-numerico { font-size: 1.2rem; font-weight: bold; }
+        .opcao .valor-texto { font-size: 0.75rem; color: var(--gray); margin-top: 4px; }
         .opcao:hover { background-color: #f9fafb; }
         .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .opcao.selecionada .valor-texto { color: white; }
         .declaracao-container { margin-top: 30px; border-top: 2px solid #e5e7eb; padding-top: 20px; background-color: #f9fafb; padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
         .declaracao-container.invalid-question { border-color: var(--danger); }
         .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
@@ -87,8 +91,10 @@
         .stat-card p { font-size: 2rem; font-weight: 600; color: var(--dark); }
         .stat-card.stat-success { border-left-color: var(--success); }
         .stat-card.stat-warning { border-left-color: var(--warning); }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; }
-        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.visible { display: flex; opacity: 1; }
+        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-content h3 { color: var(--primary-dark); margin-top: 0; margin-bottom: 15px; }
         .modal-content p { margin-bottom: 25px; font-size: 1.1rem; }
         .modal-content #modalScore { font-weight: bold; font-size: 1.2rem; color: var(--primary); }
@@ -116,6 +122,7 @@
         body.dark-theme .stat-card p { color: var(--dark); }
         body.dark-theme .review-item span { color: white; background-color: var(--primary); }
         body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
+        body.dark-theme .opcao.selecionada .valor-texto { color: #f0fdf4; }
         @media (max-width: 768px) {
             .servidores-grid { grid-template-columns: 1fr; }
             .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
@@ -146,6 +153,7 @@
                 <ul>
                     <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o desenvolvimento na carreira dos servidores, sendo critério para promoção, progressão ou ambas.</li>
                     <li><strong>Período para Avaliar:</strong> A avaliação dos servidores da sua equipe estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
+                    <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias do prazo. Caso o sistema apresente lentidão ou erro, por favor, tente novamente em um horário de menor movimento antes de acionar o suporte. Agradecemos a compreensão.</li>
                     <li><strong>Justificativa das Notas:</strong> A avaliação é um ato de gestão que requer critério e justiça. Esteja preparado para fundamentar as notas atribuídas, pois conforme o <strong>Art. 45</strong> da mesma lei, o servidor avaliado terá o direito de solicitar reconsideração do resultado final.</li>
                     <li><strong>Avalie com Calma:</strong> Você possui tempo hábil para avaliar todos os seus subordinados. Não é uma maratona! O sistema estará disponível durante todo o cronograma.</li>
                     <li><strong>Revisão Final:</strong> Antes de finalizar cada avaliação, uma tela de revisão será exibida. Confira todas as respostas com atenção nesta etapa, pois o envio é definitivo.</li>
@@ -202,11 +210,11 @@
             <div id="avaliacaoAlert" class="alert alert-error hidden"></div>
             <form id="formAvaliacao">
                 <input type="hidden" id="matriculaAvaliado"><input type="hidden" id="nomeAvaliado">
-                <div class="criterio" id="criterio-produtividade"><h3>PRODUTIVIDADE E METAS</h3><div class="questao" id="q-1"><p>1- Procura novos conhecimentos que contribuam para o desenvolvimento dos trabalhos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao1"></div><div class="questao" id="q-2"><p>2- Coloca-se à disposição da chefia, espontaneamente, para aprender novas técnicas e auxiliar os colegas.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao2"></div><div class="questao" id="q-3"><p>3- É hábil em identificar e apresentar soluções para os problemas que surjam no trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao3"></div><div class="questao" id="q-4"><p>4- Zela pelo próprio preparo profissional e incentiva os companheiros a fazerem o mesmo, em prol do cumprimento da missão comum.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao4"></div><div class="questao" id="q-5"><p>5- Quando ofertado, participa de cursos, palestras, atividades, dinâmicas que contribuam para o seu desenvolvimento profissional na instituição.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao5"></div></div>
-                <div class="criterio" id="criterio-responsabilidade"><h3>RESPONSABILIDADE</h3><div class="questao" id="q-6"><p>6- É comprometido com o seu trabalho, atuando com prudência, firmeza e efetividade na sua área de responsabilidade.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao6"></div><div class="questao" id="q-7"><p>7- Cumpre as normas, as regras e os regulamentos das legislações vigentes.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao7"></div><div class="questao" id="q-8"><p>8- Respeita a hierarquia, obedecendo fielmente as ordens de seus superiores, desde que legais.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao8"></div><div class="questao" id="q-9"><p>9- Mantem sigilo sobre os assuntos internos da Guarda Municipal ou de matéria confidencial que possam de alguma forma expor o outro.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao9"></div><div class="questao" id="q-10"><p>10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao10"></div></div>
-                <div class="criterio" id="criterio-pontualidade"><h3>PONTUALIDADE</h3><div class="questao" id="q-11"><p>11- Cumpre o horário de trabalho, respeitando o horário de entrada e saída.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="3.0">3,0</div><div class="opcao" data-value="4.0">4,0</div><div class="opcao" data-value="5.0">5,0</div></div><input type="hidden" id="questao11"></div></div>
-                <div class="criterio" id="criterio-assiduidade"><h3>ASSIDUIDADE</h3><div class="questao" id="q-12"><p>12- Comparece regularmente ao local de trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao12"></div><div class="questao" id="q-13"><p>13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao13"></div><div class="questao" id="q-14"><p>14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao14"></div><div class="questao" id="q-15"><p>15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao15"></div><div class="questao" id="q-16"><p>16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao16"></div></div>
-                <div class="criterio" id="criterio-equipamentos"><h3>USO ADEQUADO DOS EQUIPAMENTOS</h3><div class="questao" id="q-17"><p>17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5">0,5</div><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="1.5">1,5</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="2.5">2,5</div></div><input type="hidden" id="questao17"></div><div class="questao" id="q-18"><p>18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5">0,5</div><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="1.5">1,5</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="2.5">2,5</div></div><input type="hidden" id="questao18"></div></div>
+                <div class="criterio" id="criterio-produtividade"><h3>PRODUTIVIDADE E METAS</h3><div class="questao" id="q-1"><p>1- Procura novos conhecimentos que contribuam para o desenvolvimento dos trabalhos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao1"></div><div class="questao" id="q-2"><p>2- Coloca-se à disposição da chefia, espontaneamente, para aprender novas técnicas e auxiliar os colegas.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao2"></div><div class="questao" id="q-3"><p>3- É hábil em identificar e apresentar soluções para os problemas que surjam no trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao3"></div><div class="questao" id="q-4"><p>4- Zela pelo próprio preparo profissional e incentiva os companheiros a fazerem o mesmo, em prol do cumprimento da missão comum.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao4"></div><div class="questao" id="q-5"><p>5- Quando ofertado, participa de cursos, palestras, atividades, dinâmicas que contribuam para o seu desenvolvimento profissional na instituição.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao5"></div></div>
+                <div class="criterio" id="criterio-responsabilidade"><h3>RESPONSABILIDADE</h3><div class="questao" id="q-6"><p>6- É comprometido com o seu trabalho, atuando com prudência, firmeza e efetividade na sua área de responsabilidade.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao6"></div><div class="questao" id="q-7"><p>7- Cumpre as normas, as regras e os regulamentos das legislações vigentes.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao7"></div><div class="questao" id="q-8"><p>8- Respeita a hierarquia, obedecendo fielmente as ordens de seus superiores, desde que legais.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao8"></div><div class="questao" id="q-9"><p>9- Mantem sigilo sobre os assuntos internos da Guarda Municipal ou de matéria confidencial que possam de alguma forma expor o outro.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao9"></div><div class="questao" id="q-10"><p>10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao10"></div></div>
+                <div class="criterio" id="criterio-pontualidade"><h3>PONTUALIDADE</h3><div class="questao" id="q-11"><p>11- Cumpre o horário de trabalho, respeitando o horário de entrada e saída.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="2.0"><span class="valor-numerico">2,0</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="3.0"><span class="valor-numerico">3,0</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="4.0"><span class="valor-numerico">4,0</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="5.0"><span class="valor-numerico">5,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao11"></div></div>
+                <div class="criterio" id="criterio-assiduidade"><h3>ASSIDUIDADE</h3><div class="questao" id="q-12"><p>12- Comparece regularmente ao local de trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao12"></div><div class="questao" id="q-13"><p>13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao13"></div><div class="questao" id="q-14"><p>14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao14"></div><div class="questao" id="q-15"><p>15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao15"></div><div class="questao" id="q-16"><p>16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao16"></div></div>
+                <div class="criterio" id="criterio-equipamentos"><h3>USO ADEQUADO DOS EQUIPAMENTOS</h3><div class="questao" id="q-17"><p>17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5"><span class="valor-numerico">0,5</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="1.5"><span class="valor-numerico">1,5</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="2.0"><span class="valor-numerico">2,0</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="2.5"><span class="valor-numerico">2,5</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao17"></div><div class="questao" id="q-18"><p>18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5"><span class="valor-numerico">0,5</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="1.5"><span class="valor-numerico">1,5</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="2.0"><span class="valor-numerico">2,0</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="2.5"><span class="valor-numerico">2,5</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao18"></div></div>
                 <div class="resumo-pontuacao">
                     <h3>Resumo de Pontuação</h3>
                     <div class="progress-bar"><div id="progressBar" class="progress" style="width: 0%"></div></div>
@@ -287,7 +295,10 @@
             avaliacao: { screen: document.getElementById('avaliacaoScreen'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper') },
             userInfo: document.getElementById('userInfo'),
             userName: document.getElementById('userName'),
-            successModal: { el: document.getElementById('successModal'), message: document.getElementById('successModalMessage'), closeBtn: document.getElementById('successModalClose') }
+            successModal: { el: document.getElementById('successModal'), message: document.getElementById('successModalMessage'), closeBtn: document.getElementById('successModalClose') },
+            reviewModal: document.getElementById('reviewModal'),
+            confirmationModal: document.getElementById('confirmationModal'),
+            infoModal: document.getElementById('infoModal')
         };
 
         let currentUser = null, servidores = [], avaliacoes = [], sortByPending = false;
@@ -299,6 +310,14 @@
         function hideAlert(el) { el.classList.add('hidden'); }
         function showScreen(el) { el.classList.remove('hidden'); }
         function hideScreen(el) { el.classList.add('hidden'); }
+
+        function showModal(modalElement) {
+            modalElement.classList.add('visible');
+        }
+
+        function hideModal(modalElement) {
+            modalElement.classList.remove('visible');
+        }
         
         function applyTheme(theme) {
             if (theme === 'dark') {
@@ -326,6 +345,7 @@
             dom.userName.textContent = currentUser.nome;
             const searchInput = document.getElementById('searchServidor');
             if (searchInput) searchInput.value = '';
+            window.scrollTo(0, 0);
         }
 
         function logout() {
@@ -424,31 +444,25 @@
             dom.avaliacao.stepper.innerHTML = html;
         }
 
-        function updateStepper() {
-            let CriteriosElements = sections.map(s => document.getElementById(`criterio-${s.id}`));
-            let currentSectionId = null;
-
-            for (let i = CriteriosElements.length - 1; i >= 0; i--) {
-                const sectionEl = CriteriosElements[i];
-                if (sectionEl.getBoundingClientRect().top < window.innerHeight / 2) {
-                    currentSectionId = sections[i].id;
-                    break;
+        let observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.id.replace('criterio-', '');
+                const stepEl = document.getElementById(`step-${id}`);
+                document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.criterio.active-criterio').forEach(c => c.classList.remove('active-criterio'));
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active-criterio');
+                    stepEl.classList.add('active');
                 }
-            }
-            
-            sections.forEach(section => {
-                const stepEl = document.getElementById(`step-${section.id}`);
-                const criterioEl = document.getElementById(`criterio-${section.id}`);
-                const inputs = [...criterioEl.querySelectorAll('input[type=hidden]')];
-                const isCompleted = inputs.every(input => input.value);
-
-                stepEl.classList.remove('active', 'completed');
-                if (isCompleted) stepEl.classList.add('completed');
-                if (section.id === currentSectionId) stepEl.classList.add('active');
             });
+        }, { threshold: 0.5 });
+        
+        function setupObservers(){
+            document.querySelectorAll('.criterio').forEach(el => observer.observe(el));
         }
 
         function showAvaliacaoScreen(servidor, avaliacaoExistente) {
+            window.scrollTo(0, 0);
             document.getElementById('avaliadoNome').textContent = servidor.nome; 
             document.getElementById('avaliadoMatricula').textContent = servidor.matricula; 
             document.getElementById('avaliadoLotacao').textContent = servidor.lotacao;
@@ -471,7 +485,7 @@
             calcularPontuacao(); 
             hideScreen(dom.servidores.screen); 
             showScreen(dom.avaliacao.screen);
-            setTimeout(updateStepper, 100);
+            setupObservers();
         }
 
         function calcularPontuacao() {
@@ -548,11 +562,11 @@
                 item.innerHTML = `<p>${questaoTexto}</p><p>Sua nota: <span>${respostaValor.replace('.',',')}</span></p>`;
                 reviewContent.appendChild(item);
             }
-            document.getElementById('reviewModal').style.display = 'flex';
+            showModal(dom.reviewModal);
         }
 
         function submitEvaluation() {
-            document.getElementById('confirmationModal').style.display = 'none';
+            hideModal(dom.confirmationModal);
             const pontuacaoTotal = calcularPontuacao();
             const respostas = {};
             for (let i = 1; i <= 18; i++) {
@@ -570,7 +584,7 @@
                 .then(res => res.json()).then(data => {
                     if (data.success) {
                         dom.successModal.message.innerHTML = `A avaliação de <strong>${avaliacaoData.nomeAvaliado}</strong> foi enviada com sucesso.`;
-                        dom.successModal.el.style.display = 'flex';
+                        showModal(dom.successModal.el);
                     } else { 
                         showAlert(dom.avaliacao.alert, data.error, 'error'); 
                     }
@@ -584,7 +598,7 @@
         
         function showInfoModal(message) {
             document.getElementById('infoModalMessage').textContent = message;
-            document.getElementById('infoModal').style.display = 'flex';
+            showModal(dom.infoModal);
         }
 
         // --- INICIALIZAÇÃO ---
@@ -602,14 +616,14 @@
         document.getElementById('searchServidor').addEventListener('keyup', renderServidores);
         document.getElementById('btnSortStatus').addEventListener('click', function() { sortByPending = !sortByPending; this.classList.toggle('active'); renderServidores(); });
         document.getElementById('modalConfirm').addEventListener('click', submitEvaluation);
-        document.getElementById('modalCancel').addEventListener('click', () => document.getElementById('confirmationModal').style.display = 'none');
-        document.getElementById('infoModalClose').addEventListener('click', () => document.getElementById('infoModal').style.display = 'none');
-        document.getElementById('modalCloseReview').addEventListener('click', () => document.getElementById('reviewModal').style.display = 'none');
+        document.getElementById('modalCancel').addEventListener('click', () => hideModal(dom.confirmationModal));
+        document.getElementById('infoModalClose').addEventListener('click', () => hideModal(dom.infoModal));
+        document.getElementById('modalCloseReview').addEventListener('click', () => hideModal(dom.reviewModal));
         document.getElementById('modalConfirmReview').addEventListener('click', () => {
-            document.getElementById('reviewModal').style.display = 'none';
+            hideModal(dom.reviewModal);
             const pontuacaoTotal = calcularPontuacao();
             document.getElementById('modalScore').textContent = pontuacaoTotal.toFixed(1);
-            document.getElementById('confirmationModal').style.display = 'flex';
+            showModal(dom.confirmationModal);
         });
         dom.login.togglePass.addEventListener('click', () => {
             const isPassword = dom.login.senha.type === 'password';
@@ -618,7 +632,7 @@
             dom.login.togglePass.classList.toggle('fa-eye-slash');
         });
         dom.successModal.closeBtn.addEventListener('click', () => {
-            dom.successModal.el.style.display = 'none';
+            hideModal(dom.successModal.el);
             loadServidores();
             showServidoresScreen();
         });
@@ -633,7 +647,12 @@
                 questaoDiv.classList.add('questao-respondida');
                 questaoDiv.classList.remove('invalid-question');
                 calcularPontuacao();
-                updateStepper();
+
+                const criterioEl = this.closest('.criterio');
+                const inputs = [...criterioEl.querySelectorAll('input[type=hidden]')];
+                const isCompleted = inputs.every(input => input.value);
+                const stepId = criterioEl.id.replace('criterio-','step-');
+                if(isCompleted) document.getElementById(stepId).classList.add('completed');
             });
         });
         
@@ -643,10 +662,6 @@
         });
 
         generateStepper();
-        let formContainer = document.querySelector('.container');
-        formContainer.addEventListener('scroll', updateStepper, { passive: true });
-        window.addEventListener('scroll', updateStepper, { passive: true });
-        
         const savedTheme = localStorage.getItem('theme') || 'light';
         applyTheme(savedTheme);
     });
