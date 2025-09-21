@@ -45,7 +45,8 @@
         .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
         .info-avaliado { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background-color: var(--light); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
         .info-avaliado p { margin: 0; }
-        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; }
+        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out; }
+        .criterio.active-criterio { box-shadow: 0 8px 25px rgba(26, 86, 219, 0.2); border-color: var(--primary); }
         .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
         .questao { padding: 20px; background: white; transition: background-color 0.4s ease, border-left-color 0.4s ease; border-left: 4px solid transparent; }
         .questao + .questao { border-top: 1px solid var(--border-color); }
@@ -53,9 +54,12 @@
         .questao.invalid-question { border-left-color: var(--danger); background-color: #fee2e2; }
         .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
         .opcoes-avaliacao { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
-        .opcao { text-align: center; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; }
+        .opcao { text-align: center; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80px; }
+        .opcao .valor-numerico { font-size: 1.2rem; font-weight: bold; }
+        .opcao .valor-texto { font-size: 0.75rem; color: var(--gray); margin-top: 4px; }
         .opcao:hover { background-color: var(--light); }
         .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .opcao.selecionada .valor-texto { color: white; }
         .declaracao-container { margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 20px; background-color: var(--light); padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
         .declaracao-container.invalid { border-color: var(--danger); }
         .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
@@ -69,8 +73,10 @@
         .instructions-panel h3 { font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .instructions-panel ul { list-style-position: inside; padding-left: 5px; }
         .instructions-panel li + li { margin-top: 5px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; }
-        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.visible { display: flex; opacity: 1; }
+        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-content h3 { color: var(--primary-dark); margin-top: 0; margin-bottom: 15px; }
         .modal-content p { margin-bottom: 25px; font-size: 1.1rem; }
         .modal-content #modalScore { font-weight: bold; font-size: 1.2rem; color: var(--primary); }
@@ -93,6 +99,7 @@
         body.dark-theme .instructions-panel, body.dark-theme .review-container { background-color: var(--light); border-color: var(--primary); color: var(--dark); }
         body.dark-theme .review-item span { color: white; background-color: var(--primary); }
         body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
+        body.dark-theme .opcao.selecionada .valor-texto { color: #f0fdf4; }
         @media (max-width: 768px) {
             .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
             .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
@@ -125,7 +132,8 @@
                 <ul>
                     <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o seu desenvolvimento na carreira, sendo critério para promoção e progressão.</li>
                     <li><strong>Período para Avaliar:</strong> Sua autoavaliação estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
-                    <li><strong>Seja Honesto(a) e Criterioso(a):</strong> Esta é uma oportunidade para refletir sobre seu próprio desempenho. Suas respostas devem ser sinceras e baseadas em suas atividades diárias.</li>
+                    <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias do prazo. Caso o sistema apresente lentidão ou erro, por favor, tente novamente em um horário de menor movimento antes de acionar o suporte. Agradecemos a compreensão.</li>
+                    <li><strong>Seja Honesto(a) e Criterioso(a):</strong> Esta é uma oportunidade para refletir sobre seu próprio desempenho. Suas respostas devem ser sinceras e baseadas em suas atividades diárias. Lembre-se que o resultado final será homologado por sua chefia.</li>
                     <li><strong>Avalie-se com Calma:</strong> Você possui tempo hábil para preencher sua avaliação. Não é uma maratona! O sistema estará disponível durante todo o cronograma.</li>
                     <li><strong>Revisão Final:</strong> Antes de finalizar, uma tela de revisão será exibida. Confira todas as suas respostas com atenção, pois o envio é definitivo.</li>
                     <li><strong>Ação Definitiva:</strong> Lembre-se, sua autoavaliação, uma vez enviada, <strong>não poderá ser editada</strong>.</li>
@@ -236,13 +244,19 @@
             };
         
             const sections = [
-                { id: 'produtividade', title: 'Produtividade', questions: [ { id: 'c1', text: '1- Procura novos conhecimentos visando o aperfeiçoamento profissional e a melhoria contínua dos processos de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c2', text: '2- Coloca-se à disposição da chefia e dos demais colegas para a realização de novas tarefas, além das suas atribuições de rotina.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c3', text: '3- É hábil em identificar soluções para problemas e/ou situações inusitadas, em tempo hábil.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c4', text: '4- Zela pelo preparo profissional, mantendo os conhecimentos e a aptidão física e mental em níveis adequados ao exercício da função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c5', text: '5- Participa de cursos e atividades de aperfeiçoamento ou atualização profissional, dentro ou fora do serviço.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'responsabilidade', title: 'Responsabilidade', questions: [ { id: 'c6', text: '6- É comprometido com seu trabalho, cumprindo suas tarefas com qualidade, nos prazos estabelecidos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c7', text: '7- Cumpre normas e regulamentos estabelecidos, inclusive quanto ao uso dos uniformes e equipamentos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c8', text: '8- Respeita a hierarquia, a disciplina, a cooperação, o espírito de corpo e a lealdade para com a instituição.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c9', text: '9- Mantém sigilo sobre assuntos internos da Instituição dos quais tenha conhecimento em razão do cargo ou função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c10', text: '10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'pontualidade', title: 'Pontualidade', questions: [ { id: 'c11', text: '11- Cumpre o horário de trabalho, evitando atrasos na chegada e na saída para o intervalo.', values: ['1.0', '2.0', '3.0', '4.0', '5.0'] } ] },
-                { id: 'assiduidade', title: 'Assiduidade', questions: [ { id: 'c12', text: '12- Comparece regularmente ao local de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c13', text: '13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c14', text: '14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c15', text: '15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c16', text: '16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'equipamentos', title: 'Equipamentos', questions: [ { id: 'c17', text: '17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] }, { id: 'c18', text: '18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] } ] }
+                { id: 'produtividade', title: 'Produtividade', scaleType: 'A', questions: [ { id: 'c1', text: '1- Procura novos conhecimentos visando o aperfeiçoamento profissional e a melhoria contínua dos processos de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c2', text: '2- Coloca-se à disposição da chefia e dos demais colegas para a realização de novas tarefas, além das suas atribuições de rotina.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c3', text: '3- É hábil em identificar soluções para problemas e/ou situações inusitadas, em tempo hábil.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c4', text: '4- Zela pelo preparo profissional, mantendo os conhecimentos e a aptidão física e mental em níveis adequados ao exercício da função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c5', text: '5- Participa de cursos e atividades de aperfeiçoamento ou atualização profissional, dentro ou fora do serviço.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
+                { id: 'responsabilidade', title: 'Responsabilidade', scaleType: 'A', questions: [ { id: 'c6', text: '6- É comprometido com seu trabalho, cumprindo suas tarefas com qualidade, nos prazos estabelecidos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c7', text: '7- Cumpre normas e regulamentos estabelecidos, inclusive quanto ao uso dos uniformes e equipamentos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c8', text: '8- Respeita a hierarquia, a disciplina, a cooperação, o espírito de corpo e a lealdade para com a instituição.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c9', text: '9- Mantém sigilo sobre assuntos internos da Instituição dos quais tenha conhecimento em razão do cargo ou função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c10', text: '10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
+                { id: 'pontualidade', title: 'Pontualidade', scaleType: 'B', questions: [ { id: 'c11', text: '11- Cumpre o horário de trabalho, evitando atrasos na chegada e na saída para o intervalo.', values: ['1.0', '2.0', '3.0', '4.0', '5.0'] } ] },
+                { id: 'assiduidade', title: 'Assiduidade', scaleType: 'A', questions: [ { id: 'c12', text: '12- Comparece regularmente ao local de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c13', text: '13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c14', text: '14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c15', text: '15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c16', text: '16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
+                { id: 'equipamentos', title: 'Equipamentos', scaleType: 'C', questions: [ { id: 'c17', text: '17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] }, { id: 'c18', text: '18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] } ] }
             ];
             const TOTAL_QUESTIONS = sections.reduce((acc, section) => acc + section.questions.length, 0);
+
+            const scaleLabels = {
+                A: ['Abaixo do Esperado', 'Regular', 'Bom', 'Muito Bom', 'Excelente'],
+                B: ['Abaixo do Esperado', 'Regular', 'Bom', 'Muito Bom', 'Excelente'],
+                C: ['Abaixo do Esperado', 'Regular', 'Bom', 'Muito Bom', 'Excelente']
+            };
         
             const dom = {
                 login: { section: document.getElementById('loginSection'), user: document.getElementById('username'), pass: document.getElementById('password'), button: document.getElementById('loginButton'), alert: document.getElementById('loginAlert'), togglePass: document.getElementById('togglePassword') },
@@ -267,7 +281,14 @@
                     html += `<div class="criterio" id="criterio-${section.id}"><h3>${section.title}</h3>`;
                     section.questions.forEach(q => {
                         html += `<div class="questao" id="questao-${q.id}"><p>${q.text}</p><div class="opcoes-avaliacao">`;
-                        q.values.forEach(val => { html += `<div class="opcao" data-value="${val}">${val.replace('.',',')}</div>`; });
+                        const labels = scaleLabels[section.scaleType];
+                        q.values.forEach((val, index) => { 
+                            const label = labels[index] || '';
+                            html += `<div class="opcao" data-value="${val}">
+                                        <span class="valor-numerico">${val.replace('.',',')}</span>
+                                        <span class="valor-texto">${label}</span>
+                                     </div>`; 
+                        });
                         html += `</div><input type="hidden" id="${q.id}"></div>`;
                     });
                     html += `</div>`;
@@ -287,34 +308,21 @@
                 dom.eval.stepper.innerHTML = html;
             }
 
-            function updateStepper() {
-                let CriteriosElements = sections.map(s => document.getElementById(`criterio-${s.id}`));
-                let currentSectionId = null;
-
-                // Find the current active section based on scroll position
-                for (let i = CriteriosElements.length - 1; i >= 0; i--) {
-                    const sectionEl = CriteriosElements[i];
-                    if (sectionEl.getBoundingClientRect().top < window.innerHeight / 2) {
-                        currentSectionId = sections[i].id;
-                        break;
-                    }
-                }
-                
-                // Update classes for all steps
-                sections.forEach(section => {
-                    const stepEl = document.getElementById(`step-${section.id}`);
-                    const criterioEl = document.getElementById(`criterio-${section.id}`);
-                    const inputs = [...criterioEl.querySelectorAll('input[type=hidden]')];
-                    const isCompleted = inputs.every(input => input.value);
-
-                    stepEl.classList.remove('active', 'completed');
-                    if (isCompleted) {
-                        stepEl.classList.add('completed');
-                    }
-                    if (section.id === currentSectionId) {
+            let observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const id = entry.target.id.replace('criterio-', '');
+                    const stepEl = document.getElementById(`step-${id}`);
+                    document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
+                    document.querySelectorAll('.criterio.active-criterio').forEach(c => c.classList.remove('active-criterio'));
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active-criterio');
                         stepEl.classList.add('active');
                     }
                 });
+            }, { threshold: 0.5 });
+
+            function setupObservers() {
+                document.querySelectorAll('.criterio').forEach(el => observer.observe(el));
             }
             
             function addOptionListeners() {
@@ -331,14 +339,25 @@
                         this.classList.add('selecionada');
                         if(questaoDiv) questaoDiv.classList.add('questao-respondida');
                         calculateScore();
-                        updateStepper();
+                        
+                        const criterioEl = this.closest('.criterio');
+                        const inputs = [...criterioEl.querySelectorAll('input[type=hidden]')];
+                        const isCompleted = inputs.every(input => input.value);
+                        const stepId = criterioEl.id.replace('criterio-','step-');
+                        if(isCompleted) document.getElementById(stepId).classList.add('completed');
+
                     });
                 });
             }
         
             function showSection(sectionToShow) {
                 [dom.login.section, dom.eval.section, dom.success.section, dom.submitted.section].forEach(s => s.classList.add('hidden'));
-                if (sectionToShow) sectionToShow.classList.remove('hidden');
+                if (sectionToShow) {
+                    sectionToShow.classList.remove('hidden');
+                    if (sectionToShow.id === 'evaluationSection') {
+                        setupObservers();
+                    }
+                }
                 
                 const mainUserInfo = document.getElementById('userInfo');
                 if (sectionToShow !== dom.login.section) {
@@ -361,7 +380,7 @@
                         currentUser = result.user;
                         populateUserInfo(currentUser);
                         showSection(dom.eval.section);
-                        setTimeout(updateStepper, 100); // Initial call
+                        window.scrollTo(0, 0);
                     } else {
                         if(result.error === 'ALREADY_SUBMITTED') showSection(dom.submitted.section);
                         else showAlert(dom.login.alert, result.error, 'error');
@@ -384,6 +403,14 @@
                 showReview();
             }
 
+            function showModal(modalElement) {
+                modalElement.classList.add('visible');
+            }
+
+            function hideModal(modalElement) {
+                modalElement.classList.remove('visible');
+            }
+
             function showReview() {
                 const reviewContent = document.getElementById('reviewContent');
                 reviewContent.innerHTML = ''; 
@@ -404,11 +431,11 @@
                         }
                     });
                 });
-                dom.modal.review.style.display = 'flex';
+                showModal(dom.modal.review);
             }
 
             async function submitEvaluation() {
-                dom.modal.confirmation.style.display = 'none';
+                hideModal(dom.modal.confirmation);
                 const totalScore = calculateScore();
                 const btn = dom.eval.sendButton;
                 btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
@@ -490,7 +517,7 @@
 
                 if (percentage < 64) {
                     dom.progressBar.style.backgroundColor = 'var(--danger)';
-                    dom.faixaDesempenho.textContent = "Abaixo do esperado";
+                    dom.faixaDesempenho.textContent = "Abaixo do Esperado";
                 } else if (percentage < 80) {
                     dom.progressBar.style.backgroundColor = 'var(--primary)';
                     dom.faixaDesempenho.textContent = "Regular";
@@ -563,22 +590,17 @@
             dom.login.button.addEventListener("click", login);
             dom.eval.sendButton.addEventListener("click", handleSendEvaluation);
             dom.modal.confirmBtn.addEventListener("click", submitEvaluation);
-            dom.modal.cancelBtn.addEventListener("click", () => dom.modal.confirmation.style.display = 'none');
-            dom.modal.closeReviewBtn.addEventListener('click', () => dom.modal.review.style.display = 'none');
+            dom.modal.cancelBtn.addEventListener("click", () => hideModal(dom.modal.confirmation));
+            dom.modal.closeReviewBtn.addEventListener('click', () => hideModal(dom.modal.review));
             dom.modal.confirmReviewBtn.addEventListener('click', () => {
-                dom.modal.review.style.display = 'none';
+                hideModal(dom.modal.review);
                 const totalScore = calculateScore();
                 dom.modal.score.textContent = totalScore.toString().replace('.', ',');
-                dom.modal.confirmation.style.display = 'flex';
+                showModal(dom.modal.confirmation);
             });
             [dom.logoutButtonEval, dom.success.logoutButton, dom.submitted.logoutButton, document.getElementById('btnLogout')].forEach(btn => {
                 if(btn) btn.addEventListener('click', logout)
             });
-            
-            // Add scroll listener for stepper
-            let formContainer = document.querySelector('.container');
-            formContainer.addEventListener('scroll', updateStepper, { passive: true });
-            window.addEventListener('scroll', updateStepper, { passive: true });
 
             showSection(dom.login.section);
             calculateScore();
@@ -586,4 +608,3 @@
     </script>
 </body>
 </html>
-
