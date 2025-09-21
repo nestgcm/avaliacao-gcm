@@ -2,15 +2,14 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Avaliação de Desempenho - GCM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Avaliação de Desempenho Realizado pela Chefia da GUARDA CIVIL MUNICIPAL DE SALVADOR</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         :root {
-            --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71; 
-            --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937; 
-            --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444; 
+            --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71;
+            --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937;
+            --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444;
             --warning: #f59e0b; --gray: #6b7280; --border-color: #e5e7eb;
             --border-radius: 8px; --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -34,48 +33,67 @@
         .btn-secondary { background-color: var(--gray); color: white; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 16px; transition: all 0.3s ease; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 16px; }
         .password-wrapper { position: relative; }
         .password-wrapper input { padding-right: 45px; }
         .password-wrapper i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--gray); }
-        .alert { padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; }
-        .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-error { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-        .alert-warning { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .toolbar { display: flex; gap: 15px; margin-top: 15px; margin-bottom: 15px; }
+        .search-container { position: relative; flex-grow: 1; }
+        .search-container input { padding-left: 35px; }
+        .search-container .fa-search { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray); }
+        .btn-sort { background-color: #fff; color: var(--primary); border: 1px solid var(--primary); }
+        .btn-sort.active { background-color: var(--primary); color: #fff; }
+        .servidores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .servidor-card { border: 1px solid #e5e7eb; border-radius: var(--border-radius); padding: 15px; cursor: pointer; transition: all 0.3s; }
+        .servidor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+        .servidor-card.concluido { background-color: #f9fafb; cursor: not-allowed; }
+        .servidor-card.concluido:hover { transform: none; box-shadow: none; }
+        .servidor-card h3 { color: var(--primary); margin-bottom: 10px; }
+        .servidor-card.concluido h3 { color: var(--gray); }
+        .servidor-info { font-size: 0.9rem; color: var(--gray); }
+        .status-badge { margin-top: 10px; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; display: inline-block; }
+        .status-pendente { background-color: #fef3c7; color: #92400e; }
+        .status-concluido { background-color: #d1fae5; color: #065f46; }
         .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
-        .info-avaliado { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background-color: var(--light); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
-        .info-avaliado p { margin: 0; }
         .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; }
         .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
-        .questao { padding: 20px; background: white; transition: background-color 0.4s ease, border-left-color 0.4s ease; border-left: 4px solid transparent; }
+        .questao { padding: 20px; background: white; transition: all 0.4s ease; border-left: 4px solid transparent; }
         .questao + .questao { border-top: 1px solid var(--border-color); }
-        .questao p { margin-bottom: 15px; }
-        .questao.invalid-question { border-left-color: var(--danger); background-color: #fee2e2; }
         .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
+        .questao.invalid-question { background-color: #fee2e2; border-left-color: var(--danger); }
         .opcoes-avaliacao { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
-        .opcao { text-align: center; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; }
-        .opcao:hover { background-color: var(--light); }
+        .opcao { text-align: center; padding: 10px; border: 1px solid #e5e7eb; border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; }
+        .opcao:hover { background-color: #f9fafb; }
         .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
-        .declaracao-container { margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 20px; background-color: var(--light); padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
-        .declaracao-container.invalid { border-color: var(--danger); }
+        .declaracao-container { margin-top: 30px; border-top: 2px solid #e5e7eb; padding-top: 20px; background-color: #f9fafb; padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
+        .declaracao-container.invalid-question { border-color: var(--danger); }
         .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
         .declaracao-box input[type="checkbox"] { width: auto; margin-top: 5px; flex-shrink: 0; }
         .declaracao-box label { font-weight: normal; font-style: italic; color: var(--gray); line-height: 1.5; }
         .declaracao-box label strong { font-style: normal; color: var(--dark); }
-        .resumo-pontuacao { background-color: var(--primary-light); padding: 15px; border-radius: var(--border-radius); margin: 20px 0; border: 1px solid var(--primary); }
-        .progress-bar { height: 10px; background-color: var(--border-color); border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .alert { padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; }
+        .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-error { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .resumo-pontuacao { background-color: #eff6ff; padding: 15px; border-radius: var(--border-radius); margin: 20px 0; }
+        .progress-bar { height: 10px; background-color: #e5e7eb; border-radius: 5px; margin: 10px 0; overflow: hidden; }
         .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: all 0.5s ease; }
         .instructions-panel { background-color: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 15px; margin-bottom: 20px; color: var(--primary-dark); }
         .instructions-panel h3 { font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .instructions-panel ul { list-style-position: inside; padding-left: 5px; }
         .instructions-panel li + li { margin-top: 5px; }
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .stat-card { background-color: #f3f4f6; border-radius: var(--border-radius); padding: 15px; text-align: center; border-left: 5px solid var(--gray); }
+        .stat-card h4 { font-size: 0.9rem; color: var(--gray); margin-bottom: 5px; }
+        .stat-card p { font-size: 2rem; font-weight: 600; color: var(--dark); }
+        .stat-card.stat-success { border-left-color: var(--success); }
+        .stat-card.stat-warning { border-left-color: var(--warning); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; }
         .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; }
         .modal-content h3 { color: var(--primary-dark); margin-top: 0; margin-bottom: 15px; }
         .modal-content p { margin-bottom: 25px; font-size: 1.1rem; }
         .modal-content #modalScore { font-weight: bold; font-size: 1.2rem; color: var(--primary); }
         .modal-buttons { display: flex; justify-content: center; gap: 15px; }
-        .review-container { max-height: 40vh; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 15px; background-color: #f9fafb; text-align: left; }
+        .review-container { max-height: 40vh; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 15px; background-color: #f9fafb; }
         .review-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
         .review-item:last-child { border-bottom: none; }
         .review-item p { margin: 0; font-size: 0.9rem; }
@@ -88,25 +106,28 @@
         .step.completed .step-icon { border-color: var(--success); background-color: var(--success); color: white; }
         .step-label { font-size: 0.75rem; }
         body.dark-theme { --light: #34495e; --dark: #ecf0f1; --border-color: #4a627a; background-color: #2c3e50; }
-        body.dark-theme .card, body.dark-theme .modal-content, body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .info-avaliado, body.dark-theme .declaracao-container, body.dark-theme .resumo-pontuacao, body.dark-theme .stepper-container { background-color: #2c3e50; border-color: var(--border-color); }
-        body.dark-theme input, body.dark-theme select, body.dark-theme textarea { background-color: #34495e; border-color: #4a627a; color: var(--dark); }
-        body.dark-theme .instructions-panel, body.dark-theme .review-container { background-color: var(--light); border-color: var(--primary); color: var(--dark); }
+        body.dark-theme .card, body.dark-theme .modal-content { background-color: #2c3e50; border: 1px solid var(--border-color); }
+        body.dark-theme .servidor-card:not(.concluido):hover { background-color: #34495e; }
+        body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .declaracao-container, body.dark-theme .servidor-card.concluido, body.dark-theme .stepper-container { background-color: #2c3e50; border-color: var(--border-color); }
+        body.dark-theme input, body.dark-theme select, body.dark-theme textarea, body.dark-theme .opcao:hover { background-color: #34495e; border-color: #4a627a; color: var(--dark); }
+        body.dark-theme .status-pendente { background-color: #8e44ad; color: white; }
+        body.dark-theme .status-concluido { background-color: #27ae60; color: white; }
+        body.dark-theme .instructions-panel, body.dark-theme .stat-card, body.dark-theme .review-container { background-color: var(--light); border-color: var(--primary); color: var(--dark); }
+        body.dark-theme .stat-card p { color: var(--dark); }
         body.dark-theme .review-item span { color: white; background-color: var(--primary); }
         body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
         @media (max-width: 768px) {
+            .servidores-grid { grid-template-columns: 1fr; }
             .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
             .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
-            .info-avaliado { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container header-content">
-            <div class="logo">
-                <i class="fas fa-shield-alt fa-2x"></i>
-                <h1>Sistema de Avaliação de Desempenho - AutoAvaliação - GCM Salvador</h1>
-            </div>
+            <div class="logo"><i class="fas fa-shield-alt fa-2x"></i><h1>Sistema de Avaliação Desempenho - Avaliação da Chefia - GCM Salvador</h1></div>
             <div id="userInfo" class="user-info hidden">
                 <span id="userName"></span>
                 <button id="themeToggle" class="btn btn-secondary" style="background-color: transparent; border: 1px solid white;">
@@ -118,97 +139,98 @@
     </header>
 
     <div class="container">
-        <div id="loginSection" class="card">
+        <div id="loginScreen" class="card">
             <h2>Acesso Restrito</h2>
             <div class="instructions-panel">
-                <h3><i class="fas fa-info-circle"></i> Orientações sobre a Autoavaliação</h3>
+                <h3><i class="fas fa-info-circle"></i> Orientações sobre a Avaliação de Chefia</h3>
                 <ul>
-                    <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o seu desenvolvimento na carreira, sendo critério para promoção e progressão.</li>
-                    <li><strong>Período para Avaliar:</strong> Sua autoavaliação estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
-                    <li><strong>Seja Honesto(a) e Criterioso(a):</strong> Esta é uma oportunidade para refletir sobre seu próprio desempenho. Suas respostas devem ser sinceras e baseadas em suas atividades diárias. Lembre-se que o resultado final será homologado por sua chefia.</li>
-                    <li><strong>Avalie-se com Calma:</strong> Você possui tempo hábil para preencher sua avaliação. Não é uma maratona! O sistema estará disponível durante todo o cronograma.</li>
-                    <li><strong>Revisão Final:</strong> Antes de finalizar, uma tela de revisão será exibida. Confira todas as suas respostas com atenção, pois o envio é definitivo.</li>
-                    <li><strong>Ação Definitiva:</strong> Lembre-se, sua autoavaliação, uma vez enviada, <strong>não poderá ser editada</strong>.</li>
-                    <li><strong>Propósito da Autoavaliação:</strong> Esta ferramenta visa o seu autoconhecimento e desenvolvimento profissional. Suas respostas são o primeiro passo do processo avaliativo.</li>
-                    <li><strong>Publicação do Resultado:</strong> Para garantir a transparência do processo, o resultado final da avaliação (após análise da chefia e possíveis recursos) será publicado em Diário Oficial do Município, conforme o <strong>Art. 43 da Lei nº 9.640/2022</strong>.</li>
+                    <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o desenvolvimento na carreira dos servidores, sendo critério para promoção, progressão ou ambas.</li>
+                    <li><strong>Período para Avaliar:</strong> A avaliação dos servidores da sua equipe estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
+                    <li><strong>Justificativa das Notas:</strong> A avaliação é um ato de gestão que requer critério e justiça. Esteja preparado para fundamentar as notas atribuídas, pois conforme o <strong>Art. 45</strong> da mesma lei, o servidor avaliado terá o direito de solicitar reconsideração do resultado final.</li>
+                    <li><strong>Avalie com Calma:</strong> Você possui tempo hábil para avaliar todos os seus subordinados. Não é uma maratona! O sistema estará disponível durante todo o cronograma.</li>
+                    <li><strong>Revisão Final:</strong> Antes de finalizar cada avaliação, uma tela de revisão será exibida. Confira todas as respostas com atenção nesta etapa, pois o envio é definitivo.</li>
+                    <li><strong>Ação Definitiva:</strong> Lembre-se, uma avaliação enviada <strong>não poderá ser editada</strong>.</li>
+                    <li><strong>Propósito e Sigilo:</strong> Esta avaliação é uma ferramenta para o desenvolvimento profissional. As respostas são confidenciais e serão tratadas com total respeito, exceto em caso de pedido de reconsideração formal por parte do servidor.</li>
+                    <li><strong>Publicação do Resultado:</strong> Para garantir a transparência do processo, o resultado final da avaliação será publicado em Diário Oficial do Município, conforme o cronograma e o princípio da publicidade (<strong>Art. 43 da Lei nº 9.640/2022</strong>).</li>
                     <li><strong>Suporte:</strong> Em caso de dúvidas sobre o processo, entre em contato com o setor responsável.</li>
                 </ul>
             </div>
             <div id="loginAlert" class="alert alert-error hidden"></div>
+            <div class="form-group"><label for="matricula">Matrícula:</label><input type="text" id="matricula" placeholder="Digite sua matrícula SIGP"></div>
             <div class="form-group">
-                <label for="username">Matrícula:</label>
-                <input type="text" id="username" placeholder="Digite sua matrícula SIGP">
-            </div>
-            <div class="form-group">
-                <label for="password">Senha (CPF Somente Números):</label>
+                <label for="senha">Senha (CPF Somente Números):</label>
                 <div class="password-wrapper">
-                    <input type="password" id="password" placeholder="Digite seu CPF (apenas números)">
+                    <input type="password" id="senha" placeholder="Digite seu CPF (apenas números)">
                     <i class="fas fa-eye" id="togglePassword"></i>
                 </div>
             </div>
-            <button id="loginButton" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+            <button id="btnLogin" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Entrar</button>
         </div>
 
-        <div id="evaluationSection" class="card avaliacao-form hidden">
+        <div id="servidoresScreen" class="card hidden">
             <div class="card-header">
-                <h2>Avaliação de Desempenho - <span id="anoAvaliacao"></span></h2>
-                <button id="logoutButtonEval" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                <div>
+                    <h2>Servidores sob sua supervisão</h2>
+                    <p>Selecione um servidor para iniciar a avaliação.</p>
+                </div>
+                <div id="progressoContador" class="resumo-pontuacao" style="margin: 0; padding: 10px;"></div>
             </div>
-            
-            <div id="stepper" class="stepper-container"></div>
-            
-            <div class="info-avaliado">
-                <p><b>Nome:</b> <strong id="nome"></strong></p>
-                <p><b>Matrícula:</b> <strong id="matricula"></strong></p>
-                <p><b>Admissão:</b> <strong id="admissao"></strong></p>
-                <p><b>Graduação:</b> <strong id="posto"></strong></p>
-                <p><b>Cargo:</b> <strong id="cargo"></strong></p>
-                <p><b>Lotação:</b> <strong id="lotacao"></strong></p>
-            </div>
-            <div id="avaliacaoAlert" class="alert alert-error hidden"></div>
-            <form id="formAvaliacao"></form>
-            <div class="resumo-pontuacao">
-                <h3>Resumo de Pontuação</h3>
-                <div class="progress-bar"><div id="progressBar" class="progress" style="width: 0%"></div></div>
-                <p>Pontuação Atual: <strong id="pontuacaoAtual">0,0 / 25 pts</strong></p>
-                <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
-            </div>
-            <div class="declaracao-container" id="declarationBox">
-                <h3>Declaração de Veracidade</h3>
-                <div class="declaracao-box">
-                    <input type="checkbox" id="declaracaoCiente">
-                    <label for="declaracaoCiente">
-                        Eu, <strong><span id="nomeDeclaracao"></span></strong>, matrícula nº <strong><span id="matriculaDeclaracao"></span></strong>, 
-                        declaro, sob minha responsabilidade, que todas as informações prestadas nesta avaliação são verdadeiras e correspondem à realidade.
-                    </label>
+            <div id="dashboard" style="margin-bottom: 25px;">
+                <div class="dashboard-stats">
+                    <div class="stat-card"><h4>Total de Servidores</h4><p id="statTotal">0</p></div>
+                    <div class="stat-card stat-success"><h4>Avaliados</h4><p id="statAvaliados">0</p></div>
+                    <div class="stat-card stat-warning"><h4>Pendentes</h4><p id="statPendentes">0</p></div>
                 </div>
             </div>
-            <div style="margin-top: 30px;">
-                <button type="button" id="sendButton" class="btn btn-success"><i class="fas fa-check-circle"></i> Enviar Avaliação</button>
+            <div class="toolbar">
+                <div class="search-container"><i class="fas fa-search"></i><input type="text" id="searchServidor" placeholder="Pesquisar por nome ou matrícula..."></div>
+                <button id="btnSortStatus" class="btn btn-sort"><i class="fas fa-filter"></i> Ordenar por Pendentes</button>
             </div>
+            <div id="servidoresList" class="servidores-grid"></div>
         </div>
 
-        <div id="successSection" class="card hidden">
-             <div class="alert alert-success"><h2>Avaliação Enviada com Sucesso!</h2></div>
-            <p>Sua auto-avaliação foi registrada em nosso sistema.</p>
-            <p><strong>Pontuação Final:</strong> <span id="finalScore"></span></p>
-            <p>Você pode baixar uma cópia do seu comprovante em PDF.</p>
-            <a href="#" id="pdfLink" target="_blank" class="btn btn-primary" style="text-decoration: none;"><i class="fas fa-file-pdf"></i> Baixar Comprovante</a>
-            <button id="logoutButtonSuccess" class="btn btn-secondary">Sair</button>
-        </div>
+        <div id="avaliacaoScreen" class="card avaliacao-form hidden">
+            <div class="card-header"><h2>Avaliação de Desempenho</h2><button id="btnVoltarLista" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Voltar</button></div>
+            
+            <div id="stepper" class="stepper-container"></div>
 
-        <div id="alreadySubmittedSection" class="card hidden">
-            <div class="alert alert-warning"><h2>Avaliação já Concluída</h2></div>
-            <p>Nosso sistema indica que você já enviou sua auto-avaliação para o período atual.</p>
-            <p>Em caso de dúvidas, entre em contato com o setor responsável.</p>
-            <button id="logoutButtonSubmitted" class="btn btn-secondary">Sair</button>
+            <div style="margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px;">
+                <p><b>Avaliado:</b> <strong id="avaliadoNome"></strong></p>
+                <p><b>Matrícula:</b> <strong id="avaliadoMatricula"></strong></p>
+                <p><b>Lotação:</b> <strong id="avaliadoLotacao"></strong></p>
+            </div>
+            <div id="avaliacaoAlert" class="alert alert-error hidden"></div>
+            <form id="formAvaliacao">
+                <input type="hidden" id="matriculaAvaliado"><input type="hidden" id="nomeAvaliado">
+                <div class="criterio" id="criterio-produtividade"><h3>PRODUTIVIDADE E METAS</h3><div class="questao" id="q-1"><p>1- Procura novos conhecimentos que contribuam para o desenvolvimento dos trabalhos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao1"></div><div class="questao" id="q-2"><p>2- Coloca-se à disposição da chefia, espontaneamente, para aprender novas técnicas e auxiliar os colegas.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao2"></div><div class="questao" id="q-3"><p>3- É hábil em identificar e apresentar soluções para os problemas que surjam no trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao3"></div><div class="questao" id="q-4"><p>4- Zela pelo próprio preparo profissional e incentiva os companheiros a fazerem o mesmo, em prol do cumprimento da missão comum.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao4"></div><div class="questao" id="q-5"><p>5- Quando ofertado, participa de cursos, palestras, atividades, dinâmicas que contribuam para o seu desenvolvimento profissional na instituição.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao5"></div></div>
+                <div class="criterio" id="criterio-responsabilidade"><h3>RESPONSABILIDADE</h3><div class="questao" id="q-6"><p>6- É comprometido com o seu trabalho, atuando com prudência, firmeza e efetividade na sua área de responsabilidade.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao6"></div><div class="questao" id="q-7"><p>7- Cumpre as normas, as regras e os regulamentos das legislações vigentes.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao7"></div><div class="questao" id="q-8"><p>8- Respeita a hierarquia, obedecendo fielmente as ordens de seus superiores, desde que legais.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao8"></div><div class="questao" id="q-9"><p>9- Mantem sigilo sobre os assuntos internos da Guarda Municipal ou de matéria confidencial que possam de alguma forma expor o outro.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao9"></div><div class="questao" id="q-10"><p>10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao10"></div></div>
+                <div class="criterio" id="criterio-pontualidade"><h3>PONTUALIDADE</h3><div class="questao" id="q-11"><p>11- Cumpre o horário de trabalho, respeitando o horário de entrada e saída.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="3.0">3,0</div><div class="opcao" data-value="4.0">4,0</div><div class="opcao" data-value="5.0">5,0</div></div><input type="hidden" id="questao11"></div></div>
+                <div class="criterio" id="criterio-assiduidade"><h3>ASSIDUIDADE</h3><div class="questao" id="q-12"><p>12- Comparece regularmente ao local de trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao12"></div><div class="questao" id="q-13"><p>13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao13"></div><div class="questao" id="q-14"><p>14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao14"></div><div class="questao" id="q-15"><p>15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao15"></div><div class="questao" id="q-16"><p>16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2">0,2</div><div class="opcao" data-value="0.4">0,4</div><div class="opcao" data-value="0.6">0,6</div><div class="opcao" data-value="0.8">0,8</div><div class="opcao" data-value="1.0">1,0</div></div><input type="hidden" id="questao16"></div></div>
+                <div class="criterio" id="criterio-equipamentos"><h3>USO ADEQUADO DOS EQUIPAMENTOS</h3><div class="questao" id="q-17"><p>17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5">0,5</div><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="1.5">1,5</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="2.5">2,5</div></div><input type="hidden" id="questao17"></div><div class="questao" id="q-18"><p>18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5">0,5</div><div class="opcao" data-value="1.0">1,0</div><div class="opcao" data-value="1.5">1,5</div><div class="opcao" data-value="2.0">2,0</div><div class="opcao" data-value="2.5">2,5</div></div><input type="hidden" id="questao18"></div></div>
+                <div class="resumo-pontuacao">
+                    <h3>Resumo de Pontuação</h3>
+                    <div class="progress-bar"><div id="progressBar" class="progress" style="width: 0%"></div></div>
+                    <p>Pontuação Atual: <strong id="pontuacaoAtual">0.0</strong> pts</p>
+                    <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
+                </div>
+                <div class="declaracao-container">
+                    <h3>Declaração de Veracidade</h3>
+                    <div class="declaracao-box">
+                        <input type="checkbox" id="checkDeclaracao">
+                        <label for="checkDeclaracao">
+                            Eu, <strong><span id="declaracaoNome"></span></strong>, matrícula nº <strong><span id="declaracaoMatricula"></span></strong>, 
+                            declaro sob as penas da lei que as informações prestadas nesta avaliação do servidor <strong><span id="declaracaoNomeAvaliado"></span></strong>, matrícula nº <strong><span id="declaracaoMatriculaAvaliado"></span></strong>, são verdadeiras e correspondem à minha justa observação de seu desempenho.
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top: 30px;"><button type="submit" id="btnSalvarAvaliacao" class="btn btn-success"><i class="fas fa-check-circle"></i> Finalizar Avaliação</button></div>
+            </form>
         </div>
     </div>
-    
     <div id="reviewModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-content" style="max-width: 700px; text-align: left;">
             <h3>Revisão Final da Avaliação</h3>
-            <p>Confira suas respostas. Após o envio, a avaliação não poderá ser alterada.</p>
+            <p>Por favor, confira todas as respostas abaixo. Após a confirmação, a avaliação não poderá ser alterada.</p>
             <div id="reviewContent" class="review-container"></div>
             <div class="modal-buttons" style="margin-top: 20px;">
                 <button id="modalCloseReview" class="btn btn-secondary"><i class="fas fa-edit"></i> Voltar e Corrigir</button>
@@ -216,373 +238,418 @@
             </div>
         </div>
     </div>
-
     <div id="confirmationModal" class="modal-overlay">
         <div class="modal-content">
             <h3>Confirmar Envio</h3>
-            <p>Sua pontuação final calculada é de <span id="modalScore"></span> pontos.</p>
-            <p>Deseja confirmar o envio da sua avaliação?</p>
+            <p>A pontuação final do servidor é de <span id="modalScore"></span> pontos.</p>
+            <p>Deseja confirmar o envio desta avaliação?</p>
             <div class="modal-buttons">
                 <button id="modalCancel" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
                 <button id="modalConfirm" class="btn btn-success"><i class="fas fa-check"></i> Confirmar Envio</button>
             </div>
         </div>
     </div>
-
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <i class="fas fa-check-circle" style="color: var(--success); font-size: 3rem; margin-bottom: 15px;"></i>
+            <h3>Avaliação Enviada!</h3>
+            <p id="successModalMessage"></p>
+            <div class="modal-buttons">
+                <button id="successModalClose" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Atenção</h3>
+            <p id="infoModalMessage"></p>
+            <div class="modal-buttons">
+                <button id="infoModalClose" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const config = {
-                WEBAPP_URL: "https://script.google.com/macros/s/AKfycby8hpyN8wIDjKHbAT4YToirgoh1-KkjjEY-F0QmI59ub3SVRqo23bjkgssYKAX2OP07/exec",
-            };
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- CONSTANTES E VARIÁVEIS ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRl3kqgG_qsGsj_NTVoRHZQjwQMpQooPmzzMYhEEmsOAtLHd0Co1nMkmF7RRAavp20gw/exec";
         
-            const sections = [
-                { id: 'produtividade', title: 'Produtividade', questions: [ { id: 'c1', text: '1- Procura novos conhecimentos visando o aperfeiçoamento profissional e a melhoria contínua dos processos de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c2', text: '2- Coloca-se à disposição da chefia e dos demais colegas para a realização de novas tarefas, além das suas atribuições de rotina.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c3', text: '3- É hábil em identificar soluções para problemas e/ou situações inusitadas, em tempo hábil.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c4', text: '4- Zela pelo preparo profissional, mantendo os conhecimentos e a aptidão física e mental em níveis adequados ao exercício da função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c5', text: '5- Participa de cursos e atividades de aperfeiçoamento ou atualização profissional, dentro ou fora do serviço.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'responsabilidade', title: 'Responsabilidade', questions: [ { id: 'c6', text: '6- É comprometido com seu trabalho, cumprindo suas tarefas com qualidade, nos prazos estabelecidos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c7', text: '7- Cumpre normas e regulamentos estabelecidos, inclusive quanto ao uso dos uniformes e equipamentos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c8', text: '8- Respeita a hierarquia, a disciplina, a cooperação, o espírito de corpo e a lealdade para com a instituição.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c9', text: '9- Mantém sigilo sobre assuntos internos da Instituição dos quais tenha conhecimento em razão do cargo ou função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c10', text: '10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'pontualidade', title: 'Pontualidade', questions: [ { id: 'c11', text: '11- Cumpre o horário de trabalho, evitando atrasos na chegada e na saída para o intervalo.', values: ['1.0', '2.0', '3.0', '4.0', '5.0'] } ] },
-                { id: 'assiduidade', title: 'Assiduidade', questions: [ { id: 'c12', text: '12- Comparece regularmente ao local de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c13', text: '13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c14', text: '14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c15', text: '15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c16', text: '16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'equipamentos', title: 'Equipamentos', questions: [ { id: 'c17', text: '17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] }, { id: 'c18', text: '18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] } ] }
-            ];
-            const TOTAL_QUESTIONS = sections.reduce((acc, section) => acc + section.questions.length, 0);
+        const sections = [
+            { id: 'produtividade', title: 'Produtividade' },
+            { id: 'responsabilidade', title: 'Responsabilidade' },
+            { id: 'pontualidade', title: 'Pontualidade' },
+            { id: 'assiduidade', title: 'Assiduidade' },
+            { id: 'equipamentos', title: 'Equipamentos' },
+        ];
         
-            const dom = {
-                login: { section: document.getElementById('loginSection'), user: document.getElementById('username'), pass: document.getElementById('password'), button: document.getElementById('loginButton'), alert: document.getElementById('loginAlert'), togglePass: document.getElementById('togglePassword') },
-                eval: { section: document.getElementById('evaluationSection'), form: document.getElementById('formAvaliacao'), sendButton: document.getElementById('sendButton'), declarationBox: document.getElementById('declarationBox'), declarationCheck: document.getElementById('declaracaoCiente'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper') },
-                success: { section: document.getElementById('successSection'), finalScore: document.getElementById('finalScore'), pdfLink: document.getElementById('pdfLink'), logoutButton: document.getElementById('logoutButtonSuccess') },
-                submitted: { section: document.getElementById('alreadySubmittedSection'), logoutButton: document.getElementById('logoutButtonSubmitted') },
-                userInfo: { container: document.getElementById('userInfo'), name: document.getElementById('userName') },
-                logoutButtonEval: document.getElementById('logoutButtonEval'),
-                progressBar: document.getElementById('progressBar'),
-                pontuacaoAtual: document.getElementById('pontuacaoAtual'),
-                faixaDesempenho: document.getElementById('faixaDesempenho'),
-                modal: { review: document.getElementById('reviewModal'), confirmation: document.getElementById('confirmationModal'), score: document.getElementById('modalScore'), confirmBtn: document.getElementById('modalConfirm'), cancelBtn: document.getElementById('modalCancel'), closeReviewBtn: document.getElementById('modalCloseReview'), confirmReviewBtn: document.getElementById('modalConfirmReview') }
-            };
+        const dom = {
+            login: { screen: document.getElementById('loginScreen'), alert: document.getElementById('loginAlert'), matricula: document.getElementById('matricula'), senha: document.getElementById('senha'), togglePass: document.getElementById('togglePassword') },
+            servidores: { screen: document.getElementById('servidoresScreen'), list: document.getElementById('servidoresList') },
+            avaliacao: { screen: document.getElementById('avaliacaoScreen'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper') },
+            userInfo: document.getElementById('userInfo'),
+            userName: document.getElementById('userName'),
+            successModal: { el: document.getElementById('successModal'), message: document.getElementById('successModalMessage'), closeBtn: document.getElementById('successModalClose') }
+        };
+
+        let currentUser = null, servidores = [], avaliacoes = [], sortByPending = false;
+        const moonIcon = '<i class="fas fa-moon"></i>';
+        const sunIcon = '<i class="fas fa-sun"></i>';
         
-            let currentUser = null;
-            function showAlert(el, msg, type) { el.textContent = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
-            function hideAlert(el) { el.classList.add('hidden'); }
+        // --- FUNÇÕES ---
+        function showAlert(el, msg, type) { el.textContent = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
+        function hideAlert(el) { el.classList.add('hidden'); }
+        function showScreen(el) { el.classList.remove('hidden'); }
+        function hideScreen(el) { el.classList.add('hidden'); }
         
-            function generateFormHTML() {
-                let html = '';
-                sections.forEach(section => {
-                    html += `<div class="criterio" id="criterio-${section.id}"><h3>${section.title}</h3>`;
-                    section.questions.forEach(q => {
-                        html += `<div class="questao" id="questao-${q.id}"><p>${q.text}</p><div class="opcoes-avaliacao">`;
-                        q.values.forEach(val => { html += `<div class="opcao" data-value="${val}">${val.replace('.',',')}</div>`; });
-                        html += `</div><input type="hidden" id="${q.id}"></div>`;
-                    });
-                    html += `</div>`;
-                });
-                dom.eval.form.innerHTML = html;
-                addOptionListeners();
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('themeToggle').innerHTML = sunIcon;
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.getElementById('themeToggle').innerHTML = moonIcon;
+                localStorage.setItem('theme', 'light');
             }
+        }
 
-            function generateStepper() {
-                let html = '';
-                sections.forEach((section, index) => {
-                    html += `<div class="step" id="step-${section.id}">
-                                <div class="step-icon">${index + 1}</div>
-                                <div class="step-label">${section.title}</div>
-                             </div>`;
-                });
-                dom.eval.stepper.innerHTML = html;
-            }
+        function showLoginScreen() {
+            [dom.servidores.screen, dom.avaliacao.screen, dom.userInfo].forEach(hideScreen);
+            showScreen(dom.login.screen);
+            dom.login.matricula.value = '';
+            dom.login.senha.value = '';
+            hideAlert(dom.login.alert);
+        }
 
-            function updateStepper() {
-                let CriteriosElements = sections.map(s => document.getElementById(`criterio-${s.id}`));
-                let currentSectionId = null;
+        function showServidoresScreen() {
+            [dom.login.screen, dom.avaliacao.screen].forEach(hideScreen);
+            [dom.servidores.screen, dom.userInfo].forEach(showScreen);
+            dom.userName.textContent = currentUser.nome;
+            const searchInput = document.getElementById('searchServidor');
+            if (searchInput) searchInput.value = '';
+        }
 
-                // Find the current active section based on scroll position
-                for (let i = CriteriosElements.length - 1; i >= 0; i--) {
-                    const sectionEl = CriteriosElements[i];
-                    if (sectionEl.getBoundingClientRect().top < window.innerHeight / 2) {
-                        currentSectionId = sections[i].id;
-                        break;
-                    }
+        function logout() {
+            localStorage.removeItem('avaliacao_user');
+            showLoginScreen();
+        }
+
+        function login() {
+            const m = dom.login.matricula, s = dom.login.senha, b = document.getElementById('btnLogin');
+            if (!m.value || !s.value) return showAlert(dom.login.alert, 'Preencha todos os campos.', 'error');
+            b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+            
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', matricula: m.value, senha: s.value }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('avaliacao_user', JSON.stringify(currentUser));
+                    showServidoresScreen();
+                    loadServidores();
+                } else {
+                    showAlert(dom.login.alert, data.error, 'error');
                 }
-                
-                // Update classes for all steps
-                sections.forEach(section => {
-                    const stepEl = document.getElementById(`step-${section.id}`);
-                    const criterioEl = document.getElementById(`criterio-${section.id}`);
-                    const inputs = [...criterioEl.querySelectorAll('input[type=hidden]')];
-                    const isCompleted = inputs.every(input => input.value);
+            })
+            .catch(err => showAlert(dom.login.alert, 'Erro de comunicação.', 'error'))
+            .finally(() => {
+                b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            });
+        }
 
-                    stepEl.classList.remove('active', 'completed');
-                    if (isCompleted) {
-                        stepEl.classList.add('completed');
-                    }
-                    if (section.id === currentSectionId) {
-                        stepEl.classList.add('active');
-                    }
+        function loadServidores() {
+            dom.servidores.list.innerHTML = '<p>Carregando servidores...</p>';
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getServidores', matriculaAvaliador: currentUser.matricula }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    servidores = data.servidores;
+                    avaliacoes = data.avaliacoes;
+                    renderServidores();
+                    updateDashboard();
+                } else {
+                    dom.servidores.list.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                }
+            })
+            .catch(err => dom.servidores.list.innerHTML = '<p style="color: red;">Erro de comunicação.</p>');
+        }
+        
+        function updateDashboard() {
+            const total = servidores.length;
+            const avaliados = avaliacoes.length;
+            const pendentes = total - avaliados;
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statAvaliados').textContent = avaliados;
+            document.getElementById('statPendentes').textContent = pendentes;
+        }
+
+        function renderServidores() {
+            const searchTerm = document.getElementById('searchServidor').value.toLowerCase().trim();
+            let servidoresFiltrados = servidores.filter(s => s.nome.toLowerCase().includes(searchTerm) || s.matricula.toString().includes(searchTerm));
+            if (sortByPending) {
+                servidoresFiltrados.sort((a, b) => {
+                    const aAvaliado = avaliacoes.some(av => av.matriculaAvaliado === a.matricula);
+                    const bAvaliado = avaliacoes.some(av => av.matriculaAvaliado === b.matricula);
+                    return aAvaliado - bAvaliado;
                 });
             }
             
-            function addOptionListeners() {
-                document.querySelectorAll('.opcoes-avaliacao .opcao').forEach(opcao => {
-                    opcao.addEventListener('click', function() {
-                        const value = this.getAttribute('data-value');
-                        const hiddenInput = this.closest('.questao').querySelector('input[type=hidden]');
-                        const questaoDiv = this.closest('.questao');
-                        if (hiddenInput) {
-                            hiddenInput.value = value;
-                            hiddenInput.dispatchEvent(new Event('change')); 
-                        }
-                        this.parentNode.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
-                        this.classList.add('selecionada');
-                        if(questaoDiv) questaoDiv.classList.add('questao-respondida');
-                        calculateScore();
-                        updateStepper();
-                    });
+            dom.servidores.list.innerHTML = '';
+            document.getElementById('progressoContador').innerHTML = `<strong>${avaliacoes.length} de ${servidores.length}</strong> avaliados`;
+            if (servidoresFiltrados.length === 0) {
+                dom.servidores.list.innerHTML = '<p>Nenhum servidor encontrado.</p>';
+                return;
+            }
+            servidoresFiltrados.forEach(servidor => {
+                const avaliacao = avaliacoes.find(av => av.matriculaAvaliado === servidor.matricula);
+                const status = avaliacao ? 'concluido' : 'pendente';
+                const card = document.createElement('div');
+                card.className = `servidor-card ${status}`;
+                card.innerHTML = `<h3>${servidor.nome}</h3><div class="servidor-info"><p>Matrícula: ${servidor.matricula}</p><p>Lotação: ${servidor.lotacao}</p></div><div class="status-badge status-${status}">${avaliacao ? 'Avaliado' : 'Pendente'}</div>`;
+                card.addEventListener('click', () => {
+                    if (avaliacao) { showInfoModal("Esta avaliação já foi concluída e não pode ser editada."); }
+                    else { showAvaliacaoScreen(servidor, null); }
                 });
-            }
+                dom.servidores.list.appendChild(card);
+            });
+        }
         
-            function showSection(sectionToShow) {
-                [dom.login.section, dom.eval.section, dom.success.section, dom.submitted.section].forEach(s => s.classList.add('hidden'));
-                if (sectionToShow) sectionToShow.classList.remove('hidden');
-                
-                const mainUserInfo = document.getElementById('userInfo');
-                if (sectionToShow !== dom.login.section) {
-                    mainUserInfo.classList.remove('hidden');
-                    document.getElementById('btnLogout').onclick = logout;
-                } else {
-                    mainUserInfo.classList.add('hidden');
-                }
-            }
-        
-            async function login() {
-                hideAlert(dom.login.alert);
-                const btn = dom.login.button;
-                if (!dom.login.user.value || !dom.login.pass.value) return showAlert(dom.login.alert, 'Preencha todos os campos.', 'error');
-                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
-                try {
-                    const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "login", matricula: dom.login.user.value, senha: dom.login.pass.value }) });
-                    const result = await response.json();
-                    if (result.success) {
-                        currentUser = result.user;
-                        populateUserInfo(currentUser);
-                        showSection(dom.eval.section);
-                        setTimeout(updateStepper, 100); // Initial call
-                    } else {
-                        if(result.error === 'ALREADY_SUBMITTED') showSection(dom.submitted.section);
-                        else showAlert(dom.login.alert, result.error, 'error');
-                    }
-                } catch (error) {
-                    showAlert(dom.login.alert, "Erro de conexão. Verifique sua internet.", 'error');
-                } finally {
-                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
-                }
-            }
-        
-            function handleSendEvaluation() {
-                if (!validateForm()) {
-                    showAlert(dom.eval.alert, "Responda todas as questões e marque a declaração de veracidade.", 'error');
-                    const firstInvalid = document.querySelector('.invalid-question, .invalid');
-                    if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    return;
-                }
-                hideAlert(dom.eval.alert);
-                showReview();
-            }
+        function generateStepper() {
+            let html = '';
+            sections.forEach((section, index) => {
+                html += `<div class="step" id="step-${section.id}">
+                            <div class="step-icon">${index + 1}</div>
+                            <div class="step-label">${section.title}</div>
+                         </div>`;
+            });
+            dom.avaliacao.stepper.innerHTML = html;
+        }
 
-            function showReview() {
-                const reviewContent = document.getElementById('reviewContent');
-                reviewContent.innerHTML = ''; 
-                sections.forEach(section => {
-                    const sectionTitle = document.createElement('h4');
-                    sectionTitle.textContent = section.title;
-                    sectionTitle.style.marginTop = '10px';
-                    reviewContent.appendChild(sectionTitle);
+        function updateStepper() {
+            let CriteriosElements = sections.map(s => document.getElementById(`criterio-${s.id}`));
+            let currentSectionId = null;
 
-                    section.questions.forEach(q => {
-                        const questaoTexto = q.text;
-                        const respostaValor = document.getElementById(q.id).value;
-                        if(respostaValor) {
-                            const item = document.createElement('div');
-                            item.className = 'review-item';
-                            item.innerHTML = `<p>${questaoTexto}</p><p>Sua nota: <span>${respostaValor.replace('.',',')}</span></p>`;
-                            reviewContent.appendChild(item);
-                        }
-                    });
-                });
-                dom.modal.review.style.display = 'flex';
+            for (let i = CriteriosElements.length - 1; i >= 0; i--) {
+                const sectionEl = CriteriosElements[i];
+                if (sectionEl.getBoundingClientRect().top < window.innerHeight / 2) {
+                    currentSectionId = sections[i].id;
+                    break;
+                }
             }
+            
+            sections.forEach(section => {
+                const stepEl = document.getElementById(`step-${section.id}`);
+                const criterioEl = document.getElementById(`criterio-${section.id}`);
+                const inputs = [...criterioEl.querySelectorAll('input[type=hidden]')];
+                const isCompleted = inputs.every(input => input.value);
 
-            async function submitEvaluation() {
-                dom.modal.confirmation.style.display = 'none';
-                const totalScore = calculateScore();
-                const btn = dom.eval.sendButton;
-                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-        
-                const answers = {};
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-                    const input = document.getElementById(`c${i}`);
-                    answers["criterio" + i] = input ? input.value : null;
-                }
-        
-                const submissionData = {
-                    matricula: document.getElementById("matricula").textContent,
-                    nome: document.getElementById("nome").textContent,
-                    graduacao: document.getElementById("posto").textContent,
-                    pontuacao: totalScore,
-                    respostas: answers,
-                    declaracaoCiente: dom.eval.declarationCheck.checked
-                };
-                
-                try {
-                    const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "salvarResposta", resposta: submissionData }) });
-                    const result = await response.json();
-                    if (result.success) {
-                        dom.success.finalScore.textContent = totalScore.toFixed(1);
-                        dom.success.pdfLink.href = result.pdfUrl || '#';
-                        if (!result.pdfUrl) dom.success.pdfLink.classList.add('hidden');
-                        showSection(dom.success.section);
-                    } else {
-                        showAlert(dom.eval.alert, "Erro ao enviar: " + result.error, 'error');
-                    }
-                } catch (error) {
-                    showAlert(dom.eval.alert, "Erro de conexão ao enviar. Tente novamente.", 'error');
-                } finally {
-                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Enviar Avaliação';
-                }
-            }
-        
-            function logout() {
-                currentUser = null;
-                dom.login.user.value = '';
-                dom.login.pass.value = '';
-                hideAlert(dom.login.alert);
-                showSection(dom.login.section);
-                if (dom.eval.form.reset) dom.eval.form.reset();
-                document.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
-                document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
-                document.querySelectorAll('input[type=hidden]').forEach(input => input.value = '');
-                dom.eval.declarationCheck.checked = false;
-                document.title = 'Avaliação de Desempenho - GCM';
-                calculateScore();
-            }
-        
-            function populateUserInfo(user) {
-                dom.userInfo.name.textContent = user.nome;
-                document.getElementById("nome").textContent = user.nome;
-                document.getElementById("matricula").textContent = user.matricula;
-                document.getElementById("admissao").textContent = new Date(user.admissao).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-                document.getElementById("posto").textContent = user.posto;
-                document.getElementById("cargo").textContent = user.cargo;
-                document.getElementById("lotacao").textContent = user.lotacao;
-                document.getElementById("nomeDeclaracao").textContent = user.nome;
-                document.getElementById("matriculaDeclaracao").textContent = user.matricula;
-                document.getElementById("anoAvaliacao").textContent = new Date().getFullYear();
-            }
-        
-            function calculateScore() {
-                let sum = 0;
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-                    const input = document.getElementById(`c${i}`);
-                    if (input && input.value) sum += parseFloat(input.value);
-                }
-                
-                const finalScore = parseFloat(sum.toFixed(1));
+                stepEl.classList.remove('active', 'completed');
+                if (isCompleted) stepEl.classList.add('completed');
+                if (section.id === currentSectionId) stepEl.classList.add('active');
+            });
+        }
 
-                const pMax = 25.0;
-                dom.pontuacaoAtual.textContent = `${finalScore.toString().replace('.', ',')} / ${pMax.toFixed(0)} pts`;
-                const percentage = (finalScore / pMax) * 100;
-                dom.progressBar.style.width = percentage + '%';
-
-                if (percentage < 64) {
-                    dom.progressBar.style.backgroundColor = 'var(--danger)';
-                    dom.faixaDesempenho.textContent = "Abaixo do esperado";
-                } else if (percentage < 80) {
-                    dom.progressBar.style.backgroundColor = 'var(--primary)';
-                    dom.faixaDesempenho.textContent = "Regular";
-                } else if (percentage < 92) {
-                    dom.progressBar.style.backgroundColor = 'var(--success)';
-                    dom.faixaDesempenho.textContent = "Bom";
-                } else {
-                    dom.progressBar.style.backgroundColor = 'var(--success)';
-                    dom.faixaDesempenho.textContent = "Excelente";
-                }
-                const answeredQuestions = document.querySelectorAll('.questao input[type=hidden][value]:not([value=""])').length;
-                if (answeredQuestions > 0 && !dom.eval.section.classList.contains('hidden')) {
-                    document.title = `(${answeredQuestions}/${TOTAL_QUESTIONS}) Avaliação de Desempenho`;
-                } else {
-                    document.title = 'Avaliação de Desempenho - GCM';
-                }
-                return finalScore;
+        function showAvaliacaoScreen(servidor, avaliacaoExistente) {
+            document.getElementById('avaliadoNome').textContent = servidor.nome; 
+            document.getElementById('avaliadoMatricula').textContent = servidor.matricula; 
+            document.getElementById('avaliadoLotacao').textContent = servidor.lotacao;
+            document.getElementById('matriculaAvaliado').value = servidor.matricula; 
+            document.getElementById('nomeAvaliado').value = servidor.nome;
+            document.getElementById('formAvaliacao').reset();
+            document.getElementById('checkDeclaracao').checked = false;
+            for (let i = 1; i <= 18; i++) {
+                const hiddenInput = document.getElementById(`questao${i}`);
+                if (hiddenInput) hiddenInput.value = '';
             }
-        
-            function validateForm() {
-                let isFormValid = true;
-                document.querySelectorAll('.questao.invalid-question').forEach(q => q.classList.remove('invalid-question'));
-                dom.eval.declarationBox.classList.remove('invalid');
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-                    const input = document.getElementById(`c${i}`);
-                    if (!input || !input.value) {
-                        isFormValid = false;
-                        const questaoDiv = document.getElementById(`questao-c${i}`);
-                        if (questaoDiv) questaoDiv.classList.add('invalid-question');
-                    }
-                }
-                if (!dom.eval.declarationCheck.checked) {
+            document.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+            document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
+            document.querySelectorAll('.invalid-question').forEach(el => el.classList.remove('invalid-question'));
+            hideAlert(dom.avaliacao.alert);
+            document.getElementById('declaracaoNome').textContent = currentUser.nome; 
+            document.getElementById('declaracaoMatricula').textContent = currentUser.matricula;
+            document.getElementById('declaracaoNomeAvaliado').textContent = servidor.nome;
+            document.getElementById('declaracaoMatriculaAvaliado').textContent = servidor.matricula;
+            calcularPontuacao(); 
+            hideScreen(dom.servidores.screen); 
+            showScreen(dom.avaliacao.screen);
+            setTimeout(updateStepper, 100);
+        }
+
+        function calcularPontuacao() {
+            let total = 0; 
+            for (let i = 1; i <= 18; i++) { 
+                const input = document.getElementById(`questao${i}`); 
+                if (input && input.value) total += parseFloat(input.value); 
+            }
+            document.getElementById('pontuacaoAtual').textContent = total.toFixed(1);
+            const pMax = 25.0;
+            document.getElementById('progressBar').style.width = ((total / pMax) * 100) + '%';
+            if (total < 16) {
+                document.getElementById('progressBar').style.backgroundColor = 'var(--danger)';
+                document.getElementById('faixaDesempenho').textContent = "Abaixo do esperado";
+            } else if (total < 20) {
+                document.getElementById('progressBar').style.backgroundColor = 'var(--primary)';
+                document.getElementById('faixaDesempenho').textContent = "Regular";
+            } else if (total < 23) {
+                document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
+                document.getElementById('faixaDesempenho').textContent = "Bom";
+            } else {
+                document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
+                document.getElementById('faixaDesempenho').textContent = "Excelente";
+            }
+            return total;
+        }
+
+        function validateForm() {
+            let isFormValid = true;
+            const declarationContainer = document.querySelector('.declaracao-container');
+            document.querySelectorAll('.invalid-question').forEach(el => el.classList.remove('invalid-question'));
+            declarationContainer.classList.remove('invalid-question');
+            for (let i = 1; i <= 18; i++) {
+                const input = document.getElementById(`questao${i}`);
+                if (!input || !input.value) {
                     isFormValid = false;
-                    dom.eval.declarationBox.classList.add('invalid');
+                    const questaoDiv = document.getElementById(`q-${i}`);
+                    if (questaoDiv) questaoDiv.classList.add('invalid-question');
                 }
-                return isFormValid;
             }
+            if (!document.getElementById('checkDeclaracao').checked) {
+                isFormValid = false;
+                declarationContainer.classList.add('invalid-question');
+            }
+            return isFormValid;
+        }
+
+        function handleFormSubmitAttempt(e) {
+            e.preventDefault();
+            hideAlert(dom.avaliacao.alert);
+            if (!validateForm()) {
+                showAlert(dom.avaliacao.alert, 'Responda todas as questões e marque a declaração para finalizar.', 'error');
+                const firstInvalid = document.querySelector('.invalid-question');
+                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            showReview();
+        }
         
-            const themeToggle = document.getElementById('themeToggle');
-            const moonIcon = '<i class="fas fa-moon"></i>';
-            const sunIcon = '<i class="fas fa-sun"></i>';
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    document.body.classList.add('dark-theme');
-                    themeToggle.innerHTML = sunIcon;
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    themeToggle.innerHTML = moonIcon;
-                    localStorage.setItem('theme', 'light');
-                }
+        function showReview() {
+            const reviewContent = document.getElementById('reviewContent');
+            reviewContent.innerHTML = ''; 
+            const avaliadoNome = document.getElementById('avaliadoNome').textContent;
+            const avaliadoMatricula = document.getElementById('avaliadoMatricula').textContent;
+            const header = document.createElement('div');
+            header.innerHTML = `<p style="margin-bottom:15px; text-align:center;"><strong>Servidor:</strong> ${avaliadoNome} | <strong>Matrícula:</strong> ${avaliadoMatricula}</p>`;
+            reviewContent.appendChild(header);
+            for (let i = 1; i <= 18; i++) {
+                const questaoDiv = document.getElementById(`q-${i}`);
+                const questaoTexto = questaoDiv.querySelector('p').textContent;
+                const respostaValor = document.getElementById(`questao${i}`).value;
+                const item = document.createElement('div');
+                item.className = 'review-item';
+                item.innerHTML = `<p>${questaoTexto}</p><p>Sua nota: <span>${respostaValor.replace('.',',')}</span></p>`;
+                reviewContent.appendChild(item);
             }
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = localStorage.getItem('theme') || 'light';
-                applyTheme(currentTheme === 'light' ? 'dark' : 'light');
-            });
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
+            document.getElementById('reviewModal').style.display = 'flex';
+        }
 
-            dom.login.togglePass.addEventListener('click', () => {
-                const isPassword = dom.login.pass.type === 'password';
-                dom.login.pass.type = isPassword ? 'text' : 'password';
-                dom.login.togglePass.classList.toggle('fa-eye');
-                dom.login.togglePass.classList.toggle('fa-eye-slash');
-            });
-
-            generateFormHTML();
-            generateStepper();
-            dom.eval.form.addEventListener('change', calculateScore);
-            dom.login.button.addEventListener("click", login);
-            dom.eval.sendButton.addEventListener("click", handleSendEvaluation);
-            dom.modal.confirmBtn.addEventListener("click", submitEvaluation);
-            dom.modal.cancelBtn.addEventListener("click", () => dom.modal.confirmation.style.display = 'none');
-            dom.modal.closeReviewBtn.addEventListener('click', () => dom.modal.review.style.display = 'none');
-            dom.modal.confirmReviewBtn.addEventListener('click', () => {
-                dom.modal.review.style.display = 'none';
-                const totalScore = calculateScore();
-                dom.modal.score.textContent = totalScore.toString().replace('.', ',');
-                dom.modal.confirmation.style.display = 'flex';
-            });
-            [dom.logoutButtonEval, dom.success.logoutButton, dom.submitted.logoutButton, document.getElementById('btnLogout')].forEach(btn => {
-                if(btn) btn.addEventListener('click', logout)
-            });
+        function submitEvaluation() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            const pontuacaoTotal = calcularPontuacao();
+            const respostas = {};
+            for (let i = 1; i <= 18; i++) {
+                respostas[`questao${i}`] = parseFloat(document.getElementById(`questao${i}`).value) || 0;
+            }
+            const avaliacaoData = {
+                matriculaAvaliador: currentUser.matricula, nomeAvaliador: currentUser.nome,
+                matriculaAvaliado: document.getElementById('matriculaAvaliado').value, nomeAvaliado: document.getElementById('nomeAvaliado').value,
+                pontuacao: pontuacaoTotal.toFixed(1), declaracao: `Confirmado por ${currentUser.nome} em ${new Date().toLocaleString('pt-BR')}`, respostas: respostas
+            };
+            const btnSalvar = document.getElementById('btnSalvarAvaliacao');
+            btnSalvar.disabled = true; btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
             
-            // Add scroll listener for stepper
-            let formContainer = document.querySelector('.container');
-            formContainer.addEventListener('scroll', updateStepper, { passive: true });
-            window.addEventListener('scroll', updateStepper, { passive: true });
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'salvarAvaliacao', avaliacao: avaliacaoData }) })
+                .then(res => res.json()).then(data => {
+                    if (data.success) {
+                        dom.successModal.message.innerHTML = `A avaliação de <strong>${avaliacaoData.nomeAvaliado}</strong> foi enviada com sucesso.`;
+                        dom.successModal.el.style.display = 'flex';
+                    } else { 
+                        showAlert(dom.avaliacao.alert, data.error, 'error'); 
+                    }
+                })
+                .catch(err => showAlert(dom.avaliacao.alert, 'Erro de comunicação com o servidor.', 'error'))
+                .finally(() => { 
+                    btnSalvar.disabled = false; 
+                    btnSalvar.innerHTML = '<i class="fas fa-check-circle"></i> Finalizar Avaliação'; 
+                });
+        }
+        
+        function showInfoModal(message) {
+            document.getElementById('infoModalMessage').textContent = message;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
 
-            showSection(dom.login.section);
-            calculateScore();
+        // --- INICIALIZAÇÃO ---
+        const savedUser = localStorage.getItem('avaliacao_user');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            showServidoresScreen();
+            loadServidores();
+        }
+        
+        document.getElementById('btnLogin').addEventListener('click', login);
+        document.getElementById('btnLogout').addEventListener('click', logout);
+        document.getElementById('btnVoltarLista').addEventListener('click', () => showServidoresScreen());
+        document.getElementById('formAvaliacao').addEventListener('submit', handleFormSubmitAttempt);
+        document.getElementById('searchServidor').addEventListener('keyup', renderServidores);
+        document.getElementById('btnSortStatus').addEventListener('click', function() { sortByPending = !sortByPending; this.classList.toggle('active'); renderServidores(); });
+        document.getElementById('modalConfirm').addEventListener('click', submitEvaluation);
+        document.getElementById('modalCancel').addEventListener('click', () => document.getElementById('confirmationModal').style.display = 'none');
+        document.getElementById('infoModalClose').addEventListener('click', () => document.getElementById('infoModal').style.display = 'none');
+        document.getElementById('modalCloseReview').addEventListener('click', () => document.getElementById('reviewModal').style.display = 'none');
+        document.getElementById('modalConfirmReview').addEventListener('click', () => {
+            document.getElementById('reviewModal').style.display = 'none';
+            const pontuacaoTotal = calcularPontuacao();
+            document.getElementById('modalScore').textContent = pontuacaoTotal.toFixed(1);
+            document.getElementById('confirmationModal').style.display = 'flex';
         });
+        dom.login.togglePass.addEventListener('click', () => {
+            const isPassword = dom.login.senha.type === 'password';
+            dom.login.senha.type = isPassword ? 'text' : 'password';
+            dom.login.togglePass.classList.toggle('fa-eye');
+            dom.login.togglePass.classList.toggle('fa-eye-slash');
+        });
+        dom.successModal.closeBtn.addEventListener('click', () => {
+            dom.successModal.el.style.display = 'none';
+            loadServidores();
+            showServidoresScreen();
+        });
+        document.querySelectorAll('.opcoes-avaliacao .opcao').forEach(opcao => {
+            opcao.addEventListener('click', function() {
+                const questaoDiv = this.closest('.questao');
+                const value = this.getAttribute('data-value');
+                const hiddenInput = questaoDiv.querySelector('input[type=hidden]');
+                if (hiddenInput) hiddenInput.value = value;
+                this.parentNode.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+                this.classList.add('selecionada');
+                questaoDiv.classList.add('questao-respondida');
+                questaoDiv.classList.remove('invalid-question');
+                calcularPontuacao();
+                updateStepper();
+            });
+        });
+        
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+        });
+
+        generateStepper();
+        let formContainer = document.querySelector('.container');
+        formContainer.addEventListener('scroll', updateStepper, { passive: true });
+        window.addEventListener('scroll', updateStepper, { passive: true });
+        
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+    });
     </script>
 </body>
 </html>
