@@ -50,7 +50,6 @@
         .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
         .questao { padding: 20px; background: white; transition: background-color 0.4s ease, border-left-color 0.4s ease; border-left: 4px solid transparent; }
         .questao + .questao { border-top: 1px solid var(--border-color); }
-        .questao p { margin-bottom: 15px; }
         .questao.invalid-question { border-left-color: var(--danger); background-color: #fee2e2; }
         .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
         .opcoes-avaliacao { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
@@ -130,15 +129,18 @@
             <div class="instructions-panel">
                 <h3><i class="fas fa-info-circle"></i> Orientações sobre a Autoavaliação</h3>
                 <ul>
-                    <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o seu desenvolvimento na carreira, sendo critério para promoção e progressão.</li>
+                    <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o seu desenvolvimento na carreira.</li>
                     <li><strong>Período para Avaliar:</strong> Sua autoavaliação estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
-                    <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias do prazo. Caso o sistema apresente lentidão ou erro, por favor, tente novamente em um horário de menor movimento.</li>
+                    <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias do prazo. Caso o sistema apresente <strong>lentidão ou erro genérico</strong>, por favor, tente novamente em um horário de menor movimento.</li>
+                    <li><strong>Acesso Inválido:</strong> Se a mensagem for especificamente <strong>'matrícula ou senha inválida'</strong>, isso não significa um problema de acesso simultâneo, mas sim um provável erro de digitação. Por favor, verifique os dados com atenção e tente novamente. Caso o problema persista, entre em contato com o setor responsável.</li>
+                    <li><strong>Servidores Cedidos e Inspetor Geral:</strong> Conforme o <strong>Decreto nº 38.473/2024 (Arts. 30 e 31)</strong>, os servidores cedidos para outros órgãos e o Inspetor Geral da Guarda Civil Municipal realizam apenas a etapa de autoavaliação, que terá peso de <strong>100% (cem por cento)</strong> na sua nota final.</li>
+                    <li><strong>Servidores Inaptos para Avaliação:</strong> De acordo com o <strong>Art. 47 da Lei nº 9.640/2022</strong>, servidores em afastamentos como <strong>Licença para Tratar de Interesses Particulares (sem vencimentos)</strong> ou <strong>Licença para Tratamento de Saúde (superiores a 60 dias)</strong> ficam inaptos para este ciclo. Por este motivo, caso tente acessar o sistema, poderá receber a mensagem de <strong>'matrícula ou senha inválida'</strong>, o que não representa um erro, mas sim o impedimento legal para participar. Sua habilitação será restabelecida no próximo ciclo de avaliação.</li>
+                    <li><strong>Afastamentos que NÃO Impedem a Avaliação:</strong> Períodos de <strong>Férias</strong> e <strong>Licença-Prêmio</strong>, mesmo que somados ultrapassem <strong>60 (sessenta)</strong> dias, <strong>não impedem</strong> sua participação, pois são considerados tempo de efetivo exercício <strong>(Art. 138 da Lei Complementar nº 01/1991)</strong>. Servidoras em <strong>Licença Maternidade ou Adoção</strong> também não são impedidas por esta regra <strong>(Art. 33 do Decreto nº 38.473/2024)</strong>.</li>
+                    <li><strong>Mandato Classista (Sindicato):</strong> Conforme o <strong>Art. 32 do Decreto nº 38.473/2024</strong>, os servidores afastados para desempenho de mandato classista nos últimos <strong>12 (doze)</strong> meses estão <strong>dispensados</strong> da avaliação. Por este motivo, caso tente acessar o sistema, poderá receber uma mensagem de <strong>'matrícula ou senha inválida'</strong>. Esta dispensa não causa prejuízo à sua progressão ou promoção na carreira.</li>
                     <li><strong>Seja Honesto(a) e Criterioso(a):</strong> Esta é uma oportunidade para refletir sobre seu próprio desempenho. Suas respostas devem ser sinceras e baseadas em suas atividades diárias.</li>
-                    <li><strong>Avalie-se com Calma:</strong> Você possui tempo hábil para preencher sua avaliação. Não é uma maratona! O sistema estará disponível durante todo o cronograma.</li>
                     <li><strong>Revisão Final:</strong> Antes de finalizar, uma tela de revisão será exibida. Confira todas as suas respostas com atenção, pois o envio é definitivo.</li>
                     <li><strong>Ação Definitiva:</strong> Lembre-se, sua autoavaliação, uma vez enviada, <strong>não poderá ser editada</strong>.</li>
-                    <li><strong>Propósito da Autoavaliação:</strong> Esta ferramenta visa o seu autoconhecimento e desenvolvimento profissional. Suas respostas são o primeiro passo do processo avaliativo.</li>
-                    <li><strong>Publicação do Resultado:</strong> Para garantir a transparência do processo, o resultado final da avaliação (após avaliação da chefia e possíveis recursos) será publicado em Diário Oficial do Município, conforme o <strong>Art. 43 da Lei nº 9.640/2022</strong>.</li>
+                    <li><strong>Publicação do Resultado:</strong> Para garantir a transparência do processo, o resultado final da avaliação <strong>(após avaliação da chefia e possíveis recursos)</strong> será publicado em Diário Oficial do Município, conforme o <strong>Art. 43 da Lei nº 9.640/2022</strong>.</li>
                     <li><strong>Suporte:</strong> Em caso de dúvidas sobre o processo, entre em contato com o setor responsável.</li>
                 </ul>
             </div>
@@ -608,4 +610,3 @@
     </script>
 </body>
 </html>
-
