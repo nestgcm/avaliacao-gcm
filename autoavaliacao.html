@@ -2,8 +2,12 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Avaliação de Desempenho - GCM</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação de Desempenho - AutoAvaliação - GCM Salvador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="Sistema de Autoavaliação de Desempenho da Guarda Civil Municipal de Salvador">
+    <meta name="keywords" content="GCM, avaliação, desempenho, autoavaliação, Salvador">
+    <meta name="author" content="Prefeitura Municipal de Salvador">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -99,35 +103,109 @@
         body.dark-theme .review-item span { color: white; background-color: var(--primary); }
         body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
         body.dark-theme .opcao.selecionada .valor-texto { color: #f0fdf4; }
+        
+        /* Novos estilos adicionados */
+        .required-asterisk { color: var(--danger); }
+        .pulse-animation { animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .btn:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        .opcao:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+        }
+        
         @media (max-width: 768px) {
             .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
             .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
             .info-avaliado { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 480px) {
+            .logo h1 {
+                font-size: 1.2rem;
+                line-height: 1.3;
+            }
+            
+            .header-content {
+                padding: 10px 0;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .opcoes-avaliacao {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo h1 {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container header-content">
-            <div class="logo">
-                <i class="fas fa-shield-alt fa-2x"></i>
+            <div class="logo" aria-label="Sistema de Avaliação de Desempenho">
+                <i class="fas fa-shield-alt fa-2x" aria-hidden="true"></i>
                 <h1>Sistema de Avaliação de Desempenho - AutoAvaliação - GCM Salvador</h1>
             </div>
             <div id="userInfo" class="user-info hidden">
                 <span id="userName"></span>
-                <button id="themeToggle" class="btn btn-secondary" style="background-color: transparent; border: 1px solid white;">
-                    <i class="fas fa-moon"></i>
+                <button id="themeToggle" class="btn btn-secondary" aria-label="Alternar tema claro/escuro" style="background-color: transparent; border: 1px solid white;">
+                    <i class="fas fa-moon" aria-hidden="true"></i>
                 </button>
-                <button id="btnLogout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                <button id="btnLogout" class="btn btn-danger" aria-label="Sair do sistema">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sair
+                </button>
             </div>
         </div>
     </header>
 
-    <div class="container">
-        <div id="loginSection" class="card">
-            <h2>Acesso Restrito</h2>
-            <div class="instructions-panel">
-                <h3><i class="fas fa-info-circle"></i> Orientações sobre a Autoavaliação</h3>
+    <main class="container">
+        <section id="loginSection" class="card" aria-labelledby="loginTitle">
+            <h2 id="loginTitle">Acesso Restrito</h2>
+            <div class="instructions-panel" role="region" aria-labelledby="instrTitle">
+                <h3 id="instrTitle"><i class="fas fa-info-circle" aria-hidden="true"></i> Orientações sobre a Autoavaliação</h3>
                 <ul>
                     <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o seu desenvolvimento na carreira.</li>
                     <li><strong>Período para Avaliar:</strong> Sua autoavaliação estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
@@ -144,30 +222,36 @@
                     <li><strong>Suporte:</strong> Em caso de dúvidas sobre o processo, entre em contato com o setor responsável.</li>
                 </ul>
             </div>
-            <div id="loginAlert" class="alert alert-error hidden"></div>
+            <div id="loginAlert" class="alert alert-error hidden" role="alert"></div>
             <div class="form-group">
-                <label for="username">Matrícula:</label>
-                <input type="text" id="username" placeholder="Digite sua matrícula SIGP">
+                <label for="username">Matrícula: <span class="required-asterisk" aria-hidden="true">*</span></label>
+                <input type="text" id="username" name="username" placeholder="Digite sua matrícula SIGP" aria-required="true" autocomplete="username" required>
             </div>
             <div class="form-group">
-                <label for="password">Senha (CPF Somente Números):</label>
+                <label for="password">Senha (CPF Somente Números): <span class="required-asterisk" aria-hidden="true">*</span></label>
                 <div class="password-wrapper">
-                    <input type="password" id="password" placeholder="Digite seu CPF (apenas números)">
-                    <i class="fas fa-eye" id="togglePassword"></i>
+                    <input type="password" id="password" name="password" placeholder="Digite seu CPF (apenas números)" aria-required="true" autocomplete="current-password" required>
+                    <i class="fas fa-eye" id="togglePassword" aria-label="Mostrar/ocultar senha"></i>
                 </div>
             </div>
-            <button id="loginButton" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Entrar</button>
-        </div>
+            <button id="loginButton" class="btn btn-primary" type="button" aria-label="Entrar no sistema"><i class="fas fa-sign-in-alt" aria-hidden="true"></i> Entrar</button>
+            <div id="loginLoading" class="hidden" style="text-align: center; margin-top: 15px;">
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);" aria-hidden="true"></i>
+                <p style="margin-top: 10px;">Validando credenciais...</p>
+            </div>
+        </section>
 
-        <div id="evaluationSection" class="card avaliacao-form hidden">
+        <section id="evaluationSection" class="card avaliacao-form hidden" aria-labelledby="evaluationTitle" aria-describedby="stepper">
             <div class="card-header">
-                <h2>Avaliação de Desempenho - <span id="anoAvaliacao"></span></h2>
-                <button id="logoutButtonEval" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                <h2 id="evaluationTitle">Avaliação de Desempenho - <span id="anoAvaliacao"></span></h2>
+                <button id="logoutButtonEval" class="btn btn-secondary" aria-label="Sair da avaliação" type="button">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sair
+                </button>
             </div>
             
-            <div id="stepper" class="stepper-container"></div>
+            <div id="stepper" class="stepper-container" role="navigation" aria-label="Navegação entre critérios"></div>
             
-            <div class="info-avaliado">
+            <div class="info-avaliado" role="region" aria-label="Informações do avaliado">
                 <p><b>Nome:</b> <strong id="nome"></strong></p>
                 <p><b>Matrícula:</b> <strong id="matricula"></strong></p>
                 <p><b>Admissão:</b> <strong id="admissao"></strong></p>
@@ -175,45 +259,56 @@
                 <p><b>Cargo:</b> <strong id="cargo"></strong></p>
                 <p><b>Lotação:</b> <strong id="lotacao"></strong></p>
             </div>
-            <div id="avaliacaoAlert" class="alert alert-error hidden"></div>
-            <form id="formAvaliacao"></form>
+            <div id="avaliacaoAlert" class="alert alert-error hidden" role="alert"></div>
+            <form id="formAvaliacao" onsubmit="return false;"></form>
             <div class="resumo-pontuacao">
                 <h3>Resumo de Pontuação</h3>
-                <div class="progress-bar"><div id="progressBar" class="progress" style="width: 0%"></div></div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <small>Progresso: <span id="progressText">0%</span></small>
+                    <small><span id="answeredCount">0</span>/<span id="totalQuestions">18</span> questões</small>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressBar" class="progress" style="width: 0%"></div>
+                </div>
                 <p>Pontuação Atual: <strong id="pontuacaoAtual">0,0 / 25 pts</strong></p>
                 <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
             </div>
             <div class="declaracao-container" id="declarationBox">
                 <h3>Declaração de Veracidade</h3>
                 <div class="declaracao-box">
-                    <input type="checkbox" id="declaracaoCiente">
-                    <label for="declaracaoCiente">
+                    <input type="checkbox" id="declaracaoCiente" aria-describedby="declaracaoText">
+                    <label for="declaracaoCiente" id="declaracaoText">
                         Eu, <strong><span id="nomeDeclaracao"></span></strong>, matrícula nº <strong><span id="matriculaDeclaracao"></span></strong>, 
                         declaro, sob minha responsabilidade, que todas as informações prestadas nesta avaliação são verdadeiras e correspondem à realidade.
                     </label>
                 </div>
+                <small style="color: var(--gray); font-style: italic; display: block; margin-top: 5px;">
+                    Campo obrigatório para envio da avaliação
+                </small>
             </div>
             <div style="margin-top: 30px;">
-                <button type="button" id="sendButton" class="btn btn-success"><i class="fas fa-check-circle"></i> Enviar Avaliação</button>
+                <button type="button" id="sendButton" class="btn btn-success" aria-label="Enviar avaliação"><i class="fas fa-check-circle" aria-hidden="true"></i> Enviar Avaliação</button>
             </div>
-        </div>
+        </section>
 
-        <div id="successSection" class="card hidden">
+        <section id="successSection" class="card hidden" aria-live="polite">
              <div class="alert alert-success"><h2>Avaliação Enviada com Sucesso!</h2></div>
             <p>Sua auto-avaliação foi registrada em nosso sistema.</p>
             <p><strong>Pontuação Final:</strong> <span id="finalScore"></span></p>
             <p>Você pode baixar uma cópia do seu comprovante em PDF.</p>
-            <a href="#" id="pdfLink" target="_blank" class="btn btn-primary" style="text-decoration: none;"><i class="fas fa-file-pdf"></i> Baixar Comprovante</a>
-            <button id="logoutButtonSuccess" class="btn btn-secondary">Sair</button>
-        </div>
+            <a href="#" id="pdfLink" target="_blank" class="btn btn-primary" style="text-decoration: none;" aria-label="Baixar comprovante em PDF">
+                <i class="fas fa-file-pdf" aria-hidden="true"></i> Baixar Comprovante
+            </a>
+            <button id="logoutButtonSuccess" class="btn btn-secondary" type="button">Sair</button>
+        </section>
 
-        <div id="alreadySubmittedSection" class="card hidden">
+        <section id="alreadySubmittedSection" class="card hidden">
             <div class="alert alert-warning"><h2>Avaliação já Concluída</h2></div>
             <p>Nosso sistema indica que você já enviou sua auto-avaliação para o período atual.</p>
             <p>Em caso de dúvidas, entre em contato com o setor responsável.</p>
-            <button id="logoutButtonSubmitted" class="btn btn-secondary">Sair</button>
-        </div>
-    </div>
+            <button id="logoutButtonSubmitted" class="btn btn-secondary" type="button">Sair</button>
+        </section>
+    </main>
     
     <div id="reviewModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 700px;">
@@ -221,8 +316,8 @@
             <p>Confira suas respostas. Após o envio, a avaliação não poderá ser alterada.</p>
             <div id="reviewContent" class="review-container"></div>
             <div class="modal-buttons" style="margin-top: 20px;">
-                <button id="modalCloseReview" class="btn btn-secondary"><i class="fas fa-edit"></i> Voltar e Corrigir</button>
-                <button id="modalConfirmReview" class="btn btn-success"><i class="fas fa-check"></i> Confirmar e Enviar</button>
+                <button id="modalCloseReview" class="btn btn-secondary" type="button"><i class="fas fa-edit" aria-hidden="true"></i> Voltar e Corrigir</button>
+                <button id="modalConfirmReview" class="btn btn-success" type="button"><i class="fas fa-check" aria-hidden="true"></i> Confirmar e Enviar</button>
             </div>
         </div>
     </div>
@@ -233,8 +328,8 @@
             <p>Sua pontuação final calculada é de <span id="modalScore"></span> pontos.</p>
             <p>Deseja confirmar o envio da sua avaliação?</p>
             <div class="modal-buttons">
-                <button id="modalCancel" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
-                <button id="modalConfirm" class="btn btn-success"><i class="fas fa-check"></i> Confirmar Envio</button>
+                <button id="modalCancel" class="btn btn-secondary" type="button"><i class="fas fa-times" aria-hidden="true"></i> Cancelar</button>
+                <button id="modalConfirm" class="btn btn-success" type="button"><i class="fas fa-check" aria-hidden="true"></i> Confirmar Envio</button>
             </div>
         </div>
     </div>
@@ -261,7 +356,7 @@
             };
         
             const dom = {
-                login: { section: document.getElementById('loginSection'), user: document.getElementById('username'), pass: document.getElementById('password'), button: document.getElementById('loginButton'), alert: document.getElementById('loginAlert'), togglePass: document.getElementById('togglePassword') },
+                login: { section: document.getElementById('loginSection'), user: document.getElementById('username'), pass: document.getElementById('password'), button: document.getElementById('loginButton'), alert: document.getElementById('loginAlert'), togglePass: document.getElementById('togglePassword'), loading: document.getElementById('loginLoading') },
                 eval: { section: document.getElementById('evaluationSection'), form: document.getElementById('formAvaliacao'), sendButton: document.getElementById('sendButton'), declarationBox: document.getElementById('declarationBox'), declarationCheck: document.getElementById('declaracaoCiente'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper') },
                 success: { section: document.getElementById('successSection'), finalScore: document.getElementById('finalScore'), pdfLink: document.getElementById('pdfLink'), logoutButton: document.getElementById('logoutButtonSuccess') },
                 submitted: { section: document.getElementById('alreadySubmittedSection'), logoutButton: document.getElementById('logoutButtonSubmitted') },
@@ -270,6 +365,9 @@
                 progressBar: document.getElementById('progressBar'),
                 pontuacaoAtual: document.getElementById('pontuacaoAtual'),
                 faixaDesempenho: document.getElementById('faixaDesempenho'),
+                progressText: document.getElementById('progressText'),
+                answeredCount: document.getElementById('answeredCount'),
+                totalQuestions: document.getElementById('totalQuestions'),
                 modal: { review: document.getElementById('reviewModal'), confirmation: document.getElementById('confirmationModal'), score: document.getElementById('modalScore'), confirmBtn: document.getElementById('modalConfirm'), cancelBtn: document.getElementById('modalCancel'), closeReviewBtn: document.getElementById('modalCloseReview'), confirmReviewBtn: document.getElementById('modalConfirmReview') }
             };
         
@@ -282,11 +380,11 @@
                 sections.forEach(section => {
                     html += `<div class="criterio" id="criterio-${section.id}"><h3>${section.title}</h3>`;
                     section.questions.forEach(q => {
-                        html += `<div class="questao" id="questao-${q.id}"><p>${q.text}</p><div class="opcoes-avaliacao">`;
+                        html += `<div class="questao" id="questao-${q.id}"><p>${q.text}</p><div class="opcoes-avaliacao" role="radiogroup" aria-labelledby="pergunta-${q.id}">`;
                         const labels = scaleLabels[section.scaleType];
                         q.values.forEach((val, index) => { 
                             const label = labels[index] || '';
-                            html += `<div class="opcao" data-value="${val}">
+                            html += `<div class="opcao" role="radio" aria-checked="false" tabindex="0" data-value="${val}" aria-label="${label} - ${val.replace('.',',')} pontos">
                                         <span class="valor-numerico">${val.replace('.',',')}</span>
                                         <span class="valor-texto">${label}</span>
                                      </div>`; 
@@ -337,8 +435,12 @@
                             hiddenInput.value = value;
                             hiddenInput.dispatchEvent(new Event('change')); 
                         }
-                        this.parentNode.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+                        this.parentNode.querySelectorAll('.opcao').forEach(op => {
+                            op.classList.remove('selecionada');
+                            op.setAttribute('aria-checked', 'false');
+                        });
                         this.classList.add('selecionada');
+                        this.setAttribute('aria-checked', 'true');
                         if(questaoDiv) questaoDiv.classList.add('questao-respondida');
                         calculateScore();
                         
@@ -348,6 +450,13 @@
                         const stepId = criterioEl.id.replace('criterio-','step-');
                         if(isCompleted) document.getElementById(stepId).classList.add('completed');
 
+                    });
+                    // keyboard accessibility: select with Enter or Space
+                    opcao.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.click();
+                        }
                     });
                 });
             }
@@ -374,7 +483,10 @@
                 hideAlert(dom.login.alert);
                 const btn = dom.login.button;
                 if (!dom.login.user.value || !dom.login.pass.value) return showAlert(dom.login.alert, 'Preencha todos os campos.', 'error');
-                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+                btn.disabled = true; 
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+                dom.login.loading.classList.remove('hidden');
+                
                 try {
                     const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "login", matricula: dom.login.user.value, senha: dom.login.pass.value }) });
                     const result = await response.json();
@@ -390,7 +502,9 @@
                 } catch (error) {
                     showAlert(dom.login.alert, "Erro de conexão. Verifique sua internet.", 'error');
                 } finally {
-                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                    btn.disabled = false; 
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                    dom.login.loading.classList.add('hidden');
                 }
             }
         
@@ -440,7 +554,8 @@
                 hideModal(dom.modal.confirmation);
                 const totalScore = calculateScore();
                 const btn = dom.eval.sendButton;
-                btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+                btn.disabled = true; 
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
         
                 const answers = {};
                 for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
@@ -471,7 +586,8 @@
                 } catch (error) {
                     showAlert(dom.eval.alert, "Erro de conexão ao enviar. Tente novamente.", 'error');
                 } finally {
-                    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Enviar Avaliação';
+                    btn.disabled = false; 
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Enviar Avaliação';
                 }
             }
         
@@ -482,7 +598,10 @@
                 hideAlert(dom.login.alert);
                 showSection(dom.login.section);
                 if (dom.eval.form.reset) dom.eval.form.reset();
-                document.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+                document.querySelectorAll('.opcao').forEach(op => {
+                    op.classList.remove('selecionada');
+                    op.setAttribute('aria-checked', 'false');
+                });
                 document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
                 document.querySelectorAll('input[type=hidden]').forEach(input => input.value = '');
                 dom.eval.declarationCheck.checked = false;
@@ -505,34 +624,45 @@
         
             function calculateScore() {
                 let sum = 0;
+                let answeredCount = 0;
+                
                 for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
                     const input = document.getElementById(`c${i}`);
-                    if (input && input.value) sum += parseFloat(input.value);
+                    if (input && input.value) {
+                        sum += parseFloat(input.value);
+                        answeredCount++;
+                    }
                 }
                 
                 const finalScore = parseFloat(sum.toFixed(1));
+                const percentage = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
+
+                // Atualizar elementos de progresso
+                dom.progressText.textContent = `${percentage}%`;
+                dom.answeredCount.textContent = answeredCount;
+                dom.totalQuestions.textContent = TOTAL_QUESTIONS;
 
                 const pMax = 25.0;
                 dom.pontuacaoAtual.textContent = `${finalScore.toString().replace('.', ',')} / ${pMax.toFixed(0)} pts`;
-                const percentage = (finalScore / pMax) * 100;
-                dom.progressBar.style.width = percentage + '%';
+                const scorePercentage = (finalScore / pMax) * 100;
+                dom.progressBar.style.width = scorePercentage + '%';
 
-                if (percentage < 64) {
+                if (scorePercentage < 64) {
                     dom.progressBar.style.backgroundColor = 'var(--danger)';
                     dom.faixaDesempenho.textContent = "Abaixo do Esperado";
-                } else if (percentage < 80) {
+                } else if (scorePercentage < 80) {
                     dom.progressBar.style.backgroundColor = 'var(--primary)';
                     dom.faixaDesempenho.textContent = "Regular";
-                } else if (percentage < 92) {
+                } else if (scorePercentage < 92) {
                     dom.progressBar.style.backgroundColor = 'var(--success)';
                     dom.faixaDesempenho.textContent = "Bom";
                 } else {
                     dom.progressBar.style.backgroundColor = 'var(--success)';
                     dom.faixaDesempenho.textContent = "Excelente";
                 }
-                const answeredQuestions = document.querySelectorAll('.questao input[type=hidden][value]:not([value=""])').length;
-                if (answeredQuestions > 0 && !dom.eval.section.classList.contains('hidden')) {
-                    document.title = `(${answeredQuestions}/${TOTAL_QUESTIONS}) Avaliação de Desempenho`;
+                
+                if (answeredCount > 0 && !dom.eval.section.classList.contains('hidden')) {
+                    document.title = `(${answeredCount}/${TOTAL_QUESTIONS}) Avaliação de Desempenho`;
                 } else {
                     document.title = 'Avaliação de Desempenho - GCM';
                 }
@@ -584,6 +714,7 @@
                 dom.login.pass.type = isPassword ? 'text' : 'password';
                 dom.login.togglePass.classList.toggle('fa-eye');
                 dom.login.togglePass.classList.toggle('fa-eye-slash');
+                dom.login.togglePass.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
             });
 
             generateFormHTML();
