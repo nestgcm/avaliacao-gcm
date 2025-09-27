@@ -85,6 +85,7 @@
         .panel-table tbody tr { background-color: white; border-radius: var(--border-radius); box-shadow: var(--shadow); transition: all 0.3s; border-left: 5px solid; }
         .panel-table tbody tr.status-auto-concluida { border-left-color: var(--success); }
         .panel-table tbody tr.status-auto-pendente { border-left-color: var(--danger); }
+        .panel-table tbody tr.status-ambas-pendentes { border-left-color: var(--warning); background-color: var(--primary-light); }
         .panel-table tbody tr:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         .panel-table td { padding: 1rem 1.2rem; border: none; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); text-align: left; }
         .panel-user-cell { display: flex; align-items: center; gap: 1rem; }
@@ -102,10 +103,26 @@
         .data-controls { display: flex; align-items: center; gap: 10px; }
         .data-status { font-size: 0.8rem; color: var(--gray); display: flex; align-items: center; gap: 0.5rem; }
         .data-status .live-indicator { width: 8px; height: 8px; background-color: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+        
+        @keyframes subtle-flash {
+            0% { background-color: var(--success-light); }
+            100% { background-color: transparent; }
+        }
+        .data-refreshed { animation: subtle-flash 0.8s ease-out; }
 
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
             100% { box-shadow: 0 0 0 10px transparent; }
+        }
+        
+        @keyframes shake-horizontal {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .input-error-flash {
+            border-color: var(--danger) !important;
+            animation: shake-horizontal 0.4s cubic-bezier(.455,.03,.515,.955) both;
         }
 
         @media (max-width: 768px) {
@@ -144,20 +161,24 @@
             <div class="alert alert-error hidden" id="loginAlert"></div>
             <div class="form-group">
                 <label for="matricula">Matrícula:</label>
-                <input type="text" id="matricula" placeholder="Digite sua matrícula">
+                <input type="text" id="matricula" placeholder="Digite sua matrícula" inputmode="numeric">
             </div>
             <div class="form-group">
-                <label for="senha">Senha:</label>
+                <label for="senha">Senha (CPF Somente Números):</label>
                 <div class="password-wrapper">
-                    <input type="password" id="senha" placeholder="Digite sua senha">
+                    <input type="password" id="senha" placeholder="Digite seu CPF (apenas números)" inputmode="numeric">
                     <i class="fas fa-eye" id="togglePassword"></i>
                 </div>
             </div>
             <button id="btnLogin" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+            <div id="loginLoading" class="hidden" style="text-align: center; margin-top: 15px;">
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);" aria-hidden="true"></i>
+                <p style="margin-top: 10px;">Validando credenciais...</p>
+            </div>
         </div>
 
         <div id="panelScreen" class="hidden">
-            <div class="card">
+            <div class="card" id="mainPanelCard">
                 <div class="card-header">
                     <h2>Painel de Acompanhamento</h2>
                     <div class="data-controls">
@@ -217,6 +238,7 @@
             const dom = {
                 loginScreen: document.getElementById('loginScreen'),
                 panelScreen: document.getElementById('panelScreen'),
+                mainPanelCard: document.getElementById('mainPanelCard'),
                 userInfo: document.getElementById('userInfo'),
                 userName: document.getElementById('userName'),
                 loginAlert: document.getElementById('loginAlert'),
@@ -224,6 +246,7 @@
                 senha: document.getElementById('senha'),
                 togglePassword: document.getElementById('togglePassword'),
                 btnLogin: document.getElementById('btnLogin'),
+                loginLoading: document.getElementById('loginLoading'),
                 btnLogout: document.getElementById('btnLogout'),
                 themeToggle: document.getElementById('themeToggle'),
                 panelStats: document.getElementById('panelStats'),
@@ -247,11 +270,7 @@
 
             // --- FUNÇÕES DE ESTADO E PERSISTÊNCIA ---
             function saveStateToLocalStorage() {
-                const state = {
-                    filter: currentFilter,
-                    lotacao: currentLotacaoFilter,
-                    sort: sortConfig
-                };
+                const state = { filter: currentFilter, lotacao: currentLotacaoFilter, sort: sortConfig };
                 localStorage.setItem('gcmDashboardState', JSON.stringify(state));
             }
 
@@ -269,7 +288,7 @@
                 document.body.style.backgroundColor = theme === 'dark' ? 'var(--dark)' : '#f5f7fa';
                 dom.themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
                 localStorage.setItem('theme', theme);
-                if(statCharts.auto) renderStats(); // Recarrega gráficos para aplicar cores
+                if(statCharts.auto && allServidores.length > 0) renderStats(getProcessedData());
             }
 
             // --- FUNÇÕES DE AUTENTICAÇÃO ---
@@ -297,6 +316,7 @@
                 }
                 dom.btnLogin.disabled = true;
                 dom.btnLogin.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+                dom.loginLoading.classList.remove('hidden');
 
                 try {
                     const response = await fetch(WEB_APP_URL, {
@@ -318,6 +338,7 @@
                 } finally {
                     dom.btnLogin.disabled = false;
                     dom.btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                    dom.loginLoading.classList.add('hidden');
                 }
             }
 
@@ -343,23 +364,28 @@
                         allServidores = data.servidores || [];
                         populateLotacaoFilter();
                         render();
+                        updateDataStatus(); 
+                        if (isRefresh) {
+                           dom.mainPanelCard.classList.add('data-refreshed');
+                           setTimeout(() => dom.mainPanelCard.classList.remove('data-refreshed'), 800);
+                        }
                     } else {
                         if (!isRefresh) dom.panelLoader.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Erro: ${data.error}`;
                     }
                 } catch (error) {
                     console.error("Erro ao carregar dados do painel:", error);
                     if (!isRefresh) dom.panelLoader.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Falha de comunicação.`;
+                    dom.dataStatus.innerHTML = `<span class="live-indicator" style="background-color:var(--danger)"></span><strong style="color:var(--danger)">Falha na conexão</strong>`;
                 } finally {
                     if (!isRefresh) dom.panelLoader.classList.add('hidden');
                     else dom.refreshButton.querySelector('i').classList.remove('fa-spin');
-                    updateDataStatus();
                 }
             }
 
             // --- FUNÇÕES DE RENDERIZAÇÃO ---
             const render = () => {
                 const processedData = getProcessedData();
-                renderStats();
+                renderStats(processedData);
                 renderStatusFilters();
                 renderTable(processedData);
                 updateSortIcons();
@@ -413,10 +439,13 @@
                 ).join('');
             }
 
-            function renderStats() {
-                const total = allServidores.length, autoC = allServidores.filter(s => s.autoav === 'Concluída').length;
-                const chefiaC = allServidores.filter(s => s.chefia === 'Concluída').length;
-                const autoP = total - autoC, chefiaP = total - chefiaC;
+            function renderStats(data) {
+                const sourceData = data || allServidores;
+                const total = sourceData.length;
+                const autoC = sourceData.filter(s => s.autoav === 'Concluída').length;
+                const chefiaC = sourceData.filter(s => s.chefia === 'Concluída').length;
+                const autoP = total - autoC;
+                const chefiaP = total - chefiaC;
 
                 if (statCharts.auto) { statCharts.auto.destroy(); statCharts.auto = null; }
                 if (statCharts.chefia) { statCharts.chefia.destroy(); statCharts.chefia = null; }
@@ -450,8 +479,8 @@
                     data: { labels: ['Concluído', 'Pendente'], datasets: [{ data, backgroundColor: ['#10b981', '#f59e0b'], borderColor: '#ffffff', borderWidth: 2 }] },
                     options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
                 });
-                statCharts.auto = createChart('autoChart', [autoC, autoP]);
-                statCharts.chefia = createChart('chefiaChart', [chefiaC, chefiaP]);
+                if (document.getElementById('autoChart')) statCharts.auto = createChart('autoChart', [autoC, autoP]);
+                if (document.getElementById('chefiaChart')) statCharts.chefia = createChart('chefiaChart', [chefiaC, chefiaP]);
             }
 
             function renderTable(data) {
@@ -463,8 +492,13 @@
                 const getInitials = name => ((name || '').split(' ').length > 1 ? `${name.split(' ')[0][0]}${name.split(' ').slice(-1)[0][0]}` : (name || '').substring(0, 2)).toUpperCase();
                 const getColorForName = name => avatarColors[Math.abs((name||'').split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)) % avatarColors.length];
 
-                dom.servidoresTbody.innerHTML = data.map(s => `
-                    <tr class="${s.autoav === 'Concluída' && s.chefia === 'Concluída' ? 'status-auto-concluida' : 'status-auto-pendente'}">
+                dom.servidoresTbody.innerHTML = data.map(s => {
+                    let rowClass = '';
+                    if (s.autoav === 'Pendente' && s.chefia === 'Pendente') rowClass = 'status-ambas-pendentes';
+                    else if (s.autoav === 'Concluída' && s.chefia === 'Concluída') rowClass = 'status-auto-concluida';
+                    else rowClass = 'status-auto-pendente';
+                    return `
+                    <tr class="${rowClass}">
                         <td data-label="Servidor">
                             <div class="panel-user-cell">
                                 <div class="panel-user-avatar" style="background-color:${getColorForName(s.nome)}">${getInitials(s.nome)}</div>
@@ -476,7 +510,7 @@
                         <td data-label="Autoavaliação"><span class="panel-status ${s.autoav === 'Concluída' ? 'panel-status-concluida' : 'panel-status-pendente'}">${s.autoav}</span></td>
                         <td data-label="Avaliação Chefia"><span class="panel-status ${s.chefia === 'Concluída' ? 'panel-status-concluida' : 'panel-status-pendente'}">${s.chefia}</span></td>
                     </tr>`
-                ).join('');
+                }).join('');
             }
 
             function updateSortIcons() {
@@ -520,6 +554,17 @@
                 el.textContent = msg;
                 el.className = `alert alert-${type}`;
             }
+            
+            const filterNumericInput = (event) => {
+                const inputElement = event.target;
+                const originalValue = inputElement.value;
+                const sanitizedValue = originalValue.replace(/[^0-9]/g, '');
+                if (originalValue !== sanitizedValue) {
+                    inputElement.classList.add('input-error-flash');
+                    setTimeout(() => { inputElement.classList.remove('input-error-flash'); }, 500);
+                }
+                inputElement.value = sanitizedValue;
+            };
 
             // --- EVENT LISTENERS ---
             dom.btnLogin.addEventListener('click', login);
@@ -531,6 +576,9 @@
             });
             [dom.matricula, dom.senha].forEach(el => el.addEventListener('keypress', e => e.key === 'Enter' && login()));
             dom.themeToggle.addEventListener('click', () => applyTheme(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark'));
+
+            dom.matricula.addEventListener('input', filterNumericInput);
+            dom.senha.addEventListener('input', filterNumericInput);
 
             dom.searchInput.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
