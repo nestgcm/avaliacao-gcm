@@ -554,19 +554,25 @@
             document.getElementById('pontuacaoAtual').textContent = total.toFixed(1);
             const pMax = 25.0;
             document.getElementById('progressBar').style.width = ((total / pMax) * 100) + '%';
+            
+            // --- INÍCIO DA ALTERAÇÃO ---
             if (total < 16) {
                 document.getElementById('progressBar').style.backgroundColor = 'var(--danger)';
                 document.getElementById('faixaDesempenho').textContent = "Abaixo do esperado";
-            } else if (total < 20) {
+            } else if (total < 19) {
                 document.getElementById('progressBar').style.backgroundColor = 'var(--primary)';
                 document.getElementById('faixaDesempenho').textContent = "Regular";
-            } else if (total < 23) {
+            } else if (total < 22) {
                 document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
                 document.getElementById('faixaDesempenho').textContent = "Bom";
+            } else if (total < 24) {
+                document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
+                document.getElementById('faixaDesempenho').textContent = "Muito Bom";
             } else {
                 document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
                 document.getElementById('faixaDesempenho').textContent = "Excelente";
             }
+            // --- FIM DA ALTERAÇÃO ---
             return total;
         }
 
@@ -768,5 +774,3 @@
     </script>
 </body>
 </html>
-
-}
