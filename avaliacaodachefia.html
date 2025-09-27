@@ -634,7 +634,7 @@
                 matriculaAvaliado: document.getElementById('matriculaAvaliado').value, nomeAvaliado: document.getElementById('nomeAvaliado').value,
                 pontuacao: pontuacaoTotal.toFixed(1), declaracao: `Confirmado por ${currentUser.nome} em ${new Date().toLocaleString('pt-BR')}`, respostas: respostas
             };
-            const btnSalvar = document.getElementById('btnSalvarAvaliacao');
+            const btnSalvar = document.getElementById('btnSalvarAvaliaco');
             btnSalvar.disabled = true; btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
             
             isFormDirty = false;
@@ -768,3 +768,5 @@
     </script>
 </body>
 </html>
+
+}
