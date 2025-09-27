@@ -147,6 +147,35 @@
             .opcoes-avaliacao { grid-template-columns: 1fr; }
             .logo h1 { font-size: 1rem; }
         }
+
+        /* --- INÍCIO DA ESTILIZAÇÃO DA TELA DE SUCESSO --- */
+        #successSection { text-align: center; }
+        .success-message {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin: 20px 0;
+        }
+        .final-score-container {
+            margin: 25px 0;
+            background-color: var(--primary-light);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--primary);
+        }
+        .final-score-container p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: var(--primary-dark);
+        }
+        #finalScore {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        #successSection .btn { margin-top: 10px; }
+        /* --- FIM DA ESTILIZAÇÃO DA TELA DE SUCESSO --- */
+
     </style>
 </head>
 <body>
@@ -259,10 +288,13 @@
         </section>
 
         <section id="successSection" class="card hidden" aria-live="polite">
-             <div class="alert alert-success"><h2>Avaliação Enviada com Sucesso!</h2></div>
-            <p>Sua auto-avaliação foi registrada em nosso sistema.</p>
-            <p><strong>Pontuação Final:</strong> <span id="finalScore"></span></p>
-            <p>Você pode baixar uma cópia do seu comprovante em PDF.</p>
+            <div class="alert alert-success"><h2>Avaliação Enviada com Sucesso!</h2></div>
+            <p class="success-message">Sua auto-avaliação foi registrada em nosso sistema.</p>
+            <div class="final-score-container">
+                <p>Pontuação Final:</p>
+                <span id="finalScore"></span>
+            </div>
+            <p class="success-message">Você pode baixar uma cópia do seu comprovante em PDF.</p>
             <a href="#" id="pdfLink" target="_blank" class="btn btn-primary" style="text-decoration: none;" aria-label="Baixar comprovante em PDF">
                 <i class="fas fa-file-pdf" aria-hidden="true"></i> Baixar Comprovante
             </a>
@@ -574,7 +606,7 @@
                     const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "salvarResposta", resposta: submissionData }) });
                     const result = await response.json();
                     if (result.success) {
-                        dom.success.finalScore.textContent = totalScore.toFixed(1);
+                        dom.success.finalScore.textContent = totalScore.toFixed(1).replace('.', ',');
                         dom.success.pdfLink.href = result.pdfUrl || '#';
                         if (!result.pdfUrl) dom.success.pdfLink.classList.add('hidden');
                         showSection(dom.success.section);
@@ -648,12 +680,15 @@
                 if (scorePercentage < 64) {
                     dom.progressBar.style.backgroundColor = 'var(--danger)';
                     dom.faixaDesempenho.textContent = "Abaixo do Esperado";
-                } else if (scorePercentage < 80) {
+                } else if (scorePercentage < 73) {
                     dom.progressBar.style.backgroundColor = 'var(--primary)';
                     dom.faixaDesempenho.textContent = "Regular";
-                } else if (scorePercentage < 92) {
+                } else if (scorePercentage < 82) {
                     dom.progressBar.style.backgroundColor = 'var(--success)';
                     dom.faixaDesempenho.textContent = "Bom";
+                } else if (scorePercentage < 91) {
+                    dom.progressBar.style.backgroundColor = 'var(--success)';
+                    dom.faixaDesempenho.textContent = "Muito Bom";
                 } else {
                     dom.progressBar.style.backgroundColor = 'var(--success)';
                     dom.faixaDesempenho.textContent = "Excelente";
