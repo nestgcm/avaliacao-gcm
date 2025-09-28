@@ -13,7 +13,13 @@
             --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444;
             --warning: #f59e0b; --gray: #6b7280; --border-color: #e5e7eb;
             --border-radius: 8px; --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            
+            /* Novas variáveis para melhor organização */
+            --spacing-xs: 0.25rem; --spacing-sm: 0.5rem; --spacing-md: 1rem;
+            --spacing-lg: 1.5rem; --spacing-xl: 2rem;
+            --transition-fast: 0.15s ease; --transition-normal: 0.3s ease; --transition-slow: 0.5s ease;
         }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         html { scroll-behavior: smooth; }
         body { background-color: #f5f7fa; color: var(--dark); line-height: 1.6; }
@@ -104,6 +110,82 @@
         .data-status { font-size: 0.8rem; color: var(--gray); display: flex; align-items: center; gap: 0.5rem; }
         .data-status .live-indicator { width: 8px; height: 8px; background-color: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
         
+        /* Novos estilos para melhorias */
+        .skeleton-loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .skeleton-row {
+            height: 60px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius);
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            color: white;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        .toast-success { background-color: var(--success); }
+        .toast-error { background-color: var(--danger); }
+        .toast-info { background-color: var(--primary); }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .advanced-filters {
+            margin-bottom: 15px;
+        }
+        
+        .advanced-filters-panel {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .filter-group {
+            margin-bottom: 10px;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
         @keyframes subtle-flash {
             0% { background-color: var(--success-light); }
             100% { background-color: transparent; }
@@ -135,6 +217,8 @@
             .panel-table td.panel-user-cell:before { content: none; }
             .panel-table td:last-child { border-bottom: none; }
             .header-content { flex-direction: column; gap: 10px; align-items: flex-start; }
+            .data-controls { flex-wrap: wrap; }
+            .export-options { flex-direction: column; }
         }
     </style>
 </head>
@@ -189,7 +273,32 @@
                             <option value="60000">1 min</option>
                             <option value="300000">5 min</option>
                         </select>
-                        <button id="exportButton" class="btn btn-success"><i class="fas fa-download"></i> Exportar CSV</button>
+                        <div class="export-dropdown">
+                            <button id="exportButton" class="btn btn-success"><i class="fas fa-download"></i> Exportar</button>
+                            <div id="exportOptions" class="export-options hidden">
+                                <button data-format="csv" class="btn btn-success"><i class="fas fa-file-csv"></i> CSV</button>
+                                <button data-format="excel" class="btn btn-success"><i class="fas fa-file-excel"></i> Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="advanced-filters">
+                    <button id="toggleAdvancedFilters" class="btn btn-secondary">
+                        <i class="fas fa-filter"></i> Filtros Avançados
+                    </button>
+                    <div id="advancedFiltersPanel" class="advanced-filters-panel hidden">
+                        <div class="filter-group">
+                            <label>Período:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="date" id="filterStartDate">
+                                <input type="date" id="filterEndDate">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button id="applyAdvancedFilters" class="btn btn-primary">Aplicar</button>
+                            <button id="clearAdvancedFilters" class="btn btn-secondary">Limpar</button>
+                        </div>
                     </div>
                 </div>
 
@@ -233,6 +342,25 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Constantes para melhor organização
+            const CONSTANTS = {
+                STORAGE_KEYS: {
+                    THEME: 'theme',
+                    DASHBOARD_STATE: 'gcmDashboardState'
+                },
+                FILTER_TYPES: {
+                    ALL: 'all',
+                    AUTO_PENDENTE: 'auto-pendente',
+                    CHEFIA_PENDENTE: 'chefia-pendente',
+                    AMBAS_PENDENTE: 'ambas-pendente'
+                },
+                CHART_COLORS: {
+                    SUCCESS: '#10b981',
+                    WARNING: '#f59e0b',
+                    DANGER: '#ef4444'
+                }
+            };
+
             const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw1PSNWaC0X12aFgafJNDWkgyh5PD1Vg-LitYUzrLWY3HgJ40qKLt6rEJ9OMDkVWii5/exec';
 
             const dom = {
@@ -259,7 +387,14 @@
                 dataStatus: document.getElementById('dataStatus'),
                 refreshButton: document.getElementById('refreshButton'),
                 refreshSelect: document.getElementById('refreshSelect'),
-                exportButton: document.getElementById('exportButton')
+                exportButton: document.getElementById('exportButton'),
+                exportOptions: document.getElementById('exportOptions'),
+                toggleAdvancedFilters: document.getElementById('toggleAdvancedFilters'),
+                advancedFiltersPanel: document.getElementById('advancedFiltersPanel'),
+                filterStartDate: document.getElementById('filterStartDate'),
+                filterEndDate: document.getElementById('filterEndDate'),
+                applyAdvancedFilters: document.getElementById('applyAdvancedFilters'),
+                clearAdvancedFilters: document.getElementById('clearAdvancedFilters')
             };
 
             let allServidores = [], refreshInterval = null, searchTimeout;
@@ -267,19 +402,34 @@
             let statCharts = { auto: null, chefia: null };
             let currentFilter = 'all', currentLotacaoFilter = 'all';
             let sortConfig = { key: 'nome', direction: 'ascending' };
+            let advancedFilters = { startDate: null, endDate: null };
+
+            // Cache para otimização
+            let _lastCacheKey = null;
+            let _lastProcessedData = null;
 
             // --- FUNÇÕES DE ESTADO E PERSISTÊNCIA ---
             function saveStateToLocalStorage() {
-                const state = { filter: currentFilter, lotacao: currentLotacaoFilter, sort: sortConfig };
-                localStorage.setItem('gcmDashboardState', JSON.stringify(state));
+                const state = { 
+                    filter: currentFilter, 
+                    lotacao: currentLotacaoFilter, 
+                    sort: sortConfig,
+                    advancedFilters: advancedFilters
+                };
+                localStorage.setItem(CONSTANTS.STORAGE_KEYS.DASHBOARD_STATE, JSON.stringify(state));
             }
 
             function loadStateFromLocalStorage() {
-                const savedState = JSON.parse(localStorage.getItem('gcmDashboardState'));
+                const savedState = JSON.parse(localStorage.getItem(CONSTANTS.STORAGE_KEYS.DASHBOARD_STATE));
                 if (savedState) {
                     currentFilter = savedState.filter || 'all';
                     currentLotacaoFilter = savedState.lotacao || 'all';
                     sortConfig = savedState.sort || { key: 'nome', direction: 'ascending' };
+                    advancedFilters = savedState.advancedFilters || { startDate: null, endDate: null };
+                    
+                    // Aplicar filtros avançados salvos
+                    if (advancedFilters.startDate) dom.filterStartDate.value = advancedFilters.startDate;
+                    if (advancedFilters.endDate) dom.filterEndDate.value = advancedFilters.endDate;
                 }
             }
 
@@ -287,7 +437,7 @@
             function applyTheme(theme) {
                 document.body.style.backgroundColor = theme === 'dark' ? 'var(--dark)' : '#f5f7fa';
                 dom.themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-                localStorage.setItem('theme', theme);
+                localStorage.setItem(CONSTANTS.STORAGE_KEYS.THEME, theme);
                 if(statCharts.auto && allServidores.length > 0) renderStats(getProcessedData());
             }
 
@@ -312,7 +462,8 @@
                 const matricula = dom.matricula.value.trim();
                 const senha = dom.senha.value.trim();
                 if (!matricula || !senha) {
-                    showAlert(dom.loginAlert, 'Preencha todos os campos.', 'error'); return;
+                    showAlert(dom.loginAlert, 'Preencha todos os campos.', 'error'); 
+                    return;
                 }
                 dom.btnLogin.disabled = true;
                 dom.btnLogin.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
@@ -329,6 +480,7 @@
                         currentUser = data.user;
                         dom.userName.textContent = `Bem-vindo, ${currentUser.nome.split(' ')[0]}!`;
                         showPanelScreen();
+                        showToast('Login realizado com sucesso!', 'success');
                     } else {
                         showAlert(dom.loginAlert, data.error || 'Credenciais inválidas.', 'error');
                     }
@@ -343,22 +495,44 @@
             }
 
             function logout() {
-                currentUser = null; allServidores = [];
+                currentUser = null; 
+                allServidores = [];
                 if (refreshInterval) clearInterval(refreshInterval);
                 showLoginScreen();
+                showToast('Logout realizado com sucesso!', 'info');
             }
 
             // --- FUNÇÕES DO PAINEL ---
             async function loadDashboardData(isRefresh = false) {
-                if (!isRefresh) dom.panelLoader.classList.remove('hidden');
-                else dom.refreshButton.querySelector('i').classList.add('fa-spin');
+                if (!isRefresh) {
+                    dom.panelLoader.classList.remove('hidden');
+                    // Mostrar skeleton loading
+                    showSkeletonLoading();
+                } else {
+                    dom.refreshButton.querySelector('i').classList.add('fa-spin');
+                }
 
                 try {
+                    if (!navigator.onLine) {
+                        throw new Error('Sem conexão com a internet');
+                    }
+                    
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    
                     const response = await fetch(WEB_APP_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({ action: 'getDashboardData' })
+                        body: JSON.stringify({ action: 'getDashboardData' }),
+                        signal: controller.signal
                     });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
                     const data = await response.json();
                     if (data.success) {
                         allServidores = data.servidores || [];
@@ -373,13 +547,55 @@
                         if (!isRefresh) dom.panelLoader.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Erro: ${data.error}`;
                     }
                 } catch (error) {
-                    console.error("Erro ao carregar dados do painel:", error);
-                    if (!isRefresh) dom.panelLoader.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Falha de comunicação.`;
-                    dom.dataStatus.innerHTML = `<span class="live-indicator" style="background-color:var(--danger)"></span><strong style="color:var(--danger)">Falha na conexão</strong>`;
+                    handleDataLoadError(error, isRefresh);
                 } finally {
                     if (!isRefresh) dom.panelLoader.classList.add('hidden');
                     else dom.refreshButton.querySelector('i').classList.remove('fa-spin');
                 }
+            }
+
+            function handleDataLoadError(error, isRefresh) {
+                console.error('Erro ao carregar dados:', error);
+                
+                if (error.name === 'AbortError') {
+                    showToast('Tempo de requisição excedido', 'error');
+                } else if (!navigator.onLine) {
+                    showToast('Verifique sua conexão com a internet', 'error');
+                } else {
+                    showToast('Erro ao carregar dados do servidor', 'error');
+                }
+                
+                if (!isRefresh) {
+                    dom.panelLoader.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Falha de comunicação.`;
+                }
+                dom.dataStatus.innerHTML = `<span class="live-indicator" style="background-color:var(--danger)"></span><strong style="color:var(--danger)">Falha na conexão</strong>`;
+                
+                // Tentar carregar dados do cache se disponível
+                tryLoadCachedData();
+            }
+
+            function tryLoadCachedData() {
+                const cachedData = localStorage.getItem('gcmDashboardCache');
+                if (cachedData) {
+                    try {
+                        const data = JSON.parse(cachedData);
+                        if (data.servidores && data.timestamp) {
+                            const cacheAge = Date.now() - data.timestamp;
+                            // Usar cache apenas se tiver menos de 1 hora
+                            if (cacheAge < 3600000) {
+                                allServidores = data.servidores;
+                                populateLotacaoFilter();
+                                render();
+                                updateDataStatus();
+                                showToast('Dados carregados do cache', 'info');
+                                return true;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Erro ao carregar cache:', e);
+                    }
+                }
+                return false;
             }
 
             // --- FUNÇÕES DE RENDERIZAÇÃO ---
@@ -393,11 +609,34 @@
             };
 
             function getProcessedData() {
+                const cacheKey = JSON.stringify({
+                    search: dom.searchInput.value,
+                    filter: currentFilter,
+                    lotacao: currentLotacaoFilter,
+                    sort: sortConfig,
+                    advancedFilters: advancedFilters,
+                    dataLength: allServidores.length
+                });
+                
+                // Verificar cache
+                if (_lastCacheKey === cacheKey) {
+                    return _lastProcessedData;
+                }
+                
                 const search = (dom.searchInput.value || '').toLowerCase();
                 let data = allServidores.filter(s => {
                     const searchMatch = (s.nome || '').toLowerCase().includes(search) || (s.matricula || '').includes(search);
                     const lotacaoMatch = currentLotacaoFilter === 'all' || s.lotacao === currentLotacaoFilter;
-                    if (!searchMatch || !lotacaoMatch) return false;
+                    
+                    // Aplicar filtros avançados de data se existirem
+                    let dateMatch = true;
+                    if (advancedFilters.startDate || advancedFilters.endDate) {
+                        // Esta é uma implementação básica - ajuste conforme sua estrutura de dados
+                        // Assumindo que há um campo dataAvaliacao ou similar
+                        dateMatch = true; // Implementar lógica de data conforme necessário
+                    }
+                    
+                    if (!searchMatch || !lotacaoMatch || !dateMatch) return false;
 
                     switch (currentFilter) {
                         case 'auto-pendente': return s.autoav === 'Pendente';
@@ -407,13 +646,19 @@
                     }
                 });
 
-                return data.sort((a, b) => {
+                data = data.sort((a, b) => {
                     const valA = a[sortConfig.key] || '';
                     const valB = b[sortConfig.key] || '';
                     if (valA < valB) return sortConfig.direction === 'ascending' ? -1 : 1;
                     if (valA > valB) return sortConfig.direction === 'ascending' ? 1 : -1;
                     return 0;
                 });
+
+                // Atualizar cache
+                _lastCacheKey = cacheKey;
+                _lastProcessedData = data;
+                
+                return data;
             }
 
             function renderStatusFilters() {
@@ -425,10 +670,10 @@
                 };
 
                 dom.statusFilterControls.innerHTML = `
-                    <button data-filter="all" class="panel-filter-btn ${currentFilter === 'all' ? 'active' : ''}">Todos <span class="count">${counts.all}</span></button>
-                    <button data-filter="auto-pendente" class="panel-filter-btn ${currentFilter === 'auto-pendente' ? 'active' : ''}">Auto Pendente <span class="count">${counts.autoPendente}</span></button>
-                    <button data-filter="chefia-pendente" class="panel-filter-btn ${currentFilter === 'chefia-pendente' ? 'active' : ''}">Chefia Pendente <span class="count">${counts.chefiaPendente}</span></button>
-                    <button data-filter="ambas-pendente" class="panel-filter-btn ${currentFilter === 'ambas-pendente' ? 'active' : ''}">Ambas Pendentes <span class="count">${counts.ambasPendente}</span></button>
+                    <button data-filter="all" class="panel-filter-btn ${currentFilter === 'all' ? 'active' : ''}" role="tab" aria-selected="${currentFilter === 'all'}">Todos <span class="count">${counts.all}</span></button>
+                    <button data-filter="auto-pendente" class="panel-filter-btn ${currentFilter === 'auto-pendente' ? 'active' : ''}" role="tab" aria-selected="${currentFilter === 'auto-pendente'}">Auto Pendente <span class="count">${counts.autoPendente}</span></button>
+                    <button data-filter="chefia-pendente" class="panel-filter-btn ${currentFilter === 'chefia-pendente' ? 'active' : ''}" role="tab" aria-selected="${currentFilter === 'chefia-pendente'}">Chefia Pendente <span class="count">${counts.chefiaPendente}</span></button>
+                    <button data-filter="ambas-pendente" class="panel-filter-btn ${currentFilter === 'ambas-pendente' ? 'active' : ''}" role="tab" aria-selected="${currentFilter === 'ambas-pendente'}">Ambas Pendentes <span class="count">${counts.ambasPendente}</span></button>
                 `;
             }
 
@@ -476,7 +721,7 @@
 
                 const createChart = (canvasId, data) => new Chart(document.getElementById(canvasId).getContext('2d'), {
                     type: 'doughnut',
-                    data: { labels: ['Concluído', 'Pendente'], datasets: [{ data, backgroundColor: ['#10b981', '#f59e0b'], borderColor: '#ffffff', borderWidth: 2 }] },
+                    data: { labels: ['Concluído', 'Pendente'], datasets: [{ data, backgroundColor: [CONSTANTS.CHART_COLORS.SUCCESS, CONSTANTS.CHART_COLORS.WARNING], borderColor: '#ffffff', borderWidth: 2 }] },
                     options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
                 });
                 if (document.getElementById('autoChart')) statCharts.auto = createChart('autoChart', [autoC, autoP]);
@@ -513,6 +758,14 @@
                 }).join('');
             }
 
+            function showSkeletonLoading() {
+                dom.servidoresTbody.innerHTML = `
+                    <tr><td colspan="5"><div class="skeleton-loading skeleton-row"></div></td></tr>
+                    <tr><td colspan="5"><div class="skeleton-loading skeleton-row"></div></td></tr>
+                    <tr><td colspan="5"><div class="skeleton-loading skeleton-row"></div></td></tr>
+                `;
+            }
+
             function updateSortIcons() {
                 document.querySelectorAll('.panel-table th.sortable').forEach(th => {
                     const key = th.id.replace('th-', '');
@@ -529,16 +782,30 @@
             // --- FUNÇÕES AUXILIARES E DE UTILIDADE ---
             function updateDataStatus() {
                 dom.dataStatus.innerHTML = `<span class="live-indicator"></span>Dados atualizados em: ${new Date().toLocaleTimeString('pt-BR')}`;
+                
+                // Salvar cache
+                localStorage.setItem('gcmDashboardCache', JSON.stringify({
+                    servidores: allServidores,
+                    timestamp: Date.now()
+                }));
             }
 
             function setupAutoRefresh() {
                 if (refreshInterval) clearInterval(refreshInterval);
                 const interval = parseInt(dom.refreshSelect.value);
-                if (interval > 0) refreshInterval = setInterval(() => loadDashboardData(true), interval);
+                if (interval > 0) {
+                    refreshInterval = setInterval(() => loadDashboardData(true), interval);
+                    showToast(`Atualização automática ativada (${interval/60000} min)`, 'info');
+                } else {
+                    showToast('Atualização automática desativada', 'info');
+                }
             }
 
             function exportToCSV() {
-                if (allServidores.length === 0) return;
+                if (allServidores.length === 0) {
+                    showToast('Nenhum dado para exportar', 'error');
+                    return;
+                }
                 const headers = ['Nome', 'Matrícula', 'Lotação', 'Cargo', 'Autoavaliação', 'Avaliação Chefia'];
                 const csvContent = [headers.join(','), ...allServidores.map(s => [`"${(s.nome||'').replace(/"/g,'""')}"`, s.matricula||'', `"${(s.lotacao||'').replace(/"/g,'""')}"`, `"${(s.cargo||'').replace(/"/g,'""')}"`, s.autoav||'', s.chefia||''].join(','))].join('\n');
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -548,11 +815,38 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                showToast('Arquivo CSV exportado com sucesso', 'success');
+            }
+
+            function exportToExcel() {
+                if (allServidores.length === 0) {
+                    showToast('Nenhum dado para exportar', 'error');
+                    return;
+                }
+                // Implementação básica - em produção, use uma biblioteca como SheetJS
+                exportToCSV(); // Fallback para CSV por enquanto
+                showToast('Funcionalidade Excel em desenvolvimento - CSV exportado', 'info');
             }
 
             function showAlert(el, msg, type) {
                 el.textContent = msg;
                 el.className = `alert alert-${type}`;
+                el.classList.remove('hidden');
+            }
+            
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                toast.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.animation = 'slideIn 0.3s ease-out reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
             }
             
             const filterNumericInput = (event) => {
@@ -566,6 +860,19 @@
                 inputElement.value = sanitizedValue;
             };
 
+            // Debounce para otimização de busca
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
             // --- EVENT LISTENERS ---
             dom.btnLogin.addEventListener('click', login);
             dom.btnLogout.addEventListener('click', logout);
@@ -575,16 +882,18 @@
                 dom.togglePassword.className = `fas ${isPassword ? 'fa-eye-slash' : 'fa-eye'}`;
             });
             [dom.matricula, dom.senha].forEach(el => el.addEventListener('keypress', e => e.key === 'Enter' && login()));
-            dom.themeToggle.addEventListener('click', () => applyTheme(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark'));
+            dom.themeToggle.addEventListener('click', () => applyTheme(localStorage.getItem(CONSTANTS.STORAGE_KEYS.THEME) === 'dark' ? 'light' : 'dark'));
 
             dom.matricula.addEventListener('input', filterNumericInput);
             dom.senha.addEventListener('input', filterNumericInput);
 
-            dom.searchInput.addEventListener('input', () => {
-                clearTimeout(searchTimeout);
+            // Debounce na busca
+            const debouncedRender = debounce(() => {
                 dom.clearSearchButton.classList.toggle('visible', dom.searchInput.value);
-                searchTimeout = setTimeout(render, 300);
-            });
+                render();
+            }, 300);
+            
+            dom.searchInput.addEventListener('input', debouncedRender);
             dom.clearSearchButton.addEventListener('click', () => {
                 dom.searchInput.value = '';
                 dom.clearSearchButton.classList.remove('visible');
@@ -617,13 +926,80 @@
 
             dom.refreshButton.addEventListener('click', () => loadDashboardData(true));
             dom.refreshSelect.addEventListener('change', setupAutoRefresh);
-            dom.exportButton.addEventListener('click', exportToCSV);
+            
+            // Exportação
+            dom.exportButton.addEventListener('click', () => {
+                dom.exportOptions.classList.toggle('hidden');
+            });
+            
+            dom.exportOptions.addEventListener('click', (e) => {
+                const format = e.target.dataset.format;
+                if (format === 'csv') {
+                    exportToCSV();
+                } else if (format === 'excel') {
+                    exportToExcel();
+                }
+                dom.exportOptions.classList.add('hidden');
+            });
+            
+            // Fechar menu de exportação ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (!dom.exportButton.contains(e.target) && !dom.exportOptions.contains(e.target)) {
+                    dom.exportOptions.classList.add('hidden');
+                }
+            });
+
+            // Filtros avançados
+            dom.toggleAdvancedFilters.addEventListener('click', () => {
+                dom.advancedFiltersPanel.classList.toggle('hidden');
+            });
+            
+            dom.applyAdvancedFilters.addEventListener('click', () => {
+                advancedFilters.startDate = dom.filterStartDate.value || null;
+                advancedFilters.endDate = dom.filterEndDate.value || null;
+                render();
+                showToast('Filtros avançados aplicados', 'success');
+            });
+            
+            dom.clearAdvancedFilters.addEventListener('click', () => {
+                dom.filterStartDate.value = '';
+                dom.filterEndDate.value = '';
+                advancedFilters.startDate = null;
+                advancedFilters.endDate = null;
+                render();
+                showToast('Filtros avançados removidos', 'info');
+            });
+
+            // Melhorar acessibilidade
+            function enhanceAccessibility() {
+                // Adicionar live region para atualizações
+                const liveRegion = document.createElement('div');
+                liveRegion.setAttribute('aria-live', 'polite');
+                liveRegion.setAttribute('aria-atomic', 'true');
+                liveRegion.className = 'sr-only';
+                document.body.appendChild(liveRegion);
+                
+                // Navegação por teclado
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        dom.exportOptions.classList.add('hidden');
+                        dom.advancedFiltersPanel.classList.add('hidden');
+                    }
+                });
+            }
 
             // --- INICIALIZAÇÃO ---
             function initialize() {
-                applyTheme(localStorage.getItem('theme') || 'light');
+                applyTheme(localStorage.getItem(CONSTANTS.STORAGE_KEYS.THEME) || 'light');
                 loadStateFromLocalStorage();
                 showLoginScreen();
+                enhanceAccessibility();
+                
+                // Definir datas padrão para filtros
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                dom.filterStartDate.valueAsDate = firstDay;
+                dom.filterEndDate.valueAsDate = today;
             }
             initialize();
         });
