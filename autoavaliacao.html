@@ -10,28 +10,60 @@
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71; 
             --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937; 
             --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444; 
             --warning: #f59e0b; --gray: #6b7280; --border-color: #e5e7eb;
-            --border-radius: 8px; --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px; 
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake-horizontal {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         html { scroll-behavior: smooth; }
-        body { background-color: #f5f7fa; color: var(--dark); line-height: 1.6; }
+        body { background-color: #f5f7fa; color: var(--dark); line-height: 1.7; font-size: 16px; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { background: linear-gradient(to right, var(--primary), var(--primary-dark)); color: white; padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+        header { background: linear-gradient(90deg, #1a56db, #113a9b); color: white; padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
         .header-content { display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: center; gap: 10px; }
         .logo h1 { font-size: 1.5rem; }
         .user-info { display: flex; align-items: center; gap: 10px; }
-        .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--light); flex-wrap: wrap; gap: 10px;}
-        .hidden { display: none; }
-        .btn { padding: 10px 15px; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
-        .btn:disabled { background-color: var(--gray); cursor: not-allowed; }
+        .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; animation: fadeIn 0.5s ease-out forwards; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px;}
+        .hidden { display: none !important; } /* Use !important to override inline styles if needed */
+        .btn { padding: 10px 15px; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 5px; }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); }
+        .btn:disabled { background-color: var(--gray); cursor: not-allowed; opacity: 0.7; }
         .btn-primary { background-color: var(--primary); color: white; }
         .btn-success { background-color: var(--success); color: white; }
         .btn-danger { background-color: var(--danger); color: white; }
@@ -50,6 +82,8 @@
         .info-avaliado { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background-color: var(--light); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
         .info-avaliado p { margin: 0; }
         .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out; }
+        /* PAGINAÇÃO: esconde os critérios por padrão, o JS controlará a exibição */
+        .criterio:not(.active-page) { display: none; }
         .criterio.active-criterio { box-shadow: 0 8px 25px rgba(26, 86, 219, 0.2); border-color: var(--primary); }
         .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
         .questao { padding: 20px; background: white; transition: background-color 0.4s ease, border-left-color 0.4s ease; border-left: 4px solid transparent; }
@@ -63,6 +97,8 @@
         .opcao:hover { background-color: var(--light); }
         .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
         .opcao.selecionada .valor-texto { color: white; }
+        .opcao .valor-numerico::before { font-family: "Font Awesome 6 Free"; content: ""; font-weight: 900; margin-right: 8px; color: white; transition: content 0.2s ease; }
+        .opcao.selecionada .valor-numerico::before { content: "\f00c"; }
         .declaracao-container { margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 20px; background-color: var(--light); padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
         .declaracao-container.invalid { border-color: var(--danger); }
         .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
@@ -71,14 +107,14 @@
         .declaracao-box label strong { font-style: normal; color: var(--dark); }
         .resumo-pontuacao { background-color: var(--primary-light); padding: 15px; border-radius: var(--border-radius); margin: 20px 0; border: 1px solid var(--primary); }
         .progress-bar { height: 10px; background-color: var(--border-color); border-radius: 5px; margin: 10px 0; overflow: hidden; }
-        .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: all 0.5s ease; }
+        .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s ease, background-color 0.5s ease; }
         .instructions-panel { background-color: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 15px; margin-bottom: 20px; color: var(--primary-dark); }
         .instructions-panel h3 { font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        .instructions-panel ul { list-style-position: inside; padding-left: 5px; }
+        .instructions-panel ul { list-style-position: inside; padding-left: 5px; line-height: 1.8; }
         .instructions-panel li + li { margin-top: 5px; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.visible { display: flex; opacity: 1; }
-        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-content h3 { color: var(--primary-dark); margin-top: 0; margin-bottom: 15px; }
         .modal-content p { margin-bottom: 25px; font-size: 1.1rem; }
@@ -94,45 +130,29 @@
         .step-icon { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--gray); background-color: white; display: flex; justify-content: center; align-items: center; color: var(--gray); margin-bottom: 5px; transition: all 0.3s; }
         .step.active .step-icon { border-color: var(--primary); background-color: var(--primary); color: white; }
         .step.active .step-label { color: var(--primary); }
-        .step.completed .step-icon { border-color: var(--success); background-color: var(--success); color: white; }
+        .step.completed .step-icon { border-color: var(--success); background-color: var(--success); color: white; animation: pop 0.3s ease-out; }
         .step-label { font-size: 0.75rem; }
-        body.dark-theme { --light: #34495e; --dark: #ecf0f1; --border-color: #4a627a; background-color: #2c3e50; }
-        body.dark-theme .card, body.dark-theme .modal-content, body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .info-avaliado, body.dark-theme .declaracao-container, body.dark-theme .resumo-pontuacao, body.dark-theme .stepper-container { background-color: #2c3e50; border-color: var(--border-color); }
-        body.dark-theme input, body.dark-theme select, body.dark-theme textarea { background-color: #34495e; border-color: #4a627a; color: var(--dark); }
+        body.dark-theme { --light: #334155; --dark: #f1f5f9; --border-color: #475569; background-color: #0f172a; }
+        body.dark-theme .card, body.dark-theme .modal-content, body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .info-avaliado, body.dark-theme .declaracao-container, body.dark-theme .resumo-pontuacao, body.dark-theme .stepper-container { background-color: #1e293b; border-color: var(--border-color); }
+        body.dark-theme input, body.dark-theme select, body.dark-theme textarea { background-color: #334155; border-color: #475569; color: var(--dark); }
         body.dark-theme .instructions-panel, body.dark-theme .review-container { background-color: var(--light); border-color: var(--primary); color: var(--dark); }
         body.dark-theme .review-item span { color: white; background-color: var(--primary); }
         body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
         body.dark-theme .opcao.selecionada .valor-texto { color: #f0fdf4; }
-        
         .required-asterisk { color: var(--danger); }
-        
-        .btn:focus, .opcao:focus {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
-        }
-
-        @keyframes shake-horizontal {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .input-error-flash {
-            border-color: var(--danger) !important;
-            animation: shake-horizontal 0.4s cubic-bezier(.455,.03,.515,.955) both;
-        }
-        
+        .btn:focus, .opcao:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1); }
+        .input-error-flash { border-color: var(--danger) !important; animation: shake-horizontal 0.4s cubic-bezier(.455,.03,.515,.955) both; }
+        #toastContainer { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 15px 20px; border-radius: var(--border-radius); color: white; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        .toast.toast-success { background-color: var(--success); }
+        .toast.toast-info { background-color: var(--primary); }
+        .toast.toast-hiding { animation: fadeOut 0.5s ease-out forwards; }
         @media (max-width: 768px) {
             .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
             .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
             .info-avaliado { grid-template-columns: 1fr; }
         }
-        
         @media (max-width: 480px) {
             .logo h1 { font-size: 1.2rem; line-height: 1.3; }
             .header-content { padding: 10px 0; }
@@ -141,41 +161,18 @@
             .modal-content { width: 95%; margin: 10px; padding: 20px; }
             .modal-buttons { flex-direction: column; gap: 10px; }
             .btn { width: 100%; justify-content: center; }
+            #toastContainer { right: 10px; left: 10px; top: 10px; }
         }
-
         @media (max-width: 360px) {
             .opcoes-avaliacao { grid-template-columns: 1fr; }
             .logo h1 { font-size: 1rem; }
         }
-
-        /* --- INÍCIO DA ESTILIZAÇÃO DA TELA DE SUCESSO --- */
         #successSection { text-align: center; }
-        .success-message {
-            font-size: 1.1rem;
-            color: var(--gray);
-            margin: 20px 0;
-        }
-        .final-score-container {
-            margin: 25px 0;
-            background-color: var(--primary-light);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--primary);
-        }
-        .final-score-container p {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0 0 10px 0;
-            color: var(--primary-dark);
-        }
-        #finalScore {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
+        .success-message { font-size: 1.1rem; color: var(--gray); margin: 20px 0; }
+        .final-score-container { margin: 25px 0; background-color: var(--primary-light); padding: 20px; border-radius: var(--border-radius); border: 1px solid var(--primary); }
+        .final-score-container p { font-size: 1.2rem; font-weight: 600; margin: 0 0 10px 0; color: var(--primary-dark); }
+        #finalScore { font-size: 3rem; font-weight: 700; color: var(--primary); }
         #successSection .btn { margin-top: 10px; }
-        /* --- FIM DA ESTILIZAÇÃO DA TELA DE SUCESSO --- */
-
     </style>
 </head>
 <body>
@@ -269,21 +266,25 @@
                 <p>Pontuação Atual: <strong id="pontuacaoAtual">0,0 / 25 pts</strong></p>
                 <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
             </div>
-            <div class="declaracao-container" id="declarationBox">
-                <h3>Declaração de Veracidade</h3>
-                <div class="declaracao-box">
-                    <input type="checkbox" id="declaracaoCiente" aria-describedby="declaracaoText">
-                    <label for="declaracaoCiente" id="declaracaoText">
-                        Eu, <strong><span id="nomeDeclaracao"></span></strong>, matrícula nº <strong><span id="matriculaDeclaracao"></span></strong>, 
-                        declaro, sob minha responsabilidade, que todas as informações prestadas nesta avaliação são verdadeiras e correspondem à realidade.
-                    </label>
+            <div id="declarationBoxWrapper" class="hidden"> <div class="declaracao-container" id="declarationBox">
+                    <h3>Declaração de Veracidade</h3>
+                    <div class="declaracao-box">
+                        <input type="checkbox" id="declaracaoCiente" aria-describedby="declaracaoText">
+                        <label for="declaracaoCiente" id="declaracaoText">
+                            Eu, <strong><span id="nomeDeclaracao"></span></strong>, matrícula nº <strong><span id="matriculaDeclaracao"></span></strong>, 
+                            declaro, sob minha responsabilidade, que todas as informações prestadas nesta avaliação são verdadeiras e correspondem à realidade.
+                        </label>
+                    </div>
+                    <small style="color: var(--gray); font-style: italic; display: block; margin-top: 5px;">
+                        Campo obrigatório para envio da avaliação
+                    </small>
                 </div>
-                <small style="color: var(--gray); font-style: italic; display: block; margin-top: 5px;">
-                    Campo obrigatório para envio da avaliação
-                </small>
             </div>
-            <div style="margin-top: 30px;">
-                <button type="button" id="sendButton" class="btn btn-success" aria-label="Enviar avaliação"><i class="fas fa-check-circle" aria-hidden="true"></i> Enviar Avaliação</button>
+
+            <div id="paginationControls" style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; justify-content: space-between;">
+                <button type="button" id="prevButton" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Anterior</button>
+                <button type="button" id="nextButton" class="btn btn-primary">Próximo <i class="fas fa-arrow-right"></i></button>
+                <button type="button" id="sendButton" class="btn btn-success hidden" aria-label="Enviar avaliação"><i class="fas fa-check-circle" aria-hidden="true"></i> Enviar Avaliação</button>
             </div>
         </section>
 
@@ -337,6 +338,8 @@
         <i class="fas fa-arrow-up"></i>
     </button>
     
+    <div id="toastContainer"></div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const config = {
@@ -360,7 +363,7 @@
         
             const dom = {
                 login: { section: document.getElementById('loginSection'), user: document.getElementById('username'), pass: document.getElementById('password'), button: document.getElementById('loginButton'), alert: document.getElementById('loginAlert'), togglePass: document.getElementById('togglePassword'), loading: document.getElementById('loginLoading') },
-                eval: { section: document.getElementById('evaluationSection'), form: document.getElementById('formAvaliacao'), sendButton: document.getElementById('sendButton'), declarationBox: document.getElementById('declarationBox'), declarationCheck: document.getElementById('declaracaoCiente'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper') },
+                eval: { section: document.getElementById('evaluationSection'), form: document.getElementById('formAvaliacao'), sendButton: document.getElementById('sendButton'), declarationBoxWrapper: document.getElementById('declarationBoxWrapper'), declarationCheck: document.getElementById('declaracaoCiente'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper') },
                 success: { section: document.getElementById('successSection'), finalScore: document.getElementById('finalScore'), pdfLink: document.getElementById('pdfLink'), logoutButton: document.getElementById('logoutButtonSuccess') },
                 submitted: { section: document.getElementById('alreadySubmittedSection'), logoutButton: document.getElementById('logoutButtonSubmitted') },
                 userInfo: { container: document.getElementById('userInfo'), name: document.getElementById('userName') },
@@ -371,11 +374,33 @@
                 progressText: document.getElementById('progressText'),
                 answeredCount: document.getElementById('answeredCount'),
                 totalQuestions: document.getElementById('totalQuestions'),
-                modal: { review: document.getElementById('reviewModal'), confirmation: document.getElementById('confirmationModal'), score: document.getElementById('modalScore'), confirmBtn: document.getElementById('modalConfirm'), cancelBtn: document.getElementById('modalCancel'), closeReviewBtn: document.getElementById('modalCloseReview'), confirmReviewBtn: document.getElementById('modalConfirmReview') }
+                modal: { review: document.getElementById('reviewModal'), confirmation: document.getElementById('confirmationModal'), score: document.getElementById('modalScore'), confirmBtn: document.getElementById('modalConfirm'), cancelBtn: document.getElementById('modalCancel'), closeReviewBtn: document.getElementById('modalCloseReview'), confirmReviewBtn: document.getElementById('modalConfirmReview') },
+                // PAGINAÇÃO: Referências aos botões
+                pagination: {
+                    prevButton: document.getElementById('prevButton'),
+                    nextButton: document.getElementById('nextButton')
+                }
             };
         
             let currentUser = null;
             let isFormDirty = false;
+            
+            // PAGINAÇÃO: Variáveis de estado
+            let currentPageIndex = 0;
+            const pageIds = sections.map(s => s.id);
+
+            function showToast(message, type = 'info', duration = 4000) {
+                const toastContainer = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                const icons = { success: 'fa-check-circle', info: 'fa-info-circle', error: 'fa-exclamation-circle' };
+                toast.innerHTML = `<i class="fas ${icons[type] || 'fa-info-circle'}"></i> ${message}`;
+                toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.add('toast-hiding');
+                    toast.addEventListener('animationend', () => toast.remove());
+                }, duration);
+            }
 
             function showAlert(el, msg, type) { el.textContent = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
             function hideAlert(el) { el.classList.add('hidden'); }
@@ -415,32 +440,25 @@
             }
             
             function addStepperNavigation() {
-                document.querySelectorAll('.step').forEach(step => {
+                document.querySelectorAll('.step').forEach((step, index) => {
                     step.addEventListener('click', function() {
-                        const targetId = this.getAttribute('data-target');
-                        const targetElement = document.querySelector(targetId);
-                        if (targetElement) {
-                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Permite navegar para páginas anteriores já visitadas
+                        if(index < currentPageIndex) {
+                            currentPageIndex = index;
+                            showPage(currentPageIndex);
+                        } else if (index === currentPageIndex) {
+                            // Clicou no passo atual, não faz nada
+                        } else {
+                            // Tentando pular para uma página futura, valide a atual primeiro
+                            if (validateCurrentPage()) {
+                                currentPageIndex = index;
+                                showPage(currentPageIndex);
+                            } else {
+                                showToast('Responda todas as questões desta página para avançar.', 'error', 3000);
+                            }
                         }
                     });
                 });
-            }
-
-            let observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const id = entry.target.id.replace('criterio-', '');
-                    const stepEl = document.getElementById(`step-${id}`);
-                    document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
-                    document.querySelectorAll('.criterio.active-criterio').forEach(c => c.classList.remove('active-criterio'));
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active-criterio');
-                        if (stepEl) stepEl.classList.add('active');
-                    }
-                });
-            }, { threshold: 0.5 });
-
-            function setupObservers() {
-                document.querySelectorAll('.criterio').forEach(el => observer.observe(el));
             }
             
             function addOptionListeners() {
@@ -459,15 +477,11 @@
                         });
                         this.classList.add('selecionada');
                         this.setAttribute('aria-checked', 'true');
-                        if(questaoDiv) questaoDiv.classList.add('questao-respondida');
+                        if(questaoDiv) {
+                           questaoDiv.classList.add('questao-respondida');
+                           questaoDiv.classList.remove('invalid-question');
+                        }
                         calculateScore();
-                        
-                        const criterioEl = this.closest('.criterio');
-                        const inputs = [...criterioEl.querySelectorAll('input[type=hidden]')];
-                        const isCompleted = inputs.every(input => input.value);
-                        const stepId = criterioEl.id.replace('criterio-','step-');
-                        if(isCompleted) document.getElementById(stepId).classList.add('completed');
-
                     });
                     opcao.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -482,11 +496,7 @@
                 [dom.login.section, dom.eval.section, dom.success.section, dom.submitted.section].forEach(s => s.classList.add('hidden'));
                 if (sectionToShow) {
                     sectionToShow.classList.remove('hidden');
-                    if (sectionToShow.id === 'evaluationSection') {
-                        setupObservers();
-                    }
                 }
-                
                 const mainUserInfo = document.getElementById('userInfo');
                 if (sectionToShow !== dom.login.section) {
                     mainUserInfo.classList.remove('hidden');
@@ -511,7 +521,9 @@
                         currentUser = result.user;
                         populateUserInfo(currentUser);
                         showSection(dom.eval.section);
-                        window.scrollTo(0, 0);
+                        currentPageIndex = 0; // Reseta para a primeira página
+                        showPage(currentPageIndex); // PAGINAÇÃO: Mostra a primeira página
+                        showToast(`Bem-vindo(a), ${currentUser.nome.split(' ')[0]}!`, 'success');
                     } else {
                         if(result.error === 'ALREADY_SUBMITTED') showSection(dom.submitted.section);
                         else showAlert(dom.login.alert, result.error, 'error');
@@ -526,10 +538,18 @@
             }
         
             function handleSendEvaluation() {
-                if (!validateForm()) {
+                if (!validateForm()) { // Validação final de todo o formulário
                     showAlert(dom.eval.alert, "Responda todas as questões e marque a declaração de veracidade.", 'error');
                     const firstInvalid = document.querySelector('.invalid-question, .invalid');
-                    if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (firstInvalid) {
+                        // Encontra a página do primeiro erro e navega até ela
+                        const invalidCriterio = firstInvalid.closest('.criterio');
+                        const invalidIndex = pageIds.findIndex(id => `criterio-${id}` === invalidCriterio.id);
+                        if (invalidIndex !== -1) {
+                            currentPageIndex = invalidIndex;
+                            showPage(currentPageIndex);
+                        }
+                    }
                     return;
                 }
                 hideAlert(dom.eval.alert);
@@ -622,6 +642,7 @@
             }
         
             function logout() {
+                showToast('Logout efetuado com sucesso.', 'info');
                 currentUser = null;
                 isFormDirty = false;
                 dom.login.user.value = '';
@@ -699,27 +720,84 @@
                 } else {
                     document.title = 'Avaliação de Desempenho - GCM';
                 }
+
+                // Atualiza a conclusão do passo no stepper
+                sections.forEach((section, index) => {
+                    const isCompleted = section.questions.every(q => document.getElementById(q.id).value);
+                    const stepEl = document.getElementById(`step-${section.id}`);
+                    if(isCompleted) {
+                        stepEl.classList.add('completed');
+                    } else {
+                         stepEl.classList.remove('completed');
+                    }
+                });
+
                 return finalScore;
             }
         
             function validateForm() {
                 let isFormValid = true;
                 document.querySelectorAll('.questao.invalid-question').forEach(q => q.classList.remove('invalid-question'));
-                dom.eval.declarationBox.classList.remove('invalid');
+                dom.eval.declarationBoxWrapper.querySelector('.declaracao-container').classList.remove('invalid');
+
                 for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
                     const input = document.getElementById(`c${i}`);
                     if (!input || !input.value) {
                         isFormValid = false;
-                        const questaoDiv = document.getElementById(`questao-c${i}`);
-                        if (questaoDiv) questaoDiv.classList.add('invalid-question');
+                        document.getElementById(`questao-c${i}`).classList.add('invalid-question');
                     }
                 }
                 if (!dom.eval.declarationCheck.checked) {
                     isFormValid = false;
-                    dom.eval.declarationBox.classList.add('invalid');
+                    dom.eval.declarationBoxWrapper.querySelector('.declaracao-container').classList.add('invalid');
                 }
                 return isFormValid;
             }
+
+            // --- PAGINAÇÃO: Novas funções ---
+            function validateCurrentPage() {
+                let isPageValid = true;
+                const currentSection = sections[currentPageIndex];
+                currentSection.questions.forEach(q => {
+                    const input = document.getElementById(q.id);
+                    const questaoDiv = document.getElementById(`questao-${q.id}`);
+                    if (!input || !input.value) {
+                        isPageValid = false;
+                        questaoDiv.classList.add('invalid-question');
+                    } else {
+                        questaoDiv.classList.remove('invalid-question');
+                    }
+                });
+                return isPageValid;
+            }
+
+            function showPage(index) {
+                // Esconde todos os critérios
+                document.querySelectorAll('.criterio').forEach(c => c.classList.remove('active-page'));
+                // Mostra o critério atual
+                document.getElementById(`criterio-${pageIds[index]}`).classList.add('active-page');
+
+                // Atualiza botões
+                dom.pagination.prevButton.disabled = index === 0;
+
+                const isLastPage = index === pageIds.length - 1;
+                dom.pagination.nextButton.classList.toggle('hidden', isLastPage);
+                dom.eval.sendButton.classList.toggle('hidden', !isLastPage);
+                dom.eval.declarationBoxWrapper.classList.toggle('hidden', !isLastPage);
+
+
+                // Atualiza o stepper
+                document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
+                const activeStep = document.getElementById(`step-${pageIds[index]}`);
+                if (activeStep) activeStep.classList.add('active');
+
+                // Foco para acessibilidade
+                const title = document.querySelector(`#criterio-${pageIds[index]} h3`);
+                if(title) title.focus({ preventScroll: true });
+                window.scrollTo(0, dom.eval.section.offsetTop);
+            }
+
+            // --- FIM PAGINAÇÃO ---
         
             const themeToggle = document.getElementById('themeToggle');
             const moonIcon = '<i class="fas fa-moon"></i>';
@@ -750,7 +828,6 @@
                 dom.login.togglePass.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
             });
 
-            // --- MELHORIAS ---
             dom.eval.form.addEventListener('change', () => { isFormDirty = true; });
             window.addEventListener('beforeunload', (event) => {
                 if (isFormDirty) {
@@ -788,13 +865,35 @@
                     if (dom.modal.confirmation.classList.contains('visible')) { hideModal(dom.modal.confirmation); }
                 }
             });
-            // --- FIM MELHORIAS ---
 
+            // --- INICIALIZAÇÃO E EVENT LISTENERS ---
+            
             generateFormHTML();
             generateStepper();
+            
             dom.eval.form.addEventListener('change', calculateScore);
             dom.login.button.addEventListener("click", login);
             dom.eval.sendButton.addEventListener("click", handleSendEvaluation);
+
+            // PAGINAÇÃO: Event Listeners dos botões de navegação
+            dom.pagination.nextButton.addEventListener('click', () => {
+                if (validateCurrentPage()) {
+                    if (currentPageIndex < pageIds.length - 1) {
+                        currentPageIndex++;
+                        showPage(currentPageIndex);
+                    }
+                } else {
+                    showToast('Por favor, responda todas as questões para avançar.', 'error', 3000);
+                }
+            });
+
+            dom.pagination.prevButton.addEventListener('click', () => {
+                if (currentPageIndex > 0) {
+                    currentPageIndex--;
+                    showPage(currentPageIndex);
+                }
+            });
+
             dom.modal.confirmBtn.addEventListener("click", submitEvaluation);
             dom.modal.cancelBtn.addEventListener("click", () => hideModal(dom.modal.confirmation));
             dom.modal.closeReviewBtn.addEventListener('click', () => hideModal(dom.modal.review));
