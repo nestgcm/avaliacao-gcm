@@ -5,28 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Avaliação de Desempenho Realizado pela Chefia da GUARDA CIVIL MUNICIPAL DE SALVADOR</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71;
             --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937;
             --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444;
             --warning: #f59e0b; --gray: #6b7280; --border-color: #e5e7eb;
-            --border-radius: 8px; --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px; 
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        @keyframes shake-horizontal { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; } }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         html { scroll-behavior: smooth; }
-        body { background-color: #f5f7fa; color: var(--dark); line-height: 1.6; }
+        body { background-color: #f5f7fa; color: var(--dark); line-height: 1.7; font-size: 16px; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { background: linear-gradient(to right, var(--primary), var(--primary-dark)); color: white; padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+        header { background: linear-gradient(90deg, #1a56db, #113a9b); color: white; padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
         .header-content { display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: center; gap: 10px; }
         .logo h1 { font-size: 1.5rem; }
         .user-info { display: flex; align-items: center; gap: 10px; }
-        .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+        .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; animation: fadeIn 0.5s ease-out forwards; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--light); flex-wrap: wrap; gap: 10px;}
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .btn { padding: 10px 15px; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
-        .btn:disabled { background-color: var(--gray); cursor: not-allowed; }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); }
+        .btn:disabled { background-color: var(--gray); cursor: not-allowed; opacity: 0.7; }
         .btn-primary { background-color: var(--primary); color: white; }
         .btn-success { background-color: var(--success); color: white; }
         .btn-danger { background-color: var(--danger); color: white; }
@@ -56,6 +70,7 @@
         .status-concluido { background-color: #d1fae5; color: #065f46; }
         .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
         .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out; }
+        .criterio:not(.active-page) { display: none; }
         .criterio.active-criterio { box-shadow: 0 8px 25px rgba(26, 86, 219, 0.2); border-color: var(--primary); }
         .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
         .questao { padding: 20px; background: white; transition: all 0.4s ease; border-left: 4px solid transparent; }
@@ -69,6 +84,8 @@
         .opcao:hover { background-color: #f9fafb; }
         .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
         .opcao.selecionada .valor-texto { color: white; }
+        .opcao .valor-numerico::before { font-family: "Font Awesome 6 Free"; content: ""; font-weight: 900; margin-right: 8px; color: white; transition: content 0.2s ease; }
+        .opcao.selecionada .valor-numerico::before { content: "\f00c"; }
         .declaracao-container { margin-top: 30px; border-top: 2px solid #e5e7eb; padding-top: 20px; background-color: #f9fafb; padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
         .declaracao-container.invalid-question { border-color: var(--danger); }
         .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
@@ -78,10 +95,10 @@
         .alert { padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; }
         .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .alert-error { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-        .resumo-pontuacao { background-color: #eff6ff; padding: 15px; border-radius: var(--border-radius); margin: 20px 0; }
+        .resumo-pontuacao { background-color: #eff6ff; padding: 15px; border-radius: var(--border-radius); margin-top: 20px; }
         .progress-bar { height: 10px; background-color: #e5e7eb; border-radius: 5px; margin: 10px 0; overflow: hidden; }
         .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: all 0.5s ease; }
-        .instructions-panel { background-color: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 15px; margin-bottom: 20px; color: var(--primary-dark); }
+        .instructions-panel { background-color: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 15px; margin-bottom: 20px; color: var(--primary-dark); line-height: 1.8; }
         .instructions-panel h3 { font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .instructions-panel ul { list-style-position: inside; padding-left: 5px; }
         .instructions-panel li + li { margin-top: 5px; }
@@ -93,7 +110,7 @@
         .stat-card.stat-warning { border-left-color: var(--warning); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.visible { display: flex; opacity: 1; }
-        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-overlay.visible .modal-content { transform: scale(1); }
         .modal-content h3 { color: var(--primary-dark); margin-top: 0; margin-bottom: 15px; }
         .modal-content p { margin-bottom: 25px; font-size: 1.1rem; }
@@ -109,36 +126,37 @@
         .step-icon { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--gray); background-color: white; display: flex; justify-content: center; align-items: center; color: var(--gray); margin-bottom: 5px; transition: all 0.3s; }
         .step.active .step-icon { border-color: var(--primary); background-color: var(--primary); color: white; }
         .step.active .step-label { color: var(--primary); }
-        .step.completed .step-icon { border-color: var(--success); background-color: var(--success); color: white; }
+        .step.completed .step-icon { border-color: var(--success); background-color: var(--success); color: white; animation: pop 0.3s ease-out; }
         .step-label { font-size: 0.75rem; }
-        body.dark-theme { --light: #34495e; --dark: #ecf0f1; --border-color: #4a627a; background-color: #2c3e50; }
-        body.dark-theme .card, body.dark-theme .modal-content { background-color: #2c3e50; border: 1px solid var(--border-color); }
+        body.dark-theme { --light: #334155; --dark: #f1f5f9; --border-color: #475569; background-color: #0f172a; }
+        body.dark-theme .card, body.dark-theme .modal-content { background-color: #1e293b; border: 1px solid var(--border-color); }
         body.dark-theme .servidor-card:not(.concluido):hover { background-color: #34495e; }
-        body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .declaracao-container, body.dark-theme .servidor-card.concluido, body.dark-theme .stepper-container { background-color: #2c3e50; border-color: var(--border-color); }
+        body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .declaracao-container, body.dark-theme .servidor-card.concluido, body.dark-theme .stepper-container { background-color: #1e293b; border-color: var(--border-color); }
         body.dark-theme input, body.dark-theme select, body.dark-theme textarea, body.dark-theme .opcao:hover { background-color: #34495e; border-color: #4a627a; color: var(--dark); }
-        body.dark-theme .status-pendente { background-color: #8e44ad; color: white; }
-        body.dark-theme .status-concluido { background-color: #27ae60; color: white; }
+        body.dark-theme .status-pendente { background-color: #f59e0b; color: #1f2937; }
+        body.dark-theme .status-concluido { background-color: #10b981; color: white; }
         body.dark-theme .instructions-panel, body.dark-theme .stat-card, body.dark-theme .review-container { background-color: var(--light); border-color: var(--primary); color: var(--dark); }
         body.dark-theme .stat-card p { color: var(--dark); }
         body.dark-theme .review-item span { color: white; background-color: var(--primary); }
         body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
         body.dark-theme .opcao.selecionada .valor-texto { color: #f0fdf4; }
-        
-        @keyframes shake-horizontal {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        .input-error-flash {
-            border-color: var(--danger) !important;
-            animation: shake-horizontal 0.4s cubic-bezier(.455,.03,.515,.955) both;
-        }
+        #toastContainer { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 15px 20px; border-radius: var(--border-radius); color: white; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        .toast.toast-success { background-color: var(--success); }
+        .toast.toast-info { background-color: var(--primary); }
+        .toast.toast-error { background-color: var(--danger); }
+        .toast.toast-hiding { animation: fadeOut 0.5s ease-out forwards; }
+        .input-error-flash { border-color: var(--danger) !important; animation: shake-horizontal 0.4s cubic-bezier(.455,.03,.515,.955) both; }
 
         @media (max-width: 768px) {
             .servidores-grid { grid-template-columns: 1fr; }
             .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
             .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
             .toolbar { flex-direction: column; }
+        }
+        @media (max-width: 480px) {
+           #toastContainer { right: 10px; left: 10px; top: 10px; }
+           .modal-buttons { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -217,7 +235,7 @@
         </div>
 
         <div id="avaliacaoScreen" class="card avaliacao-form hidden">
-            <div class="card-header"><h2>Avaliação de Desempenho</h2><button id="btnVoltarLista" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Voltar</button></div>
+            <div class="card-header"><h2>Avaliação de Desempenho</h2><button id="btnVoltarLista" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Voltar à Lista</button></div>
             
             <div id="stepper" class="stepper-container"></div>
 
@@ -227,33 +245,42 @@
                 <p><b>Lotação:</b> <strong id="avaliadoLotacao"></strong></p>
             </div>
             <div id="avaliacaoAlert" class="alert alert-error hidden"></div>
-            <form id="formAvaliacao">
+            <form id="formAvaliacao" onsubmit="return false;">
                 <input type="hidden" id="matriculaAvaliado"><input type="hidden" id="nomeAvaliado">
                 <div class="criterio" id="criterio-produtividade"><h3>PRODUTIVIDADE E METAS</h3><div class="questao" id="q-1"><p>1- Procura novos conhecimentos que contribuam para o desenvolvimento dos trabalhos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao1"></div><div class="questao" id="q-2"><p>2- Coloca-se à disposição da chefia, espontaneamente, para aprender novas técnicas e auxiliar os colegas.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao2"></div><div class="questao" id="q-3"><p>3- É hábil em identificar e apresentar soluções para os problemas que surjam no trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao3"></div><div class="questao" id="q-4"><p>4- Zela pelo próprio preparo profissional e incentiva os companheiros a fazerem o mesmo, em prol do cumprimento da missão comum.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao4"></div><div class="questao" id="q-5"><p>5- Quando ofertado, participa de cursos, palestras, atividades, dinâmicas que contribuam para o seu desenvolvimento profissional na instituição.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao5"></div></div>
                 <div class="criterio" id="criterio-responsabilidade"><h3>RESPONSABILIDADE</h3><div class="questao" id="q-6"><p>6- É comprometido com o seu trabalho, atuando com prudência, firmeza e efetividade na sua área de responsabilidade.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao6"></div><div class="questao" id="q-7"><p>7- Cumpre as normas, as regras e os regulamentos das legislações vigentes.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao7"></div><div class="questao" id="q-8"><p>8- Respeita a hierarquia, obedecendo fielmente as ordens de seus superiores, desde que legais.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao8"></div><div class="questao" id="q-9"><p>9- Mantem sigilo sobre os assuntos internos da Guarda Municipal ou de matéria confidencial que possam de alguma forma expor o outro.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao9"></div><div class="questao" id="q-10"><p>10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao10"></div></div>
                 <div class="criterio" id="criterio-pontualidade"><h3>PONTUALIDADE</h3><div class="questao" id="q-11"><p>11- Cumpre o horário de trabalho, respeitando o horário de entrada e saída.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="2.0"><span class="valor-numerico">2,0</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="3.0"><span class="valor-numerico">3,0</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="4.0"><span class="valor-numerico">4,0</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="5.0"><span class="valor-numerico">5,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao11"></div></div>
                 <div class="criterio" id="criterio-assiduidade"><h3>ASSIDUIDADE</h3><div class="questao" id="q-12"><p>12- Comparece regularmente ao local de trabalho.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao12"></div><div class="questao" id="q-13"><p>13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao13"></div><div class="questao" id="q-14"><p>14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao14"></div><div class="questao" id="q-15"><p>15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao15"></div><div class="questao" id="q-16"><p>16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.2"><span class="valor-numerico">0,2</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="0.4"><span class="valor-numerico">0,4</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="0.6"><span class="valor-numerico">0,6</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="0.8"><span class="valor-numerico">0,8</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao16"></div></div>
                 <div class="criterio" id="criterio-equipamentos"><h3>USO ADEQUADO DOS EQUIPAMENTOS</h3><div class="questao" id="q-17"><p>17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5"><span class="valor-numerico">0,5</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="1.5"><span class="valor-numerico">1,5</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="2.0"><span class="valor-numerico">2,0</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="2.5"><span class="valor-numerico">2,5</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao17"></div><div class="questao" id="q-18"><p>18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.</p><div class="opcoes-avaliacao"><div class="opcao" data-value="0.5"><span class="valor-numerico">0,5</span><span class="valor-texto">Abaixo do Esperado</span></div><div class="opcao" data-value="1.0"><span class="valor-numerico">1,0</span><span class="valor-texto">Regular</span></div><div class="opcao" data-value="1.5"><span class="valor-numerico">1,5</span><span class="valor-texto">Bom</span></div><div class="opcao" data-value="2.0"><span class="valor-numerico">2,0</span><span class="valor-texto">Muito Bom</span></div><div class="opcao" data-value="2.5"><span class="valor-numerico">2,5</span><span class="valor-texto">Excelente</span></div></div><input type="hidden" id="questao18"></div></div>
+                
                 <div class="resumo-pontuacao">
                     <h3>Resumo de Pontuação</h3>
                     <div class="progress-bar"><div id="progressBar" class="progress" style="width: 0%"></div></div>
                     <p>Pontuação Atual: <strong id="pontuacaoAtual">0.0</strong> pts</p>
                     <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
                 </div>
-                <div class="declaracao-container">
-                    <h3>Declaração de Veracidade</h3>
-                    <div class="declaracao-box">
-                        <input type="checkbox" id="checkDeclaracao">
-                        <label for="checkDeclaracao">
-                            Eu, <strong><span id="declaracaoNome"></span></strong>, matrícula nº <strong><span id="declaracaoMatricula"></span></strong>, 
-                            declaro sob as penas da lei que as informações prestadas nesta avaliação do servidor <strong><span id="declaracaoNomeAvaliado"></span></strong>, matrícula nº <strong><span id="declaracaoMatriculaAvaliado"></span></strong>, são verdadeiras e correspondem à minha justa observação de seu desempenho.
-                        </label>
+
+                <div id="declarationBoxWrapper" class="hidden">
+                    <div class="declaracao-container">
+                        <h3>Declaração de Veracidade</h3>
+                        <div class="declaracao-box">
+                            <input type="checkbox" id="checkDeclaracao">
+                            <label for="checkDeclaracao">
+                                Eu, <strong><span id="declaracaoNome"></span></strong>, matrícula nº <strong><span id="declaracaoMatricula"></span></strong>, 
+                                declaro sob as penas da lei que as informações prestadas nesta avaliação do servidor <strong><span id="declaracaoNomeAvaliado"></span></strong>, matrícula nº <strong><span id="declaracaoMatriculaAvaliado"></span></strong>, são verdadeiras e correspondem à minha justa observação de seu desempenho.
+                            </label>
+                        </div>
+                        <small style="color: var(--gray); font-style: italic; display: block; margin-top: 5px;">
+                            Campo obrigatório para envio da avaliação
+                        </small>
                     </div>
-                    <small style="color: var(--gray); font-style: italic; display: block; margin-top: 5px;">
-                        Campo obrigatório para envio da avaliação
-                    </small>
                 </div>
-                <div style="margin-top: 30px;"><button type="submit" id="btnSalvarAvaliaco" class="btn btn-success"><i class="fas fa-check-circle"></i> Finalizar Avaliação</button></div>
+
+                <div id="paginationControls" style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; justify-content: space-between;">
+                    <button type="button" id="prevButton" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Anterior</button>
+                    <button type="button" id="nextButton" class="btn btn-primary">Próximo <i class="fas fa-arrow-right"></i></button>
+                    <button type="submit" id="btnSalvarAvaliacao" class="btn btn-success hidden"><i class="fas fa-check-circle"></i> Finalizar Avaliação</button>
+                </div>
             </form>
         </div>
     </div>
@@ -301,36 +328,49 @@
     <button id="backToTopBtn" class="btn btn-primary" style="position: fixed; bottom: 20px; right: 20px; display: none; border-radius: 50%; width: 50px; height: 50px; justify-content: center; z-index: 150;" title="Voltar ao topo">
         <i class="fas fa-arrow-up"></i>
     </button>
+    <div id="toastContainer"></div>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- CONSTANTES E VARIÁVEIS ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRl3kqgG_qsGsj_NTVoRHZQjwQMpQooPmzzMYhEEmsOAtLHd0Co1nMkmF7RRAavp20gw/exec";
         
         const sections = [
-            { id: 'produtividade', title: 'Produtividade' },
-            { id: 'responsabilidade', title: 'Responsabilidade' },
-            { id: 'pontualidade', title: 'Pontualidade' },
-            { id: 'assiduidade', title: 'Assiduidade' },
-            { id: 'equipamentos', title: 'Equipamentos' },
+            { id: 'produtividade', title: 'Produtividade', questions: ['questao1', 'questao2', 'questao3', 'questao4', 'questao5'] },
+            { id: 'responsabilidade', title: 'Responsabilidade', questions: ['questao6', 'questao7', 'questao8', 'questao9', 'questao10'] },
+            { id: 'pontualidade', title: 'Pontualidade', questions: ['questao11'] },
+            { id: 'assiduidade', title: 'Assiduidade', questions: ['questao12', 'questao13', 'questao14', 'questao15', 'questao16'] },
+            { id: 'equipamentos', title: 'Uso Adequado dos Equipamentos', questions: ['questao17', 'questao18'] }
         ];
         
         const dom = {
             login: { screen: document.getElementById('loginScreen'), alert: document.getElementById('loginAlert'), matricula: document.getElementById('matricula'), senha: document.getElementById('senha'), togglePass: document.getElementById('togglePassword'), loading: document.getElementById('loginLoading') },
             servidores: { screen: document.getElementById('servidoresScreen'), list: document.getElementById('servidoresList') },
-            avaliacao: { screen: document.getElementById('avaliacaoScreen'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper') },
+            avaliacao: { screen: document.getElementById('avaliacaoScreen'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper'), form: document.getElementById('formAvaliacao'), declarationBoxWrapper: document.getElementById('declarationBoxWrapper'), submitBtn: document.getElementById('btnSalvarAvaliacao') },
             userInfo: document.getElementById('userInfo'),
             userName: document.getElementById('userName'),
             successModal: { el: document.getElementById('successModal'), message: document.getElementById('successModalMessage'), closeBtn: document.getElementById('successModalClose') },
             reviewModal: document.getElementById('reviewModal'),
             confirmationModal: document.getElementById('confirmationModal'),
-            infoModal: document.getElementById('infoModal')
+            infoModal: document.getElementById('infoModal'),
+            pagination: { prevButton: document.getElementById('prevButton'), nextButton: document.getElementById('nextButton') }
         };
 
-        let currentUser = null, servidores = [], avaliacoes = [], sortByPending = false, isFormDirty = false;
+        let currentUser = null, servidores = [], avaliacoes = [], sortByPending = false, isFormDirty = false, currentPageIndex = 0;
         const moonIcon = '<i class="fas fa-moon"></i>';
         const sunIcon = '<i class="fas fa-sun"></i>';
         
-        // --- FUNÇÕES ---
+        function showToast(message, type = 'info', duration = 4000) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: 'fa-check-circle', info: 'fa-info-circle', error: 'fa-exclamation-circle' };
+            toast.innerHTML = `<i class="fas ${icons[type] || 'fa-info-circle'}"></i> ${message}`;
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('toast-hiding');
+                toast.addEventListener('animationend', () => toast.remove());
+            }, duration);
+        }
+
         function showAlert(el, msg, type) { el.textContent = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
         function hideAlert(el) { el.classList.add('hidden'); }
         function showScreen(el) { el.classList.remove('hidden'); }
@@ -339,41 +379,30 @@
         function showModal(modalElement) {
             modalElement.classList.add('visible');
             const focusableElements = modalElement.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            const firstElement = focusableElements[0];
-            const lastElement = focusableElements[focusableElements.length - 1];
-            if (firstElement) { firstElement.focus(); }
-            modalElement.addEventListener('keydown', function(e) {
-                if (e.key !== 'Tab') return;
-                if (e.shiftKey) { 
-                    if (document.activeElement === firstElement) { lastElement.focus(); e.preventDefault(); }
-                } else { 
-                    if (document.activeElement === lastElement) { firstElement.focus(); e.preventDefault(); }
-                }
-            });
+            if (focusableElements.length > 0) {
+                const firstElement = focusableElements[0];
+                firstElement.focus();
+                modalElement.addEventListener('keydown', function(e) {
+                    if (e.key !== 'Tab') return;
+                    const lastElement = focusableElements[focusableElements.length - 1];
+                    if (e.shiftKey) { if (document.activeElement === firstElement) { lastElement.focus(); e.preventDefault(); } }
+                    else { if (document.activeElement === lastElement) { firstElement.focus(); e.preventDefault(); } }
+                });
+            }
         }
 
-        function hideModal(modalElement) {
-            modalElement.classList.remove('visible');
-        }
+        function hideModal(modalElement) { modalElement.classList.remove('visible'); }
         
         function applyTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('dark-theme');
-                document.getElementById('themeToggle').innerHTML = sunIcon;
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.classList.remove('dark-theme');
-                document.getElementById('themeToggle').innerHTML = moonIcon;
-                localStorage.setItem('theme', 'light');
-            }
+            document.body.classList.toggle('dark-theme', theme === 'dark');
+            document.getElementById('themeToggle').innerHTML = theme === 'dark' ? sunIcon : moonIcon;
+            localStorage.setItem('theme', theme);
         }
 
         function showLoginScreen() {
             [dom.servidores.screen, dom.avaliacao.screen, dom.userInfo].forEach(hideScreen);
             showScreen(dom.login.screen);
-            dom.login.matricula.value = '';
-            dom.login.senha.value = '';
-            hideAlert(dom.login.alert);
+            dom.login.matricula.value = ''; dom.login.senha.value = ''; hideAlert(dom.login.alert);
         }
 
         function showServidoresScreen() {
@@ -387,37 +416,25 @@
         }
 
         function logout() {
-            isFormDirty = false;
-            localStorage.removeItem('avaliacao_user');
-            showLoginScreen();
+            showToast('Logout efetuado com sucesso.', 'info');
+            isFormDirty = false; localStorage.removeItem('avaliacao_user'); showLoginScreen();
         }
 
         function login() {
             const m = dom.login.matricula, s = dom.login.senha, b = document.getElementById('btnLogin');
             if (!m.value || !s.value) return showAlert(dom.login.alert, 'Preencha todos os campos.', 'error');
-            
-            b.disabled = true; 
-            b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
-            dom.login.loading.classList.remove('hidden');
-            
+            b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...'; dom.login.loading.classList.remove('hidden');
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', matricula: m.value, senha: s.value }) })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    currentUser = data.user;
-                    localStorage.setItem('avaliacao_user', JSON.stringify(currentUser));
-                    showServidoresScreen();
-                    loadServidores();
-                } else {
-                    showAlert(dom.login.alert, data.error, 'error');
-                }
+                    currentUser = data.user; localStorage.setItem('avaliacao_user', JSON.stringify(currentUser));
+                    showServidoresScreen(); loadServidores();
+                    showToast(`Bem-vindo(a), ${currentUser.nome.split(' ')[0]}!`, 'success');
+                } else { showAlert(dom.login.alert, data.error, 'error'); }
             })
             .catch(err => showAlert(dom.login.alert, 'Erro de comunicação.', 'error'))
-            .finally(() => {
-                b.disabled = false; 
-                b.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
-                dom.login.loading.classList.add('hidden');
-            });
+            .finally(() => { b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar'; dom.login.loading.classList.add('hidden'); });
         }
 
         function loadServidores() {
@@ -425,25 +442,16 @@
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getServidores', matriculaAvaliador: currentUser.matricula }) })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    servidores = data.servidores;
-                    avaliacoes = data.avaliacoes;
-                    renderServidores();
-                    updateDashboard();
-                } else {
-                    dom.servidores.list.innerHTML = `<p style="color: red;">${data.error}</p>`;
-                }
-            })
-            .catch(err => dom.servidores.list.innerHTML = '<p style="color: red;">Erro de comunicação.</p>');
+                if (data.success) { servidores = data.servidores; avaliacoes = data.avaliacoes; renderServidores(); updateDashboard(); }
+                else { dom.servidores.list.innerHTML = `<p style="color: red;">${data.error}</p>`; }
+            }).catch(err => dom.servidores.list.innerHTML = '<p style="color: red;">Erro de comunicação.</p>');
         }
         
         function updateDashboard() {
-            const total = servidores.length;
-            const avaliados = avaliacoes.length;
-            const pendentes = total - avaliados;
+            const total = servidores.length, avaliados = avaliacoes.length;
             document.getElementById('statTotal').textContent = total;
             document.getElementById('statAvaliados').textContent = avaliados;
-            document.getElementById('statPendentes').textContent = pendentes;
+            document.getElementById('statPendentes').textContent = total - avaliados;
         }
 
         function renderServidores() {
@@ -456,13 +464,9 @@
                     return aAvaliado - bAvaliado;
                 });
             }
-            
             dom.servidores.list.innerHTML = '';
             document.getElementById('progressoContador').innerHTML = `<strong>${avaliacoes.length} de ${servidores.length}</strong> avaliados`;
-            if (servidoresFiltrados.length === 0) {
-                dom.servidores.list.innerHTML = '<p>Nenhum servidor encontrado.</p>';
-                return;
-            }
+            if (servidoresFiltrados.length === 0) { dom.servidores.list.innerHTML = '<p>Nenhum servidor encontrado.</p>'; return; }
             servidoresFiltrados.forEach(servidor => {
                 const avaliacao = avaliacoes.find(av => av.matriculaAvaliado === servidor.matricula);
                 const status = avaliacao ? 'concluido' : 'pendente';
@@ -471,138 +475,114 @@
                 card.innerHTML = `<h3>${servidor.nome}</h3><div class="servidor-info"><p>Matrícula: ${servidor.matricula}</p><p>Lotação: ${servidor.lotacao}</p></div><div class="status-badge status-${status}">${avaliacao ? 'Avaliado' : 'Pendente'}</div>`;
                 card.addEventListener('click', () => {
                     if (avaliacao) { showInfoModal("Esta avaliação já foi concluída e não pode ser editada."); }
-                    else { showAvaliacaoScreen(servidor, null); }
+                    else { showAvaliacaoScreen(servidor); }
                 });
                 dom.servidores.list.appendChild(card);
             });
         }
         
         function generateStepper() {
-            let html = '';
-            sections.forEach((section, index) => {
-                html += `<div class="step" id="step-${section.id}" data-target="#criterio-${section.id}" style="cursor: pointer;">
-                            <div class="step-icon">${index + 1}</div>
-                            <div class="step-label">${section.title}</div>
-                         </div>`;
-            });
-            dom.avaliacao.stepper.innerHTML = html;
+            dom.avaliacao.stepper.innerHTML = sections.map((section, index) =>
+                `<div class="step" id="step-${section.id}" data-index="${index}" style="cursor: pointer;">
+                    <div class="step-icon">${index + 1}</div>
+                    <div class="step-label">${section.title}</div>
+                 </div>`
+            ).join('');
             addStepperNavigation();
         }
         
         function addStepperNavigation() {
             document.querySelectorAll('.step').forEach(step => {
                 step.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const index = parseInt(this.dataset.index);
+                    if (index < currentPageIndex || validateCurrentPage()) {
+                        currentPageIndex = index; showPage(currentPageIndex);
+                    } else {
+                        showToast('Responda todas as questões desta página para avançar.', 'error', 3000);
                     }
                 });
             });
         }
-
-        let observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const id = entry.target.id.replace('criterio-', '');
-                const stepEl = document.getElementById(`step-${id}`);
-                document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
-                document.querySelectorAll('.criterio.active-criterio').forEach(c => c.classList.remove('active-criterio'));
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active-criterio');
-                    if (stepEl) stepEl.classList.add('active');
-                }
-            });
-        }, { threshold: 0.5 });
         
-        function setupObservers(){
-            document.querySelectorAll('.criterio').forEach(el => observer.observe(el));
-        }
-
-        function showAvaliacaoScreen(servidor, avaliacaoExistente) {
+        function showAvaliacaoScreen(servidor) {
+            hideScreen(dom.servidores.screen); showScreen(dom.avaliacao.screen);
             window.scrollTo(0, 0);
-            document.getElementById('avaliadoNome').textContent = servidor.nome; 
-            document.getElementById('avaliadoMatricula').textContent = servidor.matricula; 
+            ['avaliadoNome', 'declaracaoNomeAvaliado'].forEach(id => document.getElementById(id).textContent = servidor.nome);
+            ['avaliadoMatricula', 'declaracaoMatriculaAvaliado'].forEach(id => document.getElementById(id).textContent = servidor.matricula);
             document.getElementById('avaliadoLotacao').textContent = servidor.lotacao;
-            document.getElementById('matriculaAvaliado').value = servidor.matricula; 
+            document.getElementById('matriculaAvaliado').value = servidor.matricula;
             document.getElementById('nomeAvaliado').value = servidor.nome;
-            document.getElementById('formAvaliacao').reset();
+            document.getElementById('declaracaoNome').textContent = currentUser.nome;
+            document.getElementById('declaracaoMatricula').textContent = currentUser.matricula;
+            
+            // CORREÇÃO: Limpeza robusta do formulário
+            dom.avaliacao.form.reset();
             document.getElementById('checkDeclaracao').checked = false;
             for (let i = 1; i <= 18; i++) {
                 const hiddenInput = document.getElementById(`questao${i}`);
                 if (hiddenInput) hiddenInput.value = '';
             }
             document.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
-            document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
-            document.querySelectorAll('.invalid-question').forEach(el => el.classList.remove('invalid-question'));
+            document.querySelectorAll('.questao').forEach(q => q.classList.remove('questao-respondida', 'invalid-question'));
             hideAlert(dom.avaliacao.alert);
-            document.getElementById('declaracaoNome').textContent = currentUser.nome; 
-            document.getElementById('declaracaoMatricula').textContent = currentUser.matricula;
-            document.getElementById('declaracaoNomeAvaliado').textContent = servidor.nome;
-            document.getElementById('declaracaoMatriculaAvaliado').textContent = servidor.matricula;
-            calcularPontuacao(); 
-            hideScreen(dom.servidores.screen); 
-            showScreen(dom.avaliacao.screen);
-            setupObservers();
+            
+            calcularPontuacao();
+            currentPageIndex = 0; 
+            showPage(currentPageIndex);
         }
 
         function calcularPontuacao() {
-            let total = 0; 
-            for (let i = 1; i <= 18; i++) { 
-                const input = document.getElementById(`questao${i}`); 
-                if (input && input.value) total += parseFloat(input.value); 
+            let total = 0;
+            for (let i = 1; i <= 18; i++) {
+                const input = document.getElementById(`questao${i}`);
+                if (input && input.value) { total += parseFloat(input.value); }
             }
             document.getElementById('pontuacaoAtual').textContent = total.toFixed(1);
-            const pMax = 25.0;
-            document.getElementById('progressBar').style.width = ((total / pMax) * 100) + '%';
+            document.getElementById('progressBar').style.width = ((total / 25.0) * 100) + '%';
+            let faixa = "Abaixo do esperado", cor = 'var(--danger)';
+            if (total >= 24) { faixa = "Excelente"; cor = 'var(--success)'; }
+            else if (total >= 22) { faixa = "Muito Bom"; cor = 'var(--success)'; }
+            else if (total >= 19) { faixa = "Bom"; cor = 'var(--success)'; }
+            else if (total >= 16) { faixa = "Regular"; cor = 'var(--primary)'; }
+            document.getElementById('progressBar').style.backgroundColor = cor;
+            document.getElementById('faixaDesempenho').textContent = faixa;
             
-            // --- INÍCIO DA ALTERAÇÃO ---
-            if (total < 16) {
-                document.getElementById('progressBar').style.backgroundColor = 'var(--danger)';
-                document.getElementById('faixaDesempenho').textContent = "Abaixo do esperado";
-            } else if (total < 19) {
-                document.getElementById('progressBar').style.backgroundColor = 'var(--primary)';
-                document.getElementById('faixaDesempenho').textContent = "Regular";
-            } else if (total < 22) {
-                document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
-                document.getElementById('faixaDesempenho').textContent = "Bom";
-            } else if (total < 24) {
-                document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
-                document.getElementById('faixaDesempenho').textContent = "Muito Bom";
-            } else {
-                document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
-                document.getElementById('faixaDesempenho').textContent = "Excelente";
-            }
-            // --- FIM DA ALTERAÇÃO ---
+            sections.forEach(section => {
+                const isCompleted = section.questions.every(qId => document.getElementById(qId) && document.getElementById(qId).value);
+                const stepEl = document.getElementById(`step-${section.id}`);
+                if (stepEl) stepEl.classList.toggle('completed', isCompleted);
+            });
             return total;
         }
 
         function validateForm() {
             let isFormValid = true;
-            const declarationContainer = document.querySelector('.declaracao-container');
-            document.querySelectorAll('.invalid-question').forEach(el => el.classList.remove('invalid-question'));
-            declarationContainer.classList.remove('invalid-question');
+            document.querySelectorAll('.declaracao-container').forEach(el => el.classList.remove('invalid-question'));
             for (let i = 1; i <= 18; i++) {
                 const input = document.getElementById(`questao${i}`);
                 if (!input || !input.value) {
-                    isFormValid = false;
-                    const questaoDiv = document.getElementById(`q-${i}`);
-                    if (questaoDiv) questaoDiv.classList.add('invalid-question');
+                    isFormValid = false; document.getElementById(`q-${i}`).classList.add('invalid-question');
                 }
             }
             if (!document.getElementById('checkDeclaracao').checked) {
-                isFormValid = false;
-                declarationContainer.classList.add('invalid-question');
+                isFormValid = false; document.querySelector('.declaracao-container').classList.add('invalid-question');
             }
             return isFormValid;
         }
 
         function handleFormSubmitAttempt(e) {
-            e.preventDefault();
-            hideAlert(dom.avaliacao.alert);
+            e.preventDefault(); hideAlert(dom.avaliacao.alert);
             if (!validateForm()) {
                 showAlert(dom.avaliacao.alert, 'Responda todas as questões e marque a declaração para finalizar.', 'error');
                 const firstInvalid = document.querySelector('.invalid-question');
-                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (firstInvalid) {
+                    const invalidCriterio = firstInvalid.closest('.criterio');
+                    if (invalidCriterio) {
+                        const invalidIndex = sections.findIndex(sec => `criterio-${sec.id}` === invalidCriterio.id);
+                        if (invalidIndex !== -1) { currentPageIndex = invalidIndex; showPage(currentPageIndex); }
+                    }
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
                 return;
             }
             showReview();
@@ -610,42 +590,40 @@
         
         function showReview() {
             const reviewContent = document.getElementById('reviewContent');
-            reviewContent.innerHTML = ''; 
-            const avaliadoNome = document.getElementById('avaliadoNome').textContent;
-            const avaliadoMatricula = document.getElementById('avaliadoMatricula').textContent;
-            const header = document.createElement('div');
-            header.innerHTML = `<p style="margin-bottom:15px; text-align:center;"><strong>Servidor:</strong> ${avaliadoNome} | <strong>Matrícula:</strong> ${avaliadoMatricula}</p>`;
-            reviewContent.appendChild(header);
+            reviewContent.innerHTML = `<p style="margin-bottom:15px; text-align:center;"><strong>Servidor:</strong> ${document.getElementById('avaliadoNome').textContent} | <strong>Matrícula:</strong> ${document.getElementById('avaliadoMatricula').textContent}</p>`;
             for (let i = 1; i <= 18; i++) {
-                const questaoDiv = document.getElementById(`q-${i}`);
-                const questaoTexto = questaoDiv.querySelector('p').textContent;
+                const questaoTexto = document.querySelector(`#q-${i} p`).textContent;
                 const respostaValor = document.getElementById(`questao${i}`).value;
-                const item = document.createElement('div');
-                item.className = 'review-item';
-                item.innerHTML = `<p>${questaoTexto}</p><p>Sua nota: <span>${respostaValor.replace('.',',')}</span></p>`;
-                reviewContent.appendChild(item);
+                reviewContent.innerHTML += `<div class="review-item"><p>${questaoTexto}</p><p>Sua nota: <span>${respostaValor.replace('.',',')}</span></p></div>`;
             }
             showModal(dom.reviewModal);
         }
 
+        // CORREÇÃO: Função de envio com melhor tratamento de erro e formato de dado
         function submitEvaluation() {
             hideModal(dom.confirmationModal);
             const pontuacaoTotal = calcularPontuacao();
-            const respostas = {};
-            for (let i = 1; i <= 18; i++) {
-                respostas[`questao${i}`] = parseFloat(document.getElementById(`questao${i}`).value) || 0;
+            const respostas = {}; 
+            for (let i = 1; i <= 18; i++) { 
+                respostas[`questao${i}`] = parseFloat(document.getElementById(`questao${i}`).value) || 0; 
             }
             const avaliacaoData = {
                 matriculaAvaliador: currentUser.matricula, nomeAvaliador: currentUser.nome,
                 matriculaAvaliado: document.getElementById('matriculaAvaliado').value, nomeAvaliado: document.getElementById('nomeAvaliado').value,
-                pontuacao: pontuacaoTotal.toFixed(1), declaracao: `Confirmado por ${currentUser.nome} em ${new Date().toLocaleString('pt-BR')}`, respostas: respostas
+                pontuacao: pontuacaoTotal, // Enviando como número
+                declaracao: `Confirmado por ${currentUser.nome} em ${new Date().toLocaleString('pt-BR')}`, 
+                respostas: respostas
             };
-            const btnSalvar = document.getElementById('btnSalvarAvaliaco');
+            const btnSalvar = dom.avaliacao.submitBtn;
             btnSalvar.disabled = true; btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-            
             isFormDirty = false;
+            
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'salvarAvaliacao', avaliacao: avaliacaoData }) })
-                .then(res => res.json()).then(data => {
+                .then(res => {
+                    if (!res.ok) throw new Error(`Erro no servidor: ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
                     if (data.success) {
                         dom.successModal.message.innerHTML = `A avaliação de <strong>${avaliacaoData.nomeAvaliado}</strong> foi enviada com sucesso.`;
                         showModal(dom.successModal.el);
@@ -653,7 +631,7 @@
                         showAlert(dom.avaliacao.alert, data.error, 'error'); 
                     }
                 })
-                .catch(err => showAlert(dom.avaliacao.alert, 'Erro de comunicação com o servidor.', 'error'))
+                .catch(err => showAlert(dom.avaliacao.alert, `Erro de comunicação: ${err.message}`, 'error'))
                 .finally(() => { 
                     btnSalvar.disabled = false; 
                     btnSalvar.innerHTML = '<i class="fas fa-check-circle"></i> Finalizar Avaliação'; 
@@ -661,78 +639,35 @@
         }
         
         function showInfoModal(message) {
-            document.getElementById('infoModalMessage').textContent = message;
-            showModal(dom.infoModal);
-        }
-
-        // --- INICIALIZAÇÃO E EVENT LISTENERS ---
-        const savedUser = localStorage.getItem('avaliacao_user');
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            showServidoresScreen();
-            loadServidores();
+            document.getElementById('infoModalMessage').textContent = message; showModal(dom.infoModal);
         }
         
-        document.getElementById('btnLogin').addEventListener('click', login);
-        document.getElementById('btnLogout').addEventListener('click', logout);
-        document.getElementById('btnVoltarLista').addEventListener('click', () => showServidoresScreen());
-        document.getElementById('formAvaliacao').addEventListener('submit', handleFormSubmitAttempt);
-        document.getElementById('searchServidor').addEventListener('keyup', renderServidores);
-        document.getElementById('btnSortStatus').addEventListener('click', function() { sortByPending = !sortByPending; this.classList.toggle('active'); renderServidores(); });
-        document.getElementById('modalConfirm').addEventListener('click', submitEvaluation);
-        document.getElementById('modalCancel').addEventListener('click', () => hideModal(dom.confirmationModal));
-        document.getElementById('infoModalClose').addEventListener('click', () => hideModal(dom.infoModal));
-        document.getElementById('modalCloseReview').addEventListener('click', () => hideModal(dom.reviewModal));
-        document.getElementById('modalConfirmReview').addEventListener('click', () => {
-            hideModal(dom.reviewModal);
-            const pontuacaoTotal = calcularPontuacao();
-            document.getElementById('modalScore').textContent = pontuacaoTotal.toFixed(1);
-            showModal(dom.confirmationModal);
-        });
-        dom.login.togglePass.addEventListener('click', () => {
-            const isPassword = dom.login.senha.type === 'password';
-            dom.login.senha.type = isPassword ? 'text' : 'password';
-            dom.login.togglePass.classList.toggle('fa-eye');
-            dom.login.togglePass.classList.toggle('fa-eye-slash');
-        });
-        dom.successModal.closeBtn.addEventListener('click', () => {
-            hideModal(dom.successModal.el);
-            loadServidores();
-            showServidoresScreen();
-        });
-        document.querySelectorAll('.opcoes-avaliacao .opcao').forEach(opcao => {
-            opcao.addEventListener('click', function() {
-                isFormDirty = true;
-                const questaoDiv = this.closest('.questao');
-                const value = this.getAttribute('data-value');
-                const hiddenInput = questaoDiv.querySelector('input[type=hidden]');
-                if (hiddenInput) hiddenInput.value = value;
-                this.parentNode.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
-                this.classList.add('selecionada');
-                questaoDiv.classList.add('questao-respondida');
-                questaoDiv.classList.remove('invalid-question');
-                calcularPontuacao();
-
-                const criterioEl = this.closest('.criterio');
-                const inputs = [...criterioEl.querySelectorAll('input[type=hidden]')];
-                const isCompleted = inputs.every(input => input.value);
-                const stepId = criterioEl.id.replace('criterio-','step-');
-                if(isCompleted) document.getElementById(stepId).classList.add('completed');
+        function validateCurrentPage() {
+            let isPageValid = true;
+            const currentSection = sections[currentPageIndex];
+            currentSection.questions.forEach(qId => {
+                const input = document.getElementById(qId);
+                const questaoDiv = document.getElementById(`q-${qId.replace('questao', '')}`);
+                if (!input || !input.value) { isPageValid = false; questaoDiv.classList.add('invalid-question'); }
+                else { questaoDiv.classList.remove('invalid-question'); }
             });
-        });
-        
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            const currentTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(currentTheme === 'light' ? 'dark' : 'light');
-        });
+            return isPageValid;
+        }
 
-        // --- MELHORIAS ADICIONAIS ---
-        window.addEventListener('beforeunload', (event) => {
-            if (isFormDirty) {
-                event.preventDefault();
-                event.returnValue = ''; 
-            }
-        });
+        function showPage(index) {
+            document.querySelectorAll('.criterio').forEach(c => c.classList.remove('active-page'));
+            document.getElementById(`criterio-${sections[index].id}`).classList.add('active-page');
+            dom.pagination.prevButton.disabled = index === 0;
+            const isLastPage = index === sections.length - 1;
+            dom.pagination.nextButton.classList.toggle('hidden', isLastPage);
+            dom.avaliacao.submitBtn.classList.toggle('hidden', !isLastPage);
+            dom.avaliacao.declarationBoxWrapper.classList.toggle('hidden', !isLastPage);
+            document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
+            const activeStep = document.getElementById(`step-${sections[index].id}`);
+            if (activeStep) activeStep.classList.add('active');
+            const title = document.querySelector(`#criterio-${sections[index].id} h3`);
+            if(title) { title.focus({ preventScroll: true }); window.scrollTo(0, dom.avaliacao.screen.offsetTop); }
+        }
 
         const filterNumericInput = (event) => {
             const inputElement = event.target;
@@ -744,32 +679,51 @@
             }
             inputElement.value = sanitizedValue;
         };
+
+        const savedUser = localStorage.getItem('avaliacao_user');
+        if (savedUser) { currentUser = JSON.parse(savedUser); showServidoresScreen(); loadServidores(); }
+        
+        document.getElementById('btnLogin').addEventListener('click', login);
+        document.getElementById('btnLogout').addEventListener('click', logout);
+        document.getElementById('btnVoltarLista').addEventListener('click', () => showServidoresScreen());
+        dom.avaliacao.form.addEventListener('submit', handleFormSubmitAttempt);
+        document.getElementById('searchServidor').addEventListener('keyup', renderServidores);
+        document.getElementById('btnSortStatus').addEventListener('click', function() { sortByPending = !sortByPending; this.classList.toggle('active'); renderServidores(); });
+        document.getElementById('modalConfirm').addEventListener('click', submitEvaluation);
+        document.getElementById('modalCancel').addEventListener('click', () => hideModal(dom.confirmationModal));
+        document.getElementById('infoModalClose').addEventListener('click', () => hideModal(dom.infoModal));
+        document.getElementById('modalCloseReview').addEventListener('click', () => hideModal(dom.reviewModal));
+        document.getElementById('modalConfirmReview').addEventListener('click', () => { hideModal(dom.reviewModal); document.getElementById('modalScore').textContent = calcularPontuacao().toFixed(1); showModal(dom.confirmationModal); });
+        dom.login.togglePass.addEventListener('click', () => { const s = dom.login.senha; s.type = s.type === 'password' ? 'text' : 'password'; dom.login.togglePass.classList.toggle('fa-eye-slash'); dom.login.togglePass.classList.toggle('fa-eye'); });
+        dom.successModal.closeBtn.addEventListener('click', () => { hideModal(dom.successModal.el); loadServidores(); showServidoresScreen(); });
+        document.querySelectorAll('.opcoes-avaliacao .opcao').forEach(opcao => {
+            opcao.addEventListener('click', function() {
+                isFormDirty = true;
+                const questaoDiv = this.closest('.questao'); const value = this.getAttribute('data-value');
+                const hiddenInput = questaoDiv.querySelector('input[type=hidden]'); if (hiddenInput) hiddenInput.value = value;
+                this.parentNode.querySelectorAll('.opcao').forEach(op => op.classList.remove('selecionada'));
+                this.classList.add('selecionada'); questaoDiv.classList.add('questao-respondida'); questaoDiv.classList.remove('invalid-question');
+                calcularPontuacao();
+            });
+        });
+        dom.pagination.nextButton.addEventListener('click', () => {
+            if (validateCurrentPage()) { if (currentPageIndex < sections.length - 1) { currentPageIndex++; showPage(currentPageIndex); } }
+            else { showToast('Por favor, responda todas as questões para avançar.', 'error', 3000); }
+        });
+        dom.pagination.prevButton.addEventListener('click', () => { if (currentPageIndex > 0) { currentPageIndex--; showPage(currentPageIndex); } });
+        document.getElementById('themeToggle').addEventListener('click', () => { applyTheme(localStorage.getItem('theme') === 'light' ? 'dark' : 'light'); });
+        window.addEventListener('beforeunload', (e) => { if (isFormDirty) { e.preventDefault(); e.returnValue = ''; } });
+        
         dom.login.matricula.addEventListener('input', filterNumericInput);
         dom.login.senha.addEventListener('input', filterNumericInput);
 
         const backToTopBtn = document.getElementById('backToTopBtn');
-        window.onscroll = function() {
-            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-                backToTopBtn.style.display = "flex";
-            } else {
-                backToTopBtn.style.display = "none";
-            }
-        };
-        backToTopBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-        
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                if (dom.reviewModal.classList.contains('visible')) { hideModal(dom.reviewModal); }
-                if (dom.confirmationModal.classList.contains('visible')) { hideModal(dom.confirmationModal); }
-                if (dom.successModal.el.classList.contains('visible')) { hideModal(dom.successModal.el); }
-                if (dom.infoModal.classList.contains('visible')) { hideModal(dom.infoModal); }
-            }
-        });
-        // --- FIM DAS MELHORIAS ---
+        window.onscroll = () => { backToTopBtn.style.display = (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) ? "flex" : "none"; };
+        backToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { [dom.reviewModal, dom.confirmationModal, dom.successModal.el, dom.infoModal].forEach(m => { if (m.classList.contains('visible')) hideModal(m); }); } });
         
         generateStepper();
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        applyTheme(savedTheme);
+        applyTheme(localStorage.getItem('theme') || 'light');
     });
     </script>
 </body>
