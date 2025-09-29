@@ -8,24 +8,26 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71;
             --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937;
             --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444;
-            --warning: #f59e0b; --gray: #6b7280; --border-color: #e5e7eb;
+            --warning: #f59e0b; --gray: #555e6b; /* Cor padronizada */ --border-color: #e5e7eb;
             --border-radius: 8px; 
             --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
         }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shake-horizontal { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; } }
-        
+        @keyframes fadeInText { from { opacity: 0; } to { opacity: 1; } }
+        .text-fade-in { animation: fadeInText 0.4s ease-in-out; }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         html { scroll-behavior: smooth; }
         body { background-color: #f5f7fa; color: var(--dark); line-height: 1.7; font-size: 16px; }
@@ -36,7 +38,7 @@
         .logo h1 { font-size: 1.5rem; }
         .user-info { display: flex; align-items: center; gap: 10px; }
         .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; animation: fadeIn 0.5s ease-out forwards; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--light); flex-wrap: wrap; gap: 10px;}
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px;}
         .hidden { display: none !important; }
         .btn { padding: 10px 15px; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
         .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); }
@@ -58,22 +60,23 @@
         .btn-sort { background-color: #fff; color: var(--primary); border: 1px solid var(--primary); }
         .btn-sort.active { background-color: var(--primary); color: #fff; }
         .servidores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
-        .servidor-card { border: 1px solid #e5e7eb; border-radius: var(--border-radius); padding: 15px; cursor: pointer; transition: all 0.3s; }
-        .servidor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+        .servidor-card { border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 15px; cursor: pointer; transition: all 0.3s; }
+        .servidor-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--primary); }
         .servidor-card.concluido { background-color: #f9fafb; cursor: not-allowed; }
-        .servidor-card.concluido:hover { transform: none; box-shadow: none; }
-        .servidor-card h3 { color: var(--primary); margin-bottom: 10px; }
+        .servidor-card.concluido:hover { transform: none; box-shadow: none; border-color: var(--border-color); }
+        .servidor-card h3 { color: var(--primary-dark); margin-bottom: 10px; font-size: 1.1rem; }
         .servidor-card.concluido h3 { color: var(--gray); }
         .servidor-info { font-size: 0.9rem; color: var(--gray); }
-        .status-badge { margin-top: 10px; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; display: inline-block; }
-        .status-pendente { background-color: #fef3c7; color: #92400e; }
-        .status-concluido { background-color: #d1fae5; color: #065f46; }
+        .status-badge { margin-top: 10px; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; display: inline-block; font-weight: 600; }
+        .status-pendente { background-color: var(--warning); color: white; }
+        .status-concluido { background-color: var(--success); color: white; }
         .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
-        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out; }
+        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out; }
         .criterio:not(.active-page) { display: none; }
         .criterio.active-criterio { box-shadow: 0 8px 25px rgba(26, 86, 219, 0.2); border-color: var(--primary); }
         .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
         .questao { padding: 20px; background: white; transition: all 0.4s ease; border-left: 4px solid transparent; }
+        .questao p { font-weight: 500; } /* Destaque para as perguntas */
         .questao + .questao { border-top: 1px solid var(--border-color); }
         .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
         .questao.invalid-question { background-color: #fee2e2; border-left-color: var(--danger); }
@@ -81,12 +84,12 @@
         .opcao { text-align: center; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80px; }
         .opcao .valor-numerico { font-size: 1.2rem; font-weight: bold; }
         .opcao .valor-texto { font-size: 0.75rem; color: var(--gray); margin-top: 4px; }
-        .opcao:hover { background-color: #f9fafb; }
+        .opcao:hover { background-color: var(--light); border-color: var(--primary); transform: translateY(-2px); }
         .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
         .opcao.selecionada .valor-texto { color: white; }
         .opcao .valor-numerico::before { font-family: "Font Awesome 6 Free"; content: ""; font-weight: 900; margin-right: 8px; color: white; transition: content 0.2s ease; }
         .opcao.selecionada .valor-numerico::before { content: "\f00c"; }
-        .declaracao-container { margin-top: 30px; border-top: 2px solid #e5e7eb; padding-top: 20px; background-color: #f9fafb; padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
+        .declaracao-container { margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 20px; background-color: var(--light); padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
         .declaracao-container.invalid-question { border-color: var(--danger); }
         .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
         .declaracao-box input[type="checkbox"] { width: auto; margin-top: 5px; flex-shrink: 0; }
@@ -95,17 +98,15 @@
         .alert { padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; }
         .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .alert-error { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-        .resumo-pontuacao { background-color: #eff6ff; padding: 15px; border-radius: var(--border-radius); margin-top: 20px; }
-        .progress-bar { height: 10px; background-color: #e5e7eb; border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .resumo-pontuacao { background-color: var(--primary-light); padding: 15px; border-radius: var(--border-radius); margin-top: 20px; border: 1px solid var(--primary); }
+        .progress-bar { height: 10px; background-color: var(--border-color); border-radius: 5px; margin: 10px 0; overflow: hidden; }
         .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: all 0.5s ease; }
-        .instructions-panel { background-color: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 15px; margin-bottom: 20px; color: var(--primary-dark); line-height: 1.8; }
+        .instructions-panel { background-color: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 15px; margin-bottom: 20px; color: var(--primary-dark); }
         .instructions-panel h3 { font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        .instructions-panel ul { list-style-position: inside; padding-left: 5px; }
-        .instructions-panel li + li { margin-top: 5px; }
         .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        .stat-card { background-color: #f3f4f6; border-radius: var(--border-radius); padding: 15px; text-align: center; border-left: 5px solid var(--gray); }
-        .stat-card h4 { font-size: 0.9rem; color: var(--gray); margin-bottom: 5px; }
-        .stat-card p { font-size: 2rem; font-weight: 600; color: var(--dark); }
+        .stat-card { background-color: var(--light); border-radius: var(--border-radius); padding: 15px; text-align: center; border-left: 5px solid var(--gray); }
+        .stat-card h4 { font-size: 0.9rem; color: var(--gray); margin-bottom: 5px; text-transform: uppercase; }
+        .stat-card p { font-size: 2rem; font-weight: 700; color: var(--dark); }
         .stat-card.stat-success { border-left-color: var(--success); }
         .stat-card.stat-warning { border-left-color: var(--warning); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; opacity: 0; transition: opacity 0.3s ease; }
@@ -121,25 +122,38 @@
         .review-item:last-child { border-bottom: none; }
         .review-item p { margin: 0; font-size: 0.9rem; }
         .review-item span { font-weight: 600; color: var(--primary); background-color: var(--primary-light); padding: 2px 8px; border-radius: 10px; font-size: 1rem; }
-        .stepper-container { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding: 10px; background-color: var(--light); border-radius: var(--border-radius); }
-        .step { display: flex; align-items: center; flex-direction: column; text-align: center; color: var(--gray); font-weight: 500; }
+        .stepper-container { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 20px; padding: 10px; background-color: var(--light); border-radius: var(--border-radius); position: relative; }
+        .stepper-container::before { content: ''; position: absolute; top: 23px; left: 10%; right: 10%; height: 2px; background-color: var(--border-color); z-index: 0; }
+        .step { display: flex; align-items: center; flex-direction: column; text-align: center; color: var(--gray); font-weight: 500; position: relative; z-index: 1; }
         .step-icon { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--gray); background-color: white; display: flex; justify-content: center; align-items: center; color: var(--gray); margin-bottom: 5px; transition: all 0.3s; }
         .step.active .step-icon { border-color: var(--primary); background-color: var(--primary); color: white; }
         .step.active .step-label { color: var(--primary); }
         .step.completed .step-icon { border-color: var(--success); background-color: var(--success); color: white; animation: pop 0.3s ease-out; }
         .step-label { font-size: 0.75rem; }
+        .accordion-item { border-bottom: 1px solid var(--primary); }
+        .accordion-item:last-child { border-bottom: none; }
+        .accordion-header { background: none; border: none; width: 100%; text-align: left; padding: 12px 5px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--primary-dark); }
+        .accordion-header::after { font-family: "Font Awesome 6 Free"; content: '\f078'; font-weight: 900; transition: transform 0.3s ease; }
+        .accordion-header.active::after { transform: rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .accordion-content-inner { padding: 5px 5px 15px; line-height: 1.8; }
+        .accordion-content-inner ul { list-style-position: inside; padding-left: 5px; }
+        .accordion-content-inner li + li { margin-top: 5px; }
+        #successIcon { font-size: 4rem; color: var(--success); margin-bottom: 15px; display: inline-block; animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         body.dark-theme { --light: #334155; --dark: #f1f5f9; --border-color: #475569; background-color: #0f172a; }
         body.dark-theme .card, body.dark-theme .modal-content { background-color: #1e293b; border: 1px solid var(--border-color); }
+        body.dark-theme .servidor-card { border-color: var(--border-color); }
         body.dark-theme .servidor-card:not(.concluido):hover { background-color: #34495e; }
         body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .declaracao-container, body.dark-theme .servidor-card.concluido, body.dark-theme .stepper-container { background-color: #1e293b; border-color: var(--border-color); }
         body.dark-theme input, body.dark-theme select, body.dark-theme textarea, body.dark-theme .opcao:hover { background-color: #34495e; border-color: #4a627a; color: var(--dark); }
         body.dark-theme .status-pendente { background-color: #f59e0b; color: #1f2937; }
         body.dark-theme .status-concluido { background-color: #10b981; color: white; }
         body.dark-theme .instructions-panel, body.dark-theme .stat-card, body.dark-theme .review-container { background-color: var(--light); border-color: var(--primary); color: var(--dark); }
-        body.dark-theme .stat-card p { color: var(--dark); }
+        body.dark-theme .stat-card p, body.dark-theme .servidor-card.concluido h3 { color: var(--dark); }
         body.dark-theme .review-item span { color: white; background-color: var(--primary); }
         body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
         body.dark-theme .opcao.selecionada .valor-texto { color: #f0fdf4; }
+        body.dark-theme .accordion-header { color: var(--dark); }
         #toastContainer { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { padding: 15px 20px; border-radius: var(--border-radius); color: white; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
         .toast.toast-success { background-color: var(--success); }
@@ -147,23 +161,14 @@
         .toast.toast-error { background-color: var(--danger); }
         .toast.toast-hiding { animation: fadeOut 0.5s ease-out forwards; }
         .input-error-flash { border-color: var(--danger) !important; animation: shake-horizontal 0.4s cubic-bezier(.455,.03,.515,.955) both; }
-
-        @media (max-width: 768px) {
-            .servidores-grid { grid-template-columns: 1fr; }
-            .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
-            .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
-            .toolbar { flex-direction: column; }
-        }
-        @media (max-width: 480px) {
-           #toastContainer { right: 10px; left: 10px; top: 10px; }
-           .modal-buttons { flex-direction: column; gap: 10px; }
-        }
+        @media (max-width: 768px) { .servidores-grid { grid-template-columns: 1fr; } .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); } .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; } .toolbar { flex-direction: column; } }
+        @media (max-width: 480px) { #toastContainer { right: 10px; left: 10px; top: 10px; } .modal-buttons { flex-direction: column; gap: 10px; } }
     </style>
 </head>
 <body>
     <header>
         <div class="container header-content">
-            <div class="logo"><i class="fas fa-shield-alt fa-2x"></i><h1>Sistema de Avaliação Desempenho - Avaliação da Chefia - GCM Salvador</h1></div>
+            <div class="logo"><i class="fas fa-shield-alt fa-2x"></i><h1>Avaliação da Chefia - GCM Salvador</h1></div>
             <div id="userInfo" class="user-info hidden">
                 <span id="userName"></span>
                 <button id="themeToggle" class="btn btn-secondary" style="background-color: transparent; border: 1px solid white;">
@@ -176,25 +181,55 @@
 
     <div class="container">
         <div id="loginScreen" class="card">
-            <h2>Acesso Restrito</h2>
+            <h2>Acesso Restrito da Chefia</h2>
             <div class="instructions-panel">
                 <h3><i class="fas fa-info-circle"></i> Orientações sobre a Avaliação de Chefia</h3>
-                <ul>
-                    <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o desenvolvimento na carreira dos servidores.</li>
-                    <li><strong>Período para Avaliar:</strong> A avaliação dos servidores da sua equipe estará disponível entre os dias <strong>02 e 21 de outubro</strong>.</li>
-                    <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias do prazo. Caso o sistema apresente <strong>lentidão ou erro genérico</strong>, por favor, tente novamente em um horário de menor movimento.</li>
-                    <li><strong>Acesso Inválido:</strong> Se a mensagem for especificamente <strong>'matrícula ou senha inválida'</strong>, isso não significa um problema de acesso simultâneo, mas sim um provável erro de digitação. Por favor, verifique os dados com atenção e tente novamente. Caso o problema persista, entre em contato com o setor responsável.</li>
-                    <li><strong>Servidores Cedidos:</strong> Conforme o <strong>Decreto nº 38.473/2024 (Art. 31)</strong>, os servidores cedidos a outros órgãos não recebem avaliação da chefia. A nota deles será composta <strong>100% (cem por cento)</strong> pela autoavaliação que eles realizarão.</li>
-                    <li><strong>Servidores Inaptos para Avaliação:</strong> De acordo com o <strong>Art. 47 da Lei nº 9.640/2022</strong>, servidores em afastamentos como <strong>Licença para Tratar de Interesses Particulares (sem vencimentos)</strong> ou <strong>Licença para Tratamento de Saúde (superiores a 60 dias)</strong> não aparecerão na sua lista para avaliação. Esteja ciente de que, caso estes servidores tentem acessar o sistema, eles receberão uma mensagem de <strong>'matrícula ou senha inválida'</strong>, o que não representa um erro no sistema, mas sim o impedimento legal deles.</li>
-                    <li><strong>Afastamentos que NÃO Impedem a Avaliação:</strong> Períodos de <strong>Férias</strong> e <strong>Licença-Prêmio</strong> dos servidores, mesmo que somados ultrapassem <strong>60 (sessenta)</strong> dias, <strong>não impedem</strong> a avaliação, pois são considerados tempo de efetivo exercício <strong>(Art. 138 da Lei Complementar nº 01/1991)</strong>. Servidoras em <strong>Licença Maternidade ou Adoção</strong> também não são impedidas por esta regra <strong>(Art. 33 do Decreto nº 38.473/2024)</strong>.</li>
-                    <li><strong>Mandato Classista (Sindicato):</strong> Conforme o <strong>Art. 32 do Decreto nº 38.473/2024</strong>, os servidores afastados para desempenho de mandato classista nos últimos <strong>12 (doze)</strong> meses estão <strong>dispensados</strong> da avaliação. Por este motivo, não aparecerão na sua lista para serem avaliados e, caso tentem acesso, receberão a mensagem de <strong>'matrícula ou senha inválida'</strong>. Esta dispensa não prejudica a progressão ou promoção na carreira deles.</li>
-                    <li><strong>Responsabilidade e Fundamentação das Notas:</strong> A Avaliação de Desempenho é um ato administrativo formal e um instrumento de gestão, não uma ferramenta para expressar afinidades ou descontentamentos pessoais. Cada nota atribuída deve ser reflexo exclusivo do desempenho profissional do servidor, baseada em fatos e observações concretas. Esteja ciente de que, conforme o <strong>Art. 45 da Lei nº 9.640/2022</strong>, o servidor avaliado possui o direito legal de solicitar reconsideração do resultado. Nesse caso, você, como avaliador, será formalmente chamado a <strong>prover justificativas detalhadas e comprobatórias</strong> para cada nota contestada perante a Comissão de Avaliação de Recursos. Avaliações que se mostrarem infundadas, desproporcionais ou baseadas em perseguição pessoal podem resultar em <strong>reversão do resultado e apuração de responsabilidade do avaliador</strong>. Avalie com imparcialidade, justiça e, acima de tudo, com profissionalismo.</li>
-                    <li><strong>Revisão Final:</strong> Antes de finalizar, uma tela de revisão será exibida. Confira com atenção todas as notas atribuídas ao servidor, pois o envio da avaliação é definitivo.</li>
-                    <li><strong>Ação Definitiva:</strong> Lembre-se, uma avaliação enviada <strong>não poderá ser editada</strong>.</li>
-                    <li><strong>Propósito e Sigilo:</strong> Esta avaliação é uma ferramenta para o desenvolvimento profissional. Suas respostas são confidenciais e serão sempre tratadas com o devido respeito. Caso o servidor avaliado solicite formalmente a reconsideração do resultado, um direito previsto no <strong>Art. 45 da Lei nº 9.640/2022</strong>, suas respostas e justificativas serão reavaliadas pela Comissão de Avaliação de Recursos.</li>
-                    <li><strong>Publicação do Resultado:</strong> Para garantir a transparência do processo, o resultado final da avaliação será publicado em Diário Oficial do Município, conforme o princípio da publicidade <strong>(Art. 43 da Lei nº 9.640/2022)</strong>.</li>
-                    <li><strong>Suporte:</strong> Em caso de dúvidas sobre o processo, entre em contato com o setor responsável.</li>
-                </ul>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header">Requisito Legal e Período</button>
+                        <div class="accordion-content"><div class="accordion-content-inner"><ul>
+                            <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o desenvolvimento na carreira dos servidores.</li>
+                            <li><strong>Período para Avaliar:</strong> A avaliação dos servidores da sua equipe estará disponível entre os dias <strong>02 e 21 de outubro</strong>.</li>
+                        </ul></div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">Acesso e Sistema</button>
+                        <div class="accordion-content"><div class="accordion-content-inner"><ul>
+                            <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias. Caso o sistema apresente <strong>lentidão ou erro genérico</strong>, por favor, tente novamente em um horário de menor movimento.</li>
+                            <li><strong>Acesso Inválido:</strong> Se a mensagem for <strong>'matrícula ou senha inválida'</strong>, verifique os dados com atenção. Persistindo, contate o setor responsável.</li>
+                        </ul></div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">Casos Específicos de Servidores</button>
+                        <div class="accordion-content"><div class="accordion-content-inner"><ul>
+                            <li><strong>Servidores Cedidos:</strong> Conforme o <strong>Decreto nº 38.473/2024 (Art. 31)</strong>, servidores cedidos não recebem avaliação da chefia (nota 100% da autoavaliação).</li>
+                            <li><strong>Mandato Classista (Sindicato):</strong> Conforme o <strong>Art. 32 do Decreto nº 38.473/2024</strong>, servidores afastados para mandato classista estão <strong>dispensados</strong> da avaliação e não aparecerão na sua lista.</li>
+                        </ul></div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">Servidores Inaptos e Afastamentos</button>
+                        <div class="accordion-content"><div class="accordion-content-inner"><ul>
+                            <li><strong>Servidores Inaptos:</strong> De acordo com o <strong>Art. 47 da Lei nº 9.640/2022</strong>, servidores em afastamentos como <strong>Licença para Tratar de Interesses Particulares</strong> ou <strong>Licença Saúde (+60 dias)</strong> não aparecerão na sua lista.</li>
+                            <li><strong>Afastamentos que NÃO Impedem:</strong> Períodos de <strong>Férias</strong>, <strong>Licença-Prêmio</strong> e <strong>Licença Maternidade/Adoção</strong> não impedem a avaliação.</li>
+                        </ul></div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header" style="color: var(--danger);">Responsabilidade e Fundamentação</button>
+                        <div class="accordion-content"><div class="accordion-content-inner"><ul>
+                            <li>A Avaliação de Desempenho é um ato administrativo formal. Cada nota deve ser reflexo do desempenho profissional, baseada em fatos e observações concretas.</li>
+                            <li>Conforme o <strong>Art. 45 da Lei nº 9.640/2022</strong>, o servidor tem direito a solicitar reconsideração. Nesse caso, você, como avaliador, será chamado a <strong>prover justificativas detalhadas e comprobatórias</strong> para cada nota.</li>
+                            <li>Avaliações infundadas, desproporcionais ou baseadas em perseguição podem resultar em <strong>reversão do resultado e apuração de sua responsabilidade</strong>. Avalie com imparcialidade, justiça e profissionalismo.</li>
+                        </ul></div></div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">Instruções Finais</button>
+                        <div class="accordion-content"><div class="accordion-content-inner"><ul>
+                           <li><strong>Revisão Final:</strong> Antes de finalizar, uma tela de revisão será exibida. Confira com atenção, pois o envio da avaliação é definitivo.</li>
+                           <li><strong>Ação Definitiva:</strong> Lembre-se, uma avaliação enviada <strong>não poderá ser editada</strong>.</li>
+                           <li><strong>Publicação do Resultado:</strong> O resultado final será publicado em Diário Oficial do Município <strong>(Art. 43 da Lei nº 9.640/2022)</strong>.</li>
+                        </ul></div></div>
+                    </div>
+                </div>
             </div>
             <div id="loginAlert" class="alert alert-error hidden"></div>
             <div class="form-group"><label for="matricula">Matrícula:</label><input type="text" id="matricula" placeholder="Digite sua matrícula SIGP" inputmode="numeric"></div>
@@ -207,8 +242,7 @@
             </div>
             <button id="btnLogin" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             <div id="loginLoading" class="hidden" style="text-align: center; margin-top: 15px;">
-                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);" aria-hidden="true"></i>
-                <p style="margin-top: 10px;">Validando credenciais...</p>
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i><p style="margin-top: 10px;">Validando credenciais...</p>
             </div>
         </div>
 
@@ -216,30 +250,27 @@
             <div class="card-header">
                 <div>
                     <h2>Servidores sob sua supervisão</h2>
-                    <p>Selecione um servidor para iniciar a avaliação.</p>
+                    <p>Selecione um servidor para iniciar ou consultar a avaliação.</p>
                 </div>
-                <div id="progressoContador" class="resumo-pontuacao" style="margin: 0; padding: 10px;"></div>
             </div>
-            <div id="dashboard" style="margin-bottom: 25px;">
+            <div id="dashboard" style="margin: 20px 0;">
                 <div class="dashboard-stats">
-                    <div class="stat-card"><h4>Total de Servidores</h4><p id="statTotal">0</p></div>
+                    <div class="stat-card"><h4>Total</h4><p id="statTotal">0</p></div>
                     <div class="stat-card stat-success"><h4>Avaliados</h4><p id="statAvaliados">0</p></div>
                     <div class="stat-card stat-warning"><h4>Pendentes</h4><p id="statPendentes">0</p></div>
                 </div>
             </div>
             <div class="toolbar">
                 <div class="search-container"><i class="fas fa-search"></i><input type="text" id="searchServidor" placeholder="Pesquisar por nome ou matrícula..."></div>
-                <button id="btnSortStatus" class="btn btn-sort"><i class="fas fa-filter"></i> Ordenar por Pendentes</button>
+                <button id="btnSortStatus" class="btn btn-sort"><i class="fas fa-filter"></i> Ordenar por Status</button>
             </div>
             <div id="servidoresList" class="servidores-grid"></div>
         </div>
 
         <div id="avaliacaoScreen" class="card avaliacao-form hidden">
             <div class="card-header"><h2>Avaliação de Desempenho</h2><button id="btnVoltarLista" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Voltar à Lista</button></div>
-            
             <div id="stepper" class="stepper-container"></div>
-
-            <div style="margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px;">
+            <div style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
                 <p><b>Avaliado:</b> <strong id="avaliadoNome"></strong></p>
                 <p><b>Matrícula:</b> <strong id="avaliadoMatricula"></strong></p>
                 <p><b>Lotação:</b> <strong id="avaliadoLotacao"></strong></p>
@@ -256,7 +287,7 @@
                 <div class="resumo-pontuacao">
                     <h3>Resumo de Pontuação</h3>
                     <div class="progress-bar"><div id="progressBar" class="progress" style="width: 0%"></div></div>
-                    <p>Pontuação Atual: <strong id="pontuacaoAtual">0.0</strong> pts</p>
+                    <p>Pontuação Atual: <strong id="pontuacaoAtual">0,0 / 25,0 pts</strong></p>
                     <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
                 </div>
 
@@ -308,7 +339,7 @@
     </div>
     <div id="successModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
         <div class="modal-content">
-            <i class="fas fa-check-circle" style="color: var(--success); font-size: 3rem; margin-bottom: 15px;"></i>
+            <i id="successIcon" class="fas fa-check-circle"></i>
             <h3 id="successModalTitle">Avaliação Enviada!</h3>
             <p id="successModalMessage"></p>
             <div class="modal-buttons">
@@ -338,7 +369,7 @@
             { id: 'responsabilidade', title: 'Responsabilidade', questions: ['questao6', 'questao7', 'questao8', 'questao9', 'questao10'] },
             { id: 'pontualidade', title: 'Pontualidade', questions: ['questao11'] },
             { id: 'assiduidade', title: 'Assiduidade', questions: ['questao12', 'questao13', 'questao14', 'questao15', 'questao16'] },
-            { id: 'equipamentos', title: 'Uso Adequado dos Equipamentos', questions: ['questao17', 'questao18'] }
+            { id: 'equipamentos', title: 'Equipamentos', questions: ['questao17', 'questao18'] }
         ];
         
         const dom = {
@@ -436,24 +467,35 @@
             .catch(err => showAlert(dom.login.alert, 'Erro de comunicação.', 'error'))
             .finally(() => { b.disabled = false; b.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar'; dom.login.loading.classList.add('hidden'); });
         }
-
+        
         function loadServidores() {
             dom.servidores.list.innerHTML = '<p>Carregando servidores...</p>';
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getServidores', matriculaAvaliador: currentUser.matricula }) })
             .then(res => res.json())
             .then(data => {
-                if (data.success) { servidores = data.servidores; avaliacoes = data.avaliacoes; renderServidores(); updateDashboard(); }
-                else { dom.servidores.list.innerHTML = `<p style="color: red;">${data.error}</p>`; }
-            }).catch(err => dom.servidores.list.innerHTML = '<p style="color: red;">Erro de comunicação.</p>');
+                if (data.success) { 
+                    servidores = data.servidores; 
+                    avaliacoes = data.avaliacoes; 
+                    renderServidores(); 
+                    updateDashboard(); 
+                } else { 
+                    dom.servidores.list.innerHTML = `<p style="color: red;">${data.error}</p>`; 
+                }
+            }).catch(err => {
+                console.error("Falha ao carregar servidores:", err);
+                dom.servidores.list.innerHTML = '<p style="color: red;">Erro de comunicação.</p>';
+            });
         }
         
         function updateDashboard() {
-            const total = servidores.length, avaliados = avaliacoes.length;
+            const total = servidores.length;
+            const avaliados = avaliacoes.length;
             document.getElementById('statTotal').textContent = total;
             document.getElementById('statAvaliados').textContent = avaliados;
             document.getElementById('statPendentes').textContent = total - avaliados;
         }
 
+        // *** FUNÇÃO CORRIGIDA PARA USAR A LÓGICA ORIGINAL E FUNCIONAL ***
         function renderServidores() {
             const searchTerm = document.getElementById('searchServidor').value.toLowerCase().trim();
             let servidoresFiltrados = servidores.filter(s => s.nome.toLowerCase().includes(searchTerm) || s.matricula.toString().includes(searchTerm));
@@ -465,13 +507,15 @@
                 });
             }
             dom.servidores.list.innerHTML = '';
-            document.getElementById('progressoContador').innerHTML = `<strong>${avaliacoes.length} de ${servidores.length}</strong> avaliados`;
+            // A linha abaixo estava no arquivo original, a removermos pois não há o elemento com ID 'progressoContador'
+            // document.getElementById('progressoContador').innerHTML = `<strong>${avaliacoes.length} de ${servidores.length}</strong> avaliados`;
             if (servidoresFiltrados.length === 0) { dom.servidores.list.innerHTML = '<p>Nenhum servidor encontrado.</p>'; return; }
             servidoresFiltrados.forEach(servidor => {
                 const avaliacao = avaliacoes.find(av => av.matriculaAvaliado === servidor.matricula);
                 const status = avaliacao ? 'concluido' : 'pendente';
                 const card = document.createElement('div');
                 card.className = `servidor-card ${status}`;
+                // *** A linha abaixo foi revertida para a original para evitar erros ***
                 card.innerHTML = `<h3>${servidor.nome}</h3><div class="servidor-info"><p>Matrícula: ${servidor.matricula}</p><p>Lotação: ${servidor.lotacao}</p></div><div class="status-badge status-${status}">${avaliacao ? 'Avaliado' : 'Pendente'}</div>`;
                 card.addEventListener('click', () => {
                     if (avaliacao) { showInfoModal("Esta avaliação já foi concluída e não pode ser editada."); }
@@ -515,7 +559,6 @@
             document.getElementById('declaracaoNome').textContent = currentUser.nome;
             document.getElementById('declaracaoMatricula').textContent = currentUser.matricula;
             
-            // CORREÇÃO: Limpeza robusta do formulário
             dom.avaliacao.form.reset();
             document.getElementById('checkDeclaracao').checked = false;
             for (let i = 1; i <= 18; i++) {
@@ -537,15 +580,25 @@
                 const input = document.getElementById(`questao${i}`);
                 if (input && input.value) { total += parseFloat(input.value); }
             }
-            document.getElementById('pontuacaoAtual').textContent = total.toFixed(1);
+            const totalFormatado = total.toFixed(1).replace('.', ',');
+            document.getElementById('pontuacaoAtual').textContent = `${totalFormatado} / 25,0 pts`;
             document.getElementById('progressBar').style.width = ((total / 25.0) * 100) + '%';
-            let faixa = "Abaixo do esperado", cor = 'var(--danger)';
-            if (total >= 24) { faixa = "Excelente"; cor = 'var(--success)'; }
-            else if (total >= 22) { faixa = "Muito Bom"; cor = 'var(--success)'; }
-            else if (total >= 19) { faixa = "Bom"; cor = 'var(--success)'; }
-            else if (total >= 16) { faixa = "Regular"; cor = 'var(--primary)'; }
+            
+            let faixa = "Abaixo do Esperado", cor = 'var(--danger)';
+            const scorePercentage = (total / 25.0) * 100;
+            if (scorePercentage >= 91) { faixa = "Excelente"; cor = 'var(--success)'; }
+            else if (scorePercentage >= 82) { faixa = "Muito Bom"; cor = 'var(--success)'; }
+            else if (scorePercentage >= 73) { faixa = "Bom"; cor = 'var(--success)'; }
+            else if (scorePercentage >= 64) { faixa = "Regular"; cor = 'var(--primary)'; }
+            
             document.getElementById('progressBar').style.backgroundColor = cor;
-            document.getElementById('faixaDesempenho').textContent = faixa;
+            const faixaEl = document.getElementById('faixaDesempenho');
+            if(faixaEl.textContent !== faixa) {
+                faixaEl.classList.remove('text-fade-in');
+                void faixaEl.offsetWidth; // Trigger reflow
+                faixaEl.textContent = faixa;
+                faixaEl.classList.add('text-fade-in');
+            }
             
             sections.forEach(section => {
                 const isCompleted = section.questions.every(qId => document.getElementById(qId) && document.getElementById(qId).value);
@@ -560,8 +613,11 @@
             document.querySelectorAll('.declaracao-container').forEach(el => el.classList.remove('invalid-question'));
             for (let i = 1; i <= 18; i++) {
                 const input = document.getElementById(`questao${i}`);
+                const qDiv = document.getElementById(`q-${i}`);
+                if (qDiv) qDiv.classList.remove('invalid-question');
                 if (!input || !input.value) {
-                    isFormValid = false; document.getElementById(`q-${i}`).classList.add('invalid-question');
+                    isFormValid = false; 
+                    if(qDiv) qDiv.classList.add('invalid-question');
                 }
             }
             if (!document.getElementById('checkDeclaracao').checked) {
@@ -599,7 +655,6 @@
             showModal(dom.reviewModal);
         }
 
-        // CORREÇÃO: Função de envio com melhor tratamento de erro e formato de dado
         function submitEvaluation() {
             hideModal(dom.confirmationModal);
             const pontuacaoTotal = calcularPontuacao();
@@ -610,7 +665,7 @@
             const avaliacaoData = {
                 matriculaAvaliador: currentUser.matricula, nomeAvaliador: currentUser.nome,
                 matriculaAvaliado: document.getElementById('matriculaAvaliado').value, nomeAvaliado: document.getElementById('nomeAvaliado').value,
-                pontuacao: pontuacaoTotal, // Enviando como número
+                pontuacao: pontuacaoTotal,
                 declaracao: `Confirmado por ${currentUser.nome} em ${new Date().toLocaleString('pt-BR')}`, 
                 respostas: respostas
             };
@@ -693,7 +748,7 @@
         document.getElementById('modalCancel').addEventListener('click', () => hideModal(dom.confirmationModal));
         document.getElementById('infoModalClose').addEventListener('click', () => hideModal(dom.infoModal));
         document.getElementById('modalCloseReview').addEventListener('click', () => hideModal(dom.reviewModal));
-        document.getElementById('modalConfirmReview').addEventListener('click', () => { hideModal(dom.reviewModal); document.getElementById('modalScore').textContent = calcularPontuacao().toFixed(1); showModal(dom.confirmationModal); });
+        document.getElementById('modalConfirmReview').addEventListener('click', () => { hideModal(dom.reviewModal); document.getElementById('modalScore').textContent = calcularPontuacao().toFixed(1).replace('.', ','); showModal(dom.confirmationModal); });
         dom.login.togglePass.addEventListener('click', () => { const s = dom.login.senha; s.type = s.type === 'password' ? 'text' : 'password'; dom.login.togglePass.classList.toggle('fa-eye-slash'); dom.login.togglePass.classList.toggle('fa-eye'); });
         dom.successModal.closeBtn.addEventListener('click', () => { hideModal(dom.successModal.el); loadServidores(); showServidoresScreen(); });
         document.querySelectorAll('.opcoes-avaliacao .opcao').forEach(opcao => {
@@ -713,7 +768,14 @@
         dom.pagination.prevButton.addEventListener('click', () => { if (currentPageIndex > 0) { currentPageIndex--; showPage(currentPageIndex); } });
         document.getElementById('themeToggle').addEventListener('click', () => { applyTheme(localStorage.getItem('theme') === 'light' ? 'dark' : 'light'); });
         window.addEventListener('beforeunload', (e) => { if (isFormDirty) { e.preventDefault(); e.returnValue = ''; } });
-        
+        document.querySelectorAll('.accordion-header').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                button.classList.toggle('active');
+                if(content.style.maxHeight) { content.style.maxHeight = null; } 
+                else { content.style.maxHeight = content.scrollHeight + "px"; }
+            });
+        });
         dom.login.matricula.addEventListener('input', filterNumericInput);
         dom.login.senha.addEventListener('input', filterNumericInput);
 
