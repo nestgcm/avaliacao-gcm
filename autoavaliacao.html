@@ -12,14 +12,14 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71; 
             --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937; 
             --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444; 
-            --warning: #f59e0b; --gray: #6b7280; --border-color: #e5e7eb;
+            --warning: #f59e0b; --gray: #555e6b; /* Cor escurecida para melhor contraste */ --border-color: #e5e7eb;
             --border-radius: 8px; 
             --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
         }
@@ -30,9 +30,9 @@
         }
         
         @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         @keyframes shake-horizontal {
@@ -49,6 +49,14 @@
             to { opacity: 0; }
         }
 
+        @keyframes fadeInText {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .text-fade-in {
+            animation: fadeInText 0.4s ease-in-out;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         html { scroll-behavior: smooth; }
         body { background-color: #f5f7fa; color: var(--dark); line-height: 1.7; font-size: 16px; }
@@ -60,7 +68,7 @@
         .user-info { display: flex; align-items: center; gap: 10px; }
         .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; animation: fadeIn 0.5s ease-out forwards; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px;}
-        .hidden { display: none !important; } /* Use !important to override inline styles if needed */
+        .hidden { display: none !important; }
         .btn { padding: 10px 15px; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 5px; }
         .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); }
         .btn:disabled { background-color: var(--gray); cursor: not-allowed; opacity: 0.7; }
@@ -81,12 +89,12 @@
         .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
         .info-avaliado { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background-color: var(--light); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
         .info-avaliado p { margin: 0; }
-        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out; }
-        /* PAGINAÇÃO: esconde os critérios por padrão, o JS controlará a exibição */
+        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out; }
         .criterio:not(.active-page) { display: none; }
         .criterio.active-criterio { box-shadow: 0 8px 25px rgba(26, 86, 219, 0.2); border-color: var(--primary); }
         .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
         .questao { padding: 20px; background: white; transition: background-color 0.4s ease, border-left-color 0.4s ease; border-left: 4px solid transparent; }
+        .questao p { font-weight: 500; } /* Destaque para as perguntas */
         .questao + .questao { border-top: 1px solid var(--border-color); }
         .questao.invalid-question { border-left-color: var(--danger); background-color: #fee2e2; }
         .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
@@ -94,7 +102,7 @@
         .opcao { text-align: center; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80px; }
         .opcao .valor-numerico { font-size: 1.2rem; font-weight: bold; }
         .opcao .valor-texto { font-size: 0.75rem; color: var(--gray); margin-top: 4px; }
-        .opcao:hover { background-color: var(--light); }
+        .opcao:hover { background-color: var(--light); border-color: var(--primary); transform: translateY(-2px); }
         .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
         .opcao.selecionada .valor-texto { color: white; }
         .opcao .valor-numerico::before { font-family: "Font Awesome 6 Free"; content: ""; font-weight: 900; margin-right: 8px; color: white; transition: content 0.2s ease; }
@@ -110,8 +118,6 @@
         .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s ease, background-color 0.5s ease; }
         .instructions-panel { background-color: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 15px; margin-bottom: 20px; color: var(--primary-dark); }
         .instructions-panel h3 { font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        .instructions-panel ul { list-style-position: inside; padding-left: 5px; line-height: 1.8; }
-        .instructions-panel li + li { margin-top: 5px; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.visible { display: flex; opacity: 1; }
         .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -125,13 +131,25 @@
         .review-item:last-child { border-bottom: none; }
         .review-item p { margin: 0; font-size: 0.9rem; }
         .review-item span { font-weight: 600; color: var(--primary); background-color: var(--primary-light); padding: 2px 8px; border-radius: 10px; font-size: 1rem; }
-        .stepper-container { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding: 10px; background-color: var(--light); border-radius: var(--border-radius); }
-        .step { display: flex; align-items: center; flex-direction: column; text-align: center; color: var(--gray); font-weight: 500; }
+        .stepper-container { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 20px; padding: 10px; background-color: var(--light); border-radius: var(--border-radius); position: relative; }
+        /* Linha conectora para o Stepper */
+        .stepper-container::before { content: ''; position: absolute; top: 23px; /* Ajuste vertical para alinhar com o centro dos ícones */ left: 10%; right: 10%; height: 2px; background-color: var(--border-color); z-index: 0; }
+        .step { display: flex; align-items: center; flex-direction: column; text-align: center; color: var(--gray); font-weight: 500; position: relative; z-index: 1; }
         .step-icon { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--gray); background-color: white; display: flex; justify-content: center; align-items: center; color: var(--gray); margin-bottom: 5px; transition: all 0.3s; }
         .step.active .step-icon { border-color: var(--primary); background-color: var(--primary); color: white; }
         .step.active .step-label { color: var(--primary); }
         .step.completed .step-icon { border-color: var(--success); background-color: var(--success); color: white; animation: pop 0.3s ease-out; }
         .step-label { font-size: 0.75rem; }
+        /* Estilos para o Acordeão */
+        .accordion-item { border-bottom: 1px solid var(--primary); }
+        .accordion-item:last-child { border-bottom: none; }
+        .accordion-header { background: none; border: none; width: 100%; text-align: left; padding: 12px 5px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--primary-dark); }
+        .accordion-header::after { font-family: "Font Awesome 6 Free"; content: '\f078'; /* chevron-down */ font-weight: 900; transition: transform 0.3s ease; }
+        .accordion-header.active::after { transform: rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .accordion-content-inner { padding: 5px 5px 15px; line-height: 1.8; }
+        .accordion-content-inner ul { list-style-position: inside; padding-left: 5px; }
+        .accordion-content-inner li + li { margin-top: 5px; }
         body.dark-theme { --light: #334155; --dark: #f1f5f9; --border-color: #475569; background-color: #0f172a; }
         body.dark-theme .card, body.dark-theme .modal-content, body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .info-avaliado, body.dark-theme .declaracao-container, body.dark-theme .resumo-pontuacao, body.dark-theme .stepper-container { background-color: #1e293b; border-color: var(--border-color); }
         body.dark-theme input, body.dark-theme select, body.dark-theme textarea { background-color: #334155; border-color: #475569; color: var(--dark); }
@@ -139,6 +157,7 @@
         body.dark-theme .review-item span { color: white; background-color: var(--primary); }
         body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
         body.dark-theme .opcao.selecionada .valor-texto { color: #f0fdf4; }
+        body.dark-theme .accordion-header { color: var(--dark); }
         .required-asterisk { color: var(--danger); }
         .btn:focus, .opcao:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1); }
@@ -152,6 +171,7 @@
             .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
             .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
             .info-avaliado { grid-template-columns: 1fr; }
+            .stepper-container { flex-wrap: wrap; }
         }
         @media (max-width: 480px) {
             .logo h1 { font-size: 1.2rem; line-height: 1.3; }
@@ -168,6 +188,13 @@
             .logo h1 { font-size: 1rem; }
         }
         #successSection { text-align: center; }
+        #successIcon {
+            font-size: 5rem;
+            color: var(--success);
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
         .success-message { font-size: 1.1rem; color: var(--gray); margin: 20px 0; }
         .final-score-container { margin: 25px 0; background-color: var(--primary-light); padding: 20px; border-radius: var(--border-radius); border: 1px solid var(--primary); }
         .final-score-container p { font-size: 1.2rem; font-weight: 600; margin: 0 0 10px 0; color: var(--primary-dark); }
@@ -199,21 +226,66 @@
             <h2 id="loginTitle">Acesso Restrito</h2>
             <div class="instructions-panel" role="region" aria-labelledby="instrTitle">
                 <h3 id="instrTitle"><i class="fas fa-info-circle" aria-hidden="true"></i> Orientações sobre a Autoavaliação</h3>
-                <ul>
-                    <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o seu desenvolvimento na carreira.</li>
-                    <li><strong>Período para Avaliar:</strong> Sua autoavaliação estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
-                    <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias do prazo. Caso o sistema apresente <strong>lentidão ou erro genérico</strong>, por favor, tente novamente em um horário de menor movimento.</li>
-                    <li><strong>Acesso Inválido:</strong> Se a mensagem for especificamente <strong>'matrícula ou senha inválida'</strong>, isso não significa um problema de acesso simultâneo, mas sim um provável erro de digitação. Por favor, verifique os dados com atenção e tente novamente. Caso o problema persista, entre em contato com o setor responsável.</li>
-                    <li><strong>Servidores Cedidos e Inspetor Geral:</strong> Conforme o <strong>Decreto nº 38.473/2024 (Arts. 30 e 31)</strong>, os servidores cedidos para outros órgãos e o Inspetor Geral da Guarda Civil Municipal realizam apenas a etapa de autoavaliação, que terá peso de <strong>100% (cem por cento)</strong> na sua nota final.</li>
-                    <li><strong>Servidores Inaptos para Avaliação:</strong> De acordo com o <strong>Art. 47 da Lei nº 9.640/2022</strong>, servidores em afastamentos como <strong>Licença para Tratar de Interesses Particulares (sem vencimentos)</strong> ou <strong>Licença para Tratamento de Saúde (superiores a 60 dias)</strong> ficam inaptos para este ciclo. Por este motivo, caso tente acessar o sistema, poderá receber a mensagem de <strong>'matrícula ou senha inválida'</strong>, o que não representa um erro, mas sim o impedimento legal para participar. Sua habilitação será restabelecida no próximo ciclo de avaliação.</li>
-                    <li><strong>Afastamentos que NÃO Impedem a Avaliação:</strong> Períodos de <strong>Férias</strong> e <strong>Licença-Prêmio</strong>, mesmo que somados ultrapassem <strong>60 (sessenta)</strong> dias, <strong>não impedem</strong> sua participação, pois são considerados tempo de efetivo exercício <strong>(Art. 138 da Lei Complementar nº 01/1991)</strong>. Servidoras em <strong>Licença Maternidade ou Adoção</strong> também não são impedidas por esta regra <strong>(Art. 33 do Decreto nº 38.473/2024)</strong>.</li>
-                    <li><strong>Mandato Classista (Sindicato):</strong> Conforme o <strong>Art. 32 do Decreto nº 38.473/2024</strong>, os servidores afastados para desempenho de mandato classista nos últimos <strong>12 (doze)</strong> meses estão <strong>dispensados</strong> da avaliação. Por este motivo, caso tente acessar o sistema, poderá receber uma mensagem de <strong>'matrícula ou senha inválida'</strong>. Esta dispensa não causa prejuízo à sua progressão ou promoção na carreira.</li>
-                    <li><strong>Seja Honesto(a) e Criterioso(a):</strong> Esta é uma oportunidade para refletir sobre seu próprio desempenho. Suas respostas devem ser sinceras e baseadas em suas atividades diárias.</li>
-                    <li><strong>Revisão Final:</strong> Antes de finalizar, uma tela de revisão será exibida. Confira todas as suas respostas com atenção, pois o envio é definitivo.</li>
-                    <li><strong>Ação Definitiva:</strong> Lembre-se, sua autoavaliação, uma vez enviada, <strong>não poderá ser editada</strong>.</li>
-                    <li><strong>Publicação do Resultado:</strong> Para garantir a transparência do processo, o resultado final da avaliação <strong>(após avaliação da chefia e possíveis recursos)</strong> será publicado em Diário Oficial do Município, conforme o <strong>Art. 43 da Lei nº 9.640/2022</strong>.</li>
-                    <li><strong>Suporte:</strong> Em caso de dúvidas sobre o processo, entre em contato com o setor responsável.</li>
-                </ul>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header">Requisito Legal e Período</button>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <ul>
+                                    <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o seu desenvolvimento na carreira.</li>
+                                    <li><strong>Período para Avaliar:</strong> Sua autoavaliação estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">Acesso ao Sistema</button>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <ul>
+                                    <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias do prazo. Caso o sistema apresente <strong>lentidão ou erro genérico</strong>, por favor, tente novamente em um horário de menor movimento.</li>
+                                    <li><strong>Acesso Inválido:</strong> Se a mensagem for especificamente <strong>'matrícula ou senha inválida'</strong>, isso não significa um problema de acesso simultâneo, mas sim um provável erro de digitação. Por favor, verifique os dados com atenção e tente novamente.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="accordion-item">
+                        <button class="accordion-header">Casos Específicos</button>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <ul>
+                                     <li><strong>Servidores Cedidos e Inspetor Geral:</strong> Conforme o <strong>Decreto nº 38.473/2024 (Arts. 30 e 31)</strong>, os servidores cedidos e o Inspetor Geral realizam apenas a autoavaliação, com peso de <strong>100%</strong> na nota final.</li>
+                                     <li><strong>Mandato Classista (Sindicato):</strong> Conforme o <strong>Art. 32 do Decreto nº 38.473/2024</strong>, servidores afastados para mandato classista estão <strong>dispensados</strong> da avaliação, sem prejuízo à carreira.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">Servidores Inaptos e Afastamentos</button>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <ul>
+                                    <li><strong>Servidores Inaptos:</strong> De acordo com o <strong>Art. 47 da Lei nº 9.640/2022</strong>, servidores em afastamentos como <strong>Licença para Tratar de Interesses Particulares</strong> ou <strong>Licença Saúde (superior a 60 dias)</strong> ficam inaptos para este ciclo.</li>
+                                    <li><strong>Afastamentos que NÃO Impedem:</strong> Períodos de <strong>Férias</strong>, <strong>Licença-Prêmio</strong> e <strong>Licença Maternidade/Adoção</strong> não impedem sua participação.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-header">Instruções Finais</button>
+                        <div class="accordion-content">
+                            <div class="accordion-content-inner">
+                                <ul>
+                                    <li><strong>Seja Honesto(a) e Criterioso(a):</strong> Esta é uma oportunidade para refletir sobre seu próprio desempenho.</li>
+                                    <li><strong>Revisão Final:</strong> Antes de finalizar, uma tela de revisão será exibida. Confira todas as suas respostas com atenção.</li>
+                                    <li><strong>Ação Definitiva:</strong> Lembre-se, sua autoavaliação, uma vez enviada, <strong>não poderá ser editada</strong>.</li>
+                                    <li><strong>Publicação do Resultado:</strong> O resultado final será publicado em Diário Oficial do Município, conforme o <strong>Art. 43 da Lei nº 9.640/2022</strong>.</li>
+                                    <li><strong>Suporte:</strong> Em caso de dúvidas sobre o processo, entre em contato com o setor responsável.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="loginAlert" class="alert alert-error hidden" role="alert"></div>
             <div class="form-group">
@@ -289,11 +361,12 @@
         </section>
 
         <section id="successSection" class="card hidden" aria-live="polite">
+            <i id="successIcon" class="fas fa-check-circle" aria-hidden="true"></i>
             <div class="alert alert-success"><h2>Avaliação Enviada com Sucesso!</h2></div>
             <p class="success-message">Sua auto-avaliação foi registrada em nosso sistema.</p>
             <div class="final-score-container">
                 <p>Pontuação Final:</p>
-                <span id="finalScore"></span>
+                <span id="finalScore">0,0</span>
             </div>
             <p class="success-message">Você pode baixar uma cópia do seu comprovante em PDF.</p>
             <a href="#" id="pdfLink" target="_blank" class="btn btn-primary" style="text-decoration: none;" aria-label="Baixar comprovante em PDF">
@@ -375,20 +448,15 @@
                 answeredCount: document.getElementById('answeredCount'),
                 totalQuestions: document.getElementById('totalQuestions'),
                 modal: { review: document.getElementById('reviewModal'), confirmation: document.getElementById('confirmationModal'), score: document.getElementById('modalScore'), confirmBtn: document.getElementById('modalConfirm'), cancelBtn: document.getElementById('modalCancel'), closeReviewBtn: document.getElementById('modalCloseReview'), confirmReviewBtn: document.getElementById('modalConfirmReview') },
-                // PAGINAÇÃO: Referências aos botões
-                pagination: {
-                    prevButton: document.getElementById('prevButton'),
-                    nextButton: document.getElementById('nextButton')
-                }
+                pagination: { prevButton: document.getElementById('prevButton'), nextButton: document.getElementById('nextButton') }
             };
         
             let currentUser = null;
             let isFormDirty = false;
-            
-            // PAGINAÇÃO: Variáveis de estado
             let currentPageIndex = 0;
             const pageIds = sections.map(s => s.id);
 
+            // --- FUNÇÕES HELPER ---
             function showToast(message, type = 'info', duration = 4000) {
                 const toastContainer = document.getElementById('toastContainer');
                 const toast = document.createElement('div');
@@ -404,7 +472,25 @@
 
             function showAlert(el, msg, type) { el.textContent = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
             function hideAlert(el) { el.classList.add('hidden'); }
-        
+            
+            function animateCounter(element, finalValue, duration = 1500) {
+                let start = 0;
+                const end = parseFloat(finalValue) || 0;
+                let startTime = null;
+
+                function animation(currentTime) {
+                    if (startTime === null) startTime = currentTime;
+                    const progress = Math.min((currentTime - startTime) / duration, 1);
+                    const currentValue = progress * end;
+                    element.textContent = currentValue.toFixed(1).replace('.', ',');
+                    if (progress < 1) {
+                        requestAnimationFrame(animation);
+                    }
+                }
+                requestAnimationFrame(animation);
+            }
+
+            // --- GERAÇÃO DO FORMULÁRIO E COMPONENTES ---
             function generateFormHTML() {
                 let html = '';
                 sections.forEach(section => {
@@ -439,17 +525,14 @@
                 addStepperNavigation();
             }
             
+            // --- LÓGICA DE NAVEGAÇÃO E INTERAÇÃO ---
             function addStepperNavigation() {
                 document.querySelectorAll('.step').forEach((step, index) => {
                     step.addEventListener('click', function() {
-                        // Permite navegar para páginas anteriores já visitadas
                         if(index < currentPageIndex) {
                             currentPageIndex = index;
                             showPage(currentPageIndex);
-                        } else if (index === currentPageIndex) {
-                            // Clicou no passo atual, não faz nada
-                        } else {
-                            // Tentando pular para uma página futura, valide a atual primeiro
+                        } else if (index > currentPageIndex) {
                             if (validateCurrentPage()) {
                                 currentPageIndex = index;
                                 showPage(currentPageIndex);
@@ -472,8 +555,7 @@
                             hiddenInput.dispatchEvent(new Event('change')); 
                         }
                         this.parentNode.querySelectorAll('.opcao').forEach(op => {
-                            op.classList.remove('selecionada');
-                            op.setAttribute('aria-checked', 'false');
+                            op.classList.remove('selecionada'); op.setAttribute('aria-checked', 'false');
                         });
                         this.classList.add('selecionada');
                         this.setAttribute('aria-checked', 'true');
@@ -483,20 +565,14 @@
                         }
                         calculateScore();
                     });
-                    opcao.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            this.click();
-                        }
-                    });
+                    opcao.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); } });
                 });
             }
         
             function showSection(sectionToShow) {
                 [dom.login.section, dom.eval.section, dom.success.section, dom.submitted.section].forEach(s => s.classList.add('hidden'));
-                if (sectionToShow) {
-                    sectionToShow.classList.remove('hidden');
-                }
+                if (sectionToShow) sectionToShow.classList.remove('hidden');
+                
                 const mainUserInfo = document.getElementById('userInfo');
                 if (sectionToShow !== dom.login.section) {
                     mainUserInfo.classList.remove('hidden');
@@ -506,6 +582,7 @@
                 }
             }
         
+            // --- LÓGICA DE LOGIN E SUBMISSÃO ---
             async function login() {
                 hideAlert(dom.login.alert);
                 const btn = dom.login.button;
@@ -521,8 +598,8 @@
                         currentUser = result.user;
                         populateUserInfo(currentUser);
                         showSection(dom.eval.section);
-                        currentPageIndex = 0; // Reseta para a primeira página
-                        showPage(currentPageIndex); // PAGINAÇÃO: Mostra a primeira página
+                        currentPageIndex = 0;
+                        showPage(currentPageIndex);
                         showToast(`Bem-vindo(a), ${currentUser.nome.split(' ')[0]}!`, 'success');
                     } else {
                         if(result.error === 'ALREADY_SUBMITTED') showSection(dom.submitted.section);
@@ -537,39 +614,168 @@
                 }
             }
         
-            function handleSendEvaluation() {
-                if (!validateForm()) { // Validação final de todo o formulário
-                    showAlert(dom.eval.alert, "Responda todas as questões e marque a declaração de veracidade.", 'error');
-                    const firstInvalid = document.querySelector('.invalid-question, .invalid');
-                    if (firstInvalid) {
-                        // Encontra a página do primeiro erro e navega até ela
-                        const invalidCriterio = firstInvalid.closest('.criterio');
-                        const invalidIndex = pageIds.findIndex(id => `criterio-${id}` === invalidCriterio.id);
-                        if (invalidIndex !== -1) {
-                            currentPageIndex = invalidIndex;
-                            showPage(currentPageIndex);
-                        }
+            async function submitEvaluation() {
+                hideModal(dom.modal.confirmation);
+                const totalScore = calculateScore();
+                const btn = dom.eval.sendButton;
+                btn.disabled = true; 
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        
+                const answers = {};
+                for (let i = 1; i <= TOTAL_QUESTIONS; i++) answers["criterio" + i] = document.getElementById(`c${i}`).value || null;
+        
+                const submissionData = {
+                    matricula: currentUser.matricula, nome: currentUser.nome, graduacao: currentUser.posto,
+                    pontuacao: totalScore, respostas: answers, declaracaoCiente: dom.eval.declarationCheck.checked
+                };
+                
+                try {
+                    isFormDirty = false;
+                    const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "salvarResposta", resposta: submissionData }) });
+                    const result = await response.json();
+                    if (result.success) {
+                        animateCounter(dom.success.finalScore, totalScore);
+                        dom.success.pdfLink.href = result.pdfUrl || '#';
+                        if (!result.pdfUrl) dom.success.pdfLink.classList.add('hidden');
+                        showSection(dom.success.section);
+                    } else {
+                        showAlert(dom.eval.alert, "Erro ao enviar: " + result.error, 'error');
                     }
-                    return;
+                } catch (error) {
+                    showAlert(dom.eval.alert, "Erro de conexão ao enviar. Tente novamente.", 'error');
+                } finally {
+                    btn.disabled = false; 
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Enviar Avaliação';
                 }
-                hideAlert(dom.eval.alert);
-                showReview();
+            }
+        
+            function logout() {
+                showToast('Logout efetuado com sucesso.', 'info');
+                currentUser = null; isFormDirty = false;
+                dom.login.user.value = ''; dom.login.pass.value = '';
+                hideAlert(dom.login.alert);
+                showSection(dom.login.section);
+                if (dom.eval.form.reset) dom.eval.form.reset();
+                document.querySelectorAll('.opcao.selecionada').forEach(op => op.classList.remove('selecionada'));
+                document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
+                document.querySelectorAll('input[type=hidden]').forEach(input => input.value = '');
+                dom.eval.declarationCheck.checked = false;
+                document.title = 'Avaliação de Desempenho - GCM';
+                calculateScore();
+            }
+        
+            function populateUserInfo(user) {
+                dom.userInfo.name.textContent = user.nome;
+                ["nome", "matricula", "posto", "cargo", "lotacao"].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = user[id];
+                });
+                document.getElementById("nomeDeclaracao").textContent = user.nome;
+                document.getElementById("matriculaDeclaracao").textContent = user.matricula;
+                document.getElementById("admissao").textContent = new Date(user.admissao).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+                document.getElementById("anoAvaliacao").textContent = new Date().getFullYear();
+            }
+        
+            // --- CÁLCULO DE PONTUAÇÃO E ATUALIZAÇÃO DE UI ---
+            function calculateScore() {
+                let sum = 0, answeredCount = 0;
+                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                    const input = document.getElementById(`c${i}`);
+                    if (input && input.value) { sum += parseFloat(input.value); answeredCount++; }
+                }
+                
+                const finalScore = parseFloat(sum.toFixed(1));
+                const percentage = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
+                
+                dom.progressText.textContent = `${percentage}%`;
+                dom.answeredCount.textContent = answeredCount;
+                dom.totalQuestions.textContent = TOTAL_QUESTIONS;
+                dom.pontuacaoAtual.textContent = `${finalScore.toString().replace('.', ',')} / 25 pts`;
+                
+                const scorePercentage = (finalScore / 25.0) * 100;
+                dom.progressBar.style.width = scorePercentage + '%';
+                
+                let performanceText = "Abaixo do Esperado";
+                let color = 'var(--danger)';
+                if (scorePercentage >= 91) { performanceText = "Excelente"; color = 'var(--success)'; }
+                else if (scorePercentage >= 82) { performanceText = "Muito Bom"; color = 'var(--success)'; }
+                else if (scorePercentage >= 73) { performanceText = "Bom"; color = 'var(--success)'; }
+                else if (scorePercentage >= 64) { performanceText = "Regular"; color = 'var(--primary)'; }
+                
+                dom.progressBar.style.backgroundColor = color;
+                if (dom.faixaDesempenho.textContent !== performanceText) {
+                    dom.faixaDesempenho.classList.remove('text-fade-in');
+                    void dom.faixaDesempenho.offsetWidth; // Trigger reflow
+                    dom.faixaDesempenho.textContent = performanceText;
+                    dom.faixaDesempenho.classList.add('text-fade-in');
+                }
+                
+                if (answeredCount > 0 && !dom.eval.section.classList.contains('hidden')) document.title = `(${answeredCount}/${TOTAL_QUESTIONS}) Avaliação`;
+                else document.title = 'Avaliação de Desempenho - GCM';
+
+                sections.forEach(section => {
+                    const isCompleted = section.questions.every(q => document.getElementById(q.id).value);
+                    document.getElementById(`step-${section.id}`).classList.toggle('completed', isCompleted);
+                });
+
+                return finalScore;
+            }
+        
+            // --- VALIDAÇÃO E PAGINAÇÃO ---
+            function validateForm() {
+                let isFormValid = true;
+                document.querySelectorAll('.invalid-question, .invalid').forEach(el => el.classList.remove('invalid-question', 'invalid'));
+                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                    if (!document.getElementById(`c${i}`).value) {
+                        isFormValid = false;
+                        document.getElementById(`questao-c${i}`).classList.add('invalid-question');
+                    }
+                }
+                if (!dom.eval.declarationCheck.checked) {
+                    isFormValid = false;
+                    dom.eval.declarationBoxWrapper.querySelector('.declaracao-container').classList.add('invalid');
+                }
+                return isFormValid;
             }
 
-            function showModal(modalElement) {
-                modalElement.classList.add('visible');
-                 const focusableElements = modalElement.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                const firstElement = focusableElements[0];
-                const lastElement = focusableElements[focusableElements.length - 1];
-                if (firstElement) { firstElement.focus(); }
-                modalElement.addEventListener('keydown', function(e) {
-                    if (e.key !== 'Tab') return;
-                    if (e.shiftKey) { 
-                        if (document.activeElement === firstElement) { lastElement.focus(); e.preventDefault(); }
-                    } else { 
-                        if (document.activeElement === lastElement) { firstElement.focus(); e.preventDefault(); }
+            function validateCurrentPage() {
+                let isPageValid = true;
+                sections[currentPageIndex].questions.forEach(q => {
+                    const questaoDiv = document.getElementById(`questao-${q.id}`);
+                    if (!document.getElementById(q.id).value) {
+                        isPageValid = false;
+                        questaoDiv.classList.add('invalid-question');
+                    } else {
+                        questaoDiv.classList.remove('invalid-question');
                     }
                 });
+                return isPageValid;
+            }
+
+            function showPage(index) {
+                document.querySelectorAll('.criterio').forEach(c => c.classList.remove('active-page'));
+                document.getElementById(`criterio-${pageIds[index]}`).classList.add('active-page');
+
+                dom.pagination.prevButton.disabled = index === 0;
+                const isLastPage = index === pageIds.length - 1;
+                dom.pagination.nextButton.classList.toggle('hidden', isLastPage);
+                dom.eval.sendButton.classList.toggle('hidden', !isLastPage);
+                dom.eval.declarationBoxWrapper.classList.toggle('hidden', !isLastPage);
+
+                document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
+                document.getElementById(`step-${pageIds[index]}`).classList.add('active');
+
+                const title = document.querySelector(`#criterio-${pageIds[index]} h3`);
+                if(title) title.focus({ preventScroll: true });
+                window.scrollTo(0, dom.eval.section.offsetTop);
+            }
+
+            // --- MODAIS ---
+            function showModal(modalElement) {
+                modalElement.classList.add('visible');
+                const focusableElements = modalElement.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                const firstElement = focusableElements[0];
+                if (firstElement) firstElement.focus();
             }
 
             function hideModal(modalElement) {
@@ -599,241 +805,57 @@
                 showModal(dom.modal.review);
             }
 
-            async function submitEvaluation() {
-                hideModal(dom.modal.confirmation);
+            // --- INICIALIZAÇÃO E EVENT LISTENERS GLOBAIS ---
+            generateFormHTML();
+            generateStepper();
+            
+            dom.login.button.addEventListener("click", login);
+            
+            dom.eval.sendButton.addEventListener("click", () => {
+                if (!validateForm()) {
+                    showAlert(dom.eval.alert, "Responda todas as questões e marque a declaração de veracidade.", 'error');
+                    const firstInvalid = document.querySelector('.invalid-question, .invalid');
+                    if(firstInvalid) {
+                        const invalidCriterio = firstInvalid.closest('.criterio');
+                        const invalidIndex = pageIds.findIndex(id => `criterio-${id}` === invalidCriterio.id);
+                        if (invalidIndex !== -1) { currentPageIndex = invalidIndex; showPage(currentPageIndex); }
+                    }
+                } else {
+                    hideAlert(dom.eval.alert);
+                    showReview();
+                }
+            });
+
+            dom.pagination.nextButton.addEventListener('click', () => {
+                if (validateCurrentPage()) {
+                    if (currentPageIndex < pageIds.length - 1) { currentPageIndex++; showPage(currentPageIndex); }
+                } else {
+                    showToast('Por favor, responda todas as questões para avançar.', 'error', 3000);
+                }
+            });
+            dom.pagination.prevButton.addEventListener('click', () => { if (currentPageIndex > 0) { currentPageIndex--; showPage(currentPageIndex); } });
+            
+            dom.modal.confirmBtn.addEventListener("click", submitEvaluation);
+            dom.modal.cancelBtn.addEventListener("click", () => hideModal(dom.modal.confirmation));
+            dom.modal.closeReviewBtn.addEventListener('click', () => hideModal(dom.modal.review));
+            dom.modal.confirmReviewBtn.addEventListener('click', () => {
+                hideModal(dom.modal.review);
                 const totalScore = calculateScore();
-                const btn = dom.eval.sendButton;
-                btn.disabled = true; 
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-        
-                const answers = {};
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-                    const input = document.getElementById(`c${i}`);
-                    answers["criterio" + i] = input ? input.value : null;
-                }
-        
-                const submissionData = {
-                    matricula: document.getElementById("matricula").textContent,
-                    nome: document.getElementById("nome").textContent,
-                    graduacao: document.getElementById("posto").textContent,
-                    pontuacao: totalScore,
-                    respostas: answers,
-                    declaracaoCiente: dom.eval.declarationCheck.checked
-                };
-                
-                try {
-                    isFormDirty = false;
-                    const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "salvarResposta", resposta: submissionData }) });
-                    const result = await response.json();
-                    if (result.success) {
-                        dom.success.finalScore.textContent = totalScore.toFixed(1).replace('.', ',');
-                        dom.success.pdfLink.href = result.pdfUrl || '#';
-                        if (!result.pdfUrl) dom.success.pdfLink.classList.add('hidden');
-                        showSection(dom.success.section);
-                    } else {
-                        showAlert(dom.eval.alert, "Erro ao enviar: " + result.error, 'error');
-                    }
-                } catch (error) {
-                    showAlert(dom.eval.alert, "Erro de conexão ao enviar. Tente novamente.", 'error');
-                } finally {
-                    btn.disabled = false; 
-                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Enviar Avaliação';
-                }
-            }
-        
-            function logout() {
-                showToast('Logout efetuado com sucesso.', 'info');
-                currentUser = null;
-                isFormDirty = false;
-                dom.login.user.value = '';
-                dom.login.pass.value = '';
-                hideAlert(dom.login.alert);
-                showSection(dom.login.section);
-                if (dom.eval.form.reset) dom.eval.form.reset();
-                document.querySelectorAll('.opcao').forEach(op => {
-                    op.classList.remove('selecionada');
-                    op.setAttribute('aria-checked', 'false');
-                });
-                document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
-                document.querySelectorAll('input[type=hidden]').forEach(input => input.value = '');
-                dom.eval.declarationCheck.checked = false;
-                document.title = 'Avaliação de Desempenho - GCM';
-                calculateScore();
-            }
-        
-            function populateUserInfo(user) {
-                dom.userInfo.name.textContent = user.nome;
-                document.getElementById("nome").textContent = user.nome;
-                document.getElementById("matricula").textContent = user.matricula;
-                document.getElementById("admissao").textContent = new Date(user.admissao).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-                document.getElementById("posto").textContent = user.posto;
-                document.getElementById("cargo").textContent = user.cargo;
-                document.getElementById("lotacao").textContent = user.lotacao;
-                document.getElementById("nomeDeclaracao").textContent = user.nome;
-                document.getElementById("matriculaDeclaracao").textContent = user.matricula;
-                document.getElementById("anoAvaliacao").textContent = new Date().getFullYear();
-            }
-        
-            function calculateScore() {
-                let sum = 0;
-                let answeredCount = 0;
-                
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-                    const input = document.getElementById(`c${i}`);
-                    if (input && input.value) {
-                        sum += parseFloat(input.value);
-                        answeredCount++;
-                    }
-                }
-                
-                const finalScore = parseFloat(sum.toFixed(1));
-                const percentage = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
-                
-                dom.progressText.textContent = `${percentage}%`;
-                dom.answeredCount.textContent = answeredCount;
-                dom.totalQuestions.textContent = TOTAL_QUESTIONS;
-
-                const pMax = 25.0;
-                dom.pontuacaoAtual.textContent = `${finalScore.toString().replace('.', ',')} / ${pMax.toFixed(0)} pts`;
-                const scorePercentage = (finalScore / pMax) * 100;
-                dom.progressBar.style.width = scorePercentage + '%';
-
-                if (scorePercentage < 64) {
-                    dom.progressBar.style.backgroundColor = 'var(--danger)';
-                    dom.faixaDesempenho.textContent = "Abaixo do Esperado";
-                } else if (scorePercentage < 73) {
-                    dom.progressBar.style.backgroundColor = 'var(--primary)';
-                    dom.faixaDesempenho.textContent = "Regular";
-                } else if (scorePercentage < 82) {
-                    dom.progressBar.style.backgroundColor = 'var(--success)';
-                    dom.faixaDesempenho.textContent = "Bom";
-                } else if (scorePercentage < 91) {
-                    dom.progressBar.style.backgroundColor = 'var(--success)';
-                    dom.faixaDesempenho.textContent = "Muito Bom";
-                } else {
-                    dom.progressBar.style.backgroundColor = 'var(--success)';
-                    dom.faixaDesempenho.textContent = "Excelente";
-                }
-                
-                if (answeredCount > 0 && !dom.eval.section.classList.contains('hidden')) {
-                    document.title = `(${answeredCount}/${TOTAL_QUESTIONS}) Avaliação de Desempenho`;
-                } else {
-                    document.title = 'Avaliação de Desempenho - GCM';
-                }
-
-                // Atualiza a conclusão do passo no stepper
-                sections.forEach((section, index) => {
-                    const isCompleted = section.questions.every(q => document.getElementById(q.id).value);
-                    const stepEl = document.getElementById(`step-${section.id}`);
-                    if(isCompleted) {
-                        stepEl.classList.add('completed');
-                    } else {
-                         stepEl.classList.remove('completed');
-                    }
-                });
-
-                return finalScore;
-            }
-        
-            function validateForm() {
-                let isFormValid = true;
-                document.querySelectorAll('.questao.invalid-question').forEach(q => q.classList.remove('invalid-question'));
-                dom.eval.declarationBoxWrapper.querySelector('.declaracao-container').classList.remove('invalid');
-
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-                    const input = document.getElementById(`c${i}`);
-                    if (!input || !input.value) {
-                        isFormValid = false;
-                        document.getElementById(`questao-c${i}`).classList.add('invalid-question');
-                    }
-                }
-                if (!dom.eval.declarationCheck.checked) {
-                    isFormValid = false;
-                    dom.eval.declarationBoxWrapper.querySelector('.declaracao-container').classList.add('invalid');
-                }
-                return isFormValid;
-            }
-
-            // --- PAGINAÇÃO: Novas funções ---
-            function validateCurrentPage() {
-                let isPageValid = true;
-                const currentSection = sections[currentPageIndex];
-                currentSection.questions.forEach(q => {
-                    const input = document.getElementById(q.id);
-                    const questaoDiv = document.getElementById(`questao-${q.id}`);
-                    if (!input || !input.value) {
-                        isPageValid = false;
-                        questaoDiv.classList.add('invalid-question');
-                    } else {
-                        questaoDiv.classList.remove('invalid-question');
-                    }
-                });
-                return isPageValid;
-            }
-
-            function showPage(index) {
-                // Esconde todos os critérios
-                document.querySelectorAll('.criterio').forEach(c => c.classList.remove('active-page'));
-                // Mostra o critério atual
-                document.getElementById(`criterio-${pageIds[index]}`).classList.add('active-page');
-
-                // Atualiza botões
-                dom.pagination.prevButton.disabled = index === 0;
-
-                const isLastPage = index === pageIds.length - 1;
-                dom.pagination.nextButton.classList.toggle('hidden', isLastPage);
-                dom.eval.sendButton.classList.toggle('hidden', !isLastPage);
-                dom.eval.declarationBoxWrapper.classList.toggle('hidden', !isLastPage);
-
-
-                // Atualiza o stepper
-                document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
-                const activeStep = document.getElementById(`step-${pageIds[index]}`);
-                if (activeStep) activeStep.classList.add('active');
-
-                // Foco para acessibilidade
-                const title = document.querySelector(`#criterio-${pageIds[index]} h3`);
-                if(title) title.focus({ preventScroll: true });
-                window.scrollTo(0, dom.eval.section.offsetTop);
-            }
-
-            // --- FIM PAGINAÇÃO ---
-        
-            const themeToggle = document.getElementById('themeToggle');
-            const moonIcon = '<i class="fas fa-moon"></i>';
-            const sunIcon = '<i class="fas fa-sun"></i>';
-            function applyTheme(theme) {
-                if (theme === 'dark') {
-                    document.body.classList.add('dark-theme');
-                    themeToggle.innerHTML = sunIcon;
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    themeToggle.innerHTML = moonIcon;
-                    localStorage.setItem('theme', 'light');
-                }
-            }
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = localStorage.getItem('theme') || 'light';
-                applyTheme(currentTheme === 'light' ? 'dark' : 'light');
-            });
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
-
-            dom.login.togglePass.addEventListener('click', () => {
-                const isPassword = dom.login.pass.type === 'password';
-                dom.login.pass.type = isPassword ? 'text' : 'password';
-                dom.login.togglePass.classList.toggle('fa-eye');
-                dom.login.togglePass.classList.toggle('fa-eye-slash');
-                dom.login.togglePass.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+                dom.modal.score.textContent = totalScore.toString().replace('.', ',');
+                showModal(dom.modal.confirmation);
             });
 
-            dom.eval.form.addEventListener('change', () => { isFormDirty = true; });
-            window.addEventListener('beforeunload', (event) => {
-                if (isFormDirty) {
-                    event.preventDefault();
-                    event.returnValue = ''; 
-                }
+            // Lógica do acordeão
+            document.querySelectorAll('.accordion-header').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    button.classList.toggle('active');
+                    if(content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
             });
 
             const filterNumericInput = (event) => {
@@ -848,65 +870,10 @@
             };
             dom.login.user.addEventListener('input', filterNumericInput);
             dom.login.pass.addEventListener('input', filterNumericInput);
+
+            // Restante dos event listeners (logout, tema, etc.)
+            [dom.logoutButtonEval, dom.success.logoutButton, dom.submitted.logoutButton, document.getElementById('btnLogout')].forEach(btn => btn && btn.addEventListener('click', logout));
             
-            const backToTopBtn = document.getElementById('backToTopBtn');
-            window.onscroll = function() {
-                if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-                    backToTopBtn.style.display = "flex";
-                } else {
-                    backToTopBtn.style.display = "none";
-                }
-            };
-            backToTopBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-            
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape') {
-                    if (dom.modal.review.classList.contains('visible')) { hideModal(dom.modal.review); }
-                    if (dom.modal.confirmation.classList.contains('visible')) { hideModal(dom.modal.confirmation); }
-                }
-            });
-
-            // --- INICIALIZAÇÃO E EVENT LISTENERS ---
-            
-            generateFormHTML();
-            generateStepper();
-            
-            dom.eval.form.addEventListener('change', calculateScore);
-            dom.login.button.addEventListener("click", login);
-            dom.eval.sendButton.addEventListener("click", handleSendEvaluation);
-
-            // PAGINAÇÃO: Event Listeners dos botões de navegação
-            dom.pagination.nextButton.addEventListener('click', () => {
-                if (validateCurrentPage()) {
-                    if (currentPageIndex < pageIds.length - 1) {
-                        currentPageIndex++;
-                        showPage(currentPageIndex);
-                    }
-                } else {
-                    showToast('Por favor, responda todas as questões para avançar.', 'error', 3000);
-                }
-            });
-
-            dom.pagination.prevButton.addEventListener('click', () => {
-                if (currentPageIndex > 0) {
-                    currentPageIndex--;
-                    showPage(currentPageIndex);
-                }
-            });
-
-            dom.modal.confirmBtn.addEventListener("click", submitEvaluation);
-            dom.modal.cancelBtn.addEventListener("click", () => hideModal(dom.modal.confirmation));
-            dom.modal.closeReviewBtn.addEventListener('click', () => hideModal(dom.modal.review));
-            dom.modal.confirmReviewBtn.addEventListener('click', () => {
-                hideModal(dom.modal.review);
-                const totalScore = calculateScore();
-                dom.modal.score.textContent = totalScore.toString().replace('.', ',');
-                showModal(dom.modal.confirmation);
-            });
-            [dom.logoutButtonEval, dom.success.logoutButton, dom.submitted.logoutButton, document.getElementById('btnLogout')].forEach(btn => {
-                if(btn) btn.addEventListener('click', logout)
-            });
-
             showSection(dom.login.section);
             calculateScore();
         });
