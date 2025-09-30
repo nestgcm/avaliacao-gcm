@@ -522,6 +522,7 @@
                     
                     const response = await fetch(WEB_APP_URL, {
                         method: 'POST',
+                        cache: 'no-cache', // LINHA CORRIGIDA: Impede o navegador de usar dados antigos (em cache).
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ action: 'getDashboardData' }),
                         signal: controller.signal
@@ -535,6 +536,7 @@
                     
                     const data = await response.json();
                     if (data.success) {
+                        _lastCacheKey = null; // LINHA CORRIGIDA: Limpa o cache interno da aplicação para forçar a renderização.
                         allServidores = data.servidores || [];
                         populateLotacaoFilter();
                         render();
