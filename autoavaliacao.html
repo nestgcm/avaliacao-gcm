@@ -472,7 +472,7 @@
                 }, duration);
             }
 
-            function showAlert(el, msg, type) { el.textContent = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
+            function showAlert(el, msg, type) { el.innerHTML = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
             function hideAlert(el) { el.classList.add('hidden'); }
             
             function animateCounter(element, finalValue, duration = 1500) {
@@ -604,8 +604,15 @@
                         showPage(currentPageIndex);
                         showToast(`Bem-vindo(a), ${currentUser.nome.split(' ')[0]}!`, 'success');
                     } else {
-                        if(result.error === 'ALREADY_SUBMITTED') showSection(dom.submitted.section);
-                        else showAlert(dom.login.alert, result.error, 'error');
+                        if (result.error === 'ALREADY_SUBMITTED') {
+                            showSection(dom.submitted.section);
+                        } else {
+                            let errorMessage = result.error;
+                            if (errorMessage && (errorMessage.includes('inválida') || errorMessage.includes('inválido'))) {
+                                errorMessage = "<strong>Matrícula ou Senha Inválida</strong><br><br>Primeiramente, verifique se os dados foram digitados corretamente.<br><br>Se os dados estiverem corretos, o acesso pode não ser permitido por você se enquadrar em uma das seguintes situações:<br><ul style='text-align: left; margin-top: 10px; margin-left: 20px;'><li style='margin-bottom: 5px;'><strong>Servidores Inaptos (Art. 47 da Lei nº 9.640/2022):</strong> Afastamento por Licença para Tratar de Interesses Particulares ou Licença Saúde por período superior a 60 dias.</li><li><strong>Servidores Dispensados (Art. 32 do Decreto nº 38.473/2024):</strong> Afastamento para exercício de mandato classista (sindicato).</li></ul><br>Consulte as orientações no início da página para mais detalhes.";
+                            }
+                            showAlert(dom.login.alert, errorMessage, 'error');
+                        }
                     }
                 } catch (error) {
                     showAlert(dom.login.alert, "Erro de conexão. Verifique sua internet.", 'error');
