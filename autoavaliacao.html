@@ -84,7 +84,7 @@
         .password-wrapper i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--gray); }
         .alert { padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; }
         .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-error { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .alert-error { background-color: #fef2f2; color: var(--danger); border: 1px solid var(--danger); }
         .alert-warning { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
         .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
         .info-avaliado { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background-color: var(--light); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
@@ -166,6 +166,8 @@
         .toast { padding: 15px 20px; border-radius: var(--border-radius); color: white; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
         .toast.toast-success { background-color: var(--success); }
         .toast.toast-info { background-color: var(--primary); }
+        /* MODIFICAÇÃO: Adicionada classe de cor para a notificação de erro */
+        .toast.toast-error { background-color: var(--danger); }
         .toast.toast-hiding { animation: fadeOut 0.5s ease-out forwards; }
         @media (max-width: 768px) {
             .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
@@ -871,13 +873,47 @@
             dom.login.user.addEventListener('input', filterNumericInput);
             dom.login.pass.addEventListener('input', filterNumericInput);
 
-            // Restante dos event listeners (logout, tema, etc.)
+            // Restante dos event listeners (logout, etc.)
             [dom.logoutButtonEval, dom.success.logoutButton, dom.submitted.logoutButton, document.getElementById('btnLogout')].forEach(btn => btn && btn.addEventListener('click', logout));
             
+            // Lógica para visualizar senha
+            dom.login.togglePass.addEventListener('click', function() {
+                const isPassword = dom.login.pass.type === 'password';
+                dom.login.pass.type = isPassword ? 'text' : 'password';
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+
+            // Lógica para Modo Escuro/Claro
+            const themeToggleBtn = document.getElementById('themeToggle');
+            const themeIcon = themeToggleBtn.querySelector('i');
+
+            const applyTheme = (theme) => {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                }
+            };
+
+            themeToggleBtn.addEventListener('click', () => {
+                const newTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            }
+
             showSection(dom.login.section);
             calculateScore();
         });
     </script>
 </body>
 </html>
-
