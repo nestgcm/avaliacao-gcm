@@ -247,6 +247,28 @@
     </style>
 </head>
 <body>
+    <script>
+        // --- SCRIPT DE BLOQUEIO POR PRAZO ---
+        const dataEncerramento = new Date('2025-10-22T00:00:00-03:00'); // Meia-noite de 21 para 22 de Outubro
+        const dataAtual = new Date();
+    
+        if (dataAtual >= dataEncerramento) {
+            document.body.innerHTML = `
+                <style>
+                    body { display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background-color: #f0f2f5; margin: 0; }
+                    .container { text-align: center; padding: 40px; background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+                    h1 { color: #d9534f; }
+                    p { color: #333; }
+                </style>
+                <div class="container">
+                    <h1>Prazo Encerrado</h1>
+                    <p>O período para preenchimento da avaliação de desempenho foi finalizado em 21 de outubro de 2025.</p>
+                    <p>Em caso de dúvidas, entre em contato com o setor responsável.</p>
+                </div>
+            `;
+        }
+        // --- FIM DO SCRIPT ---
+    </script>
     <header>
         <div class="container header-content">
             <div class="logo"><i class="fas fa-shield-alt fa-2x"></i><h1>Sistema de Avaliação de Desempenho - Avaliação da Chefia - GCM Salvador</h1></div>
@@ -896,4 +918,3 @@
     </script>
 </body>
 </html>
-
