@@ -2,947 +2,192 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema de Avaliação de Desempenho - AutoAvaliação - GCM Salvador</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="description" content="Sistema de Autoavaliação de Desempenho da Guarda Civil Municipal de Salvador">
-    <meta name="keywords" content="GCM, avaliação, desempenho, autoavaliação, Salvador">
-    <meta name="author" content="Prefeitura Municipal de Salvador">
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Offline</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
     <style>
+        /* --- Variáveis de Cor --- */
         :root {
-            --primary: #1a56db; --primary-light: #eff6ff; --primary-dark: #0e2e71; 
-            --secondary: #ff9800; --light: #f3f4f6; --dark: #1f2937; 
-            --success: #10b981; --success-light: #f0fdf4; --danger: #ef4444; 
-            --warning: #f59e0b; --gray: #555e6b; /* Cor escurecida para melhor contraste */ --border-color: #e5e7eb;
-            --border-radius: 8px; 
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --cor-fundo: #0d0d0d;        /* Quase preto */
+            --cor-texto: #e0e0e0;       /* Cinza claro */
+            --cor-impacto: #ff3c3c;     /* Vermelho de alerta */
+            --cor-impacto-brilho: rgba(255, 60, 60, 0.4);
         }
 
+        /* --- Reset Básico e Estilo do Body --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            padding: 15px;
+        }
+
+        /* --- Efeito de Fundo (Scanlines) --- */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Linhas finas pretas para dar textura */
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.2) 50%
+            );
+            background-size: 100% 4px;
+            opacity: 0.1;
+            z-index: 1;
+            /* Animação de scanline */
+            animation: scan 10s linear infinite;
+        }
+
+        /* --- Container Principal --- */
+        .container {
+            position: relative;
+            z-index: 2; /* Fica na frente das scanlines */
+            background-color: rgba(26, 26, 26, 0.6); /* Fundo semi-transparente */
+            border: 1px solid var(--cor-impacto);
+            border-radius: 12px;
+            padding: 40px 50px;
+            max-width: 600px;
+            /* Sombra vermelha para dar o brilho */
+            box-shadow: 0 0 25px var(--cor-impacto-brilho), 
+                        0 0 10px var(--cor-impacto-brilho) inset;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* --- Ícone --- */
+        .icon {
+            font-size: 4rem;
+            color: var(--cor-impacto);
+            margin-bottom: 25px;
+            /* Efeito de brilho no ícone */
+            text-shadow: 0 0 20px var(--cor-impacto);
+            /* Animação de pulsar */
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        /* --- Título "SYSTEM OFFLINE" --- */
+        h1 {
+            font-family: 'Orbitron', sans-serif; /* Fonte Tech */
+            font-size: 2.5rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            /* Efeito de brilho (neon) */
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px var(--cor-impacto),
+                0 0 30px var(--cor-impacto);
+        }
+
+        /* --- Texto de Descrição --- */
+        p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        p:first-of-type {
+            margin-bottom: 10px;
+        }
+        
+        /* --- Animações --- */
+        
+        /* Animação de entrada */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        @keyframes pop {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes shake-horizontal {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        /* Animação de pulsar para o ícone */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
         
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes fadeOut {
-            to { opacity: 0; }
-        }
-
-        @keyframes fadeInText {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .text-fade-in {
-            animation: fadeInText 0.4s ease-in-out;
+        /* Animação de scanline (rolagem) */
+        @keyframes scan {
+            0% {
+                background-position-y: 0px;
+            }
+            100% {
+                background-position-y: 400px;
+            }
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        html { scroll-behavior: smooth; }
-        body { background-color: #f5f7fa; color: var(--dark); line-height: 1.7; font-size: 16px; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { background: linear-gradient(90deg, #1a56db, #113a9b); color: white; padding: 1rem 0; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
-        .header-content { display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; align-items: center; gap: 10px; }
-        .logo h1 { font-size: 1.5rem; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .card { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; animation: fadeIn 0.5s ease-out forwards; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px;}
-        .hidden { display: none !important; }
-        .btn { padding: 10px 15px; border: none; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 5px; }
-        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); }
-        .btn:disabled { background-color: var(--gray); cursor: not-allowed; opacity: 0.7; }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-success { background-color: var(--success); color: white; }
-        .btn-danger { background-color: var(--danger); color: white; }
-        .btn-secondary { background-color: var(--gray); color: white; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 16px; transition: all 0.3s ease; }
-        .password-wrapper { position: relative; }
-        .password-wrapper input { padding-right: 45px; }
-        .password-wrapper i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--gray); }
-        .alert { padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px; }
-        .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-error { background-color: #fef2f2; color: var(--danger); border: 1px solid var(--danger); }
-        .alert-warning { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-        .avaliacao-form { max-width: 800px; margin: 0 auto; padding: 0; }
-        .info-avaliado { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background-color: var(--light); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--border-color); }
-        .info-avaliado p { margin: 0; }
-        .criterio { margin-bottom: 25px; background-color: white; border-radius: var(--border-radius); border: 1px solid var(--border-color); overflow: hidden; padding: 0; transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out; }
-        .criterio:not(.active-page) { display: none; }
-        .criterio.active-criterio { box-shadow: 0 8px 25px rgba(26, 86, 219, 0.2); border-color: var(--primary); }
-        .criterio h3 { color: white; background-color: var(--primary-dark); padding: 12px 20px; margin: 0; font-size: 1.1rem; }
-        .questao { padding: 20px; background: white; transition: background-color 0.4s ease, border-left-color 0.4s ease; border-left: 4px solid transparent; }
-        .questao p { font-weight: 500; } /* Destaque para as perguntas */
-        .questao + .questao { border-top: 1px solid var(--border-color); }
-        .questao.invalid-question { border-left-color: var(--danger); background-color: #fee2e2; }
-        .questao.questao-respondida { background-color: var(--success-light); border-left-color: var(--success); }
-        .opcoes-avaliacao { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; }
-        .opcao { text-align: center; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80px; }
-        .opcao .valor-numerico { font-size: 1.2rem; font-weight: bold; }
-        .opcao .valor-texto { font-size: 0.75rem; color: var(--gray); margin-top: 4px; }
-        .opcao:hover { background-color: var(--light); border-color: var(--primary); transform: translateY(-2px); }
-        .opcao.selecionada { background-color: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
-        .opcao.selecionada .valor-texto { color: white; }
-        .opcao .valor-numerico::before { font-family: "Font Awesome 6 Free"; content: ""; font-weight: 900; margin-right: 8px; color: white; transition: content 0.2s ease; }
-        .opcao.selecionada .valor-numerico::before { content: "\f00c"; }
-        .declaracao-container { margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 20px; background-color: var(--light); padding: 20px; border-radius: var(--border-radius); border: 1px solid transparent; transition: border-color 0.3s; }
-        .declaracao-container.invalid { border-color: var(--danger); }
-        .declaracao-box { display: flex; align-items: flex-start; gap: 15px; }
-        .declaracao-box input[type="checkbox"] { width: auto; margin-top: 5px; flex-shrink: 0; }
-        .declaracao-box label { font-weight: normal; font-style: italic; color: var(--gray); line-height: 1.5; }
-        .declaracao-box label strong { font-style: normal; color: var(--dark); }
-        .resumo-pontuacao { background-color: var(--primary-light); padding: 15px; border-radius: var(--border-radius); margin: 20px 0; border: 1px solid var(--primary); }
-        .progress-bar { height: 10px; background-color: var(--border-color); border-radius: 5px; margin: 10px 0; overflow: hidden; }
-        .progress { height: 100%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s ease, background-color 0.5s ease; }
-        .instructions-panel { background-color: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--border-radius); padding: 15px; margin-bottom: 20px; color: var(--primary-dark); }
-        .instructions-panel h3 { font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 200; opacity: 0; transition: opacity 0.3s ease; }
-        .modal-overlay.visible { display: flex; opacity: 1; }
-        .modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .modal-overlay.visible .modal-content { transform: scale(1); }
-        .modal-content h3 { color: var(--primary-dark); margin-top: 0; margin-bottom: 15px; }
-        .modal-content p { margin-bottom: 25px; font-size: 1.1rem; }
-        .modal-content #modalScore { font-weight: bold; font-size: 1.2rem; color: var(--primary); }
-        .modal-buttons { display: flex; justify-content: center; gap: 15px; }
-        .review-container { max-height: 40vh; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 15px; background-color: #f9fafb; text-align: left; }
-        .review-item { border-bottom: 1px solid var(--border-color); padding: 10px 0; }
-        .review-item:last-child { border-bottom: none; }
-        .review-item p { margin: 0; font-size: 0.9rem; }
-        .review-item span { font-weight: 600; color: var(--primary); background-color: var(--primary-light); padding: 2px 8px; border-radius: 10px; font-size: 1rem; }
-        .stepper-container { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 20px; padding: 10px; background-color: var(--light); border-radius: var(--border-radius); position: relative; }
-        /* Linha conectora para o Stepper */
-        .stepper-container::before { content: ''; position: absolute; top: 23px; /* Ajuste vertical para alinhar com o centro dos ícones */ left: 10%; right: 10%; height: 2px; background-color: var(--border-color); z-index: 0; }
-        .step { display: flex; align-items: center; flex-direction: column; text-align: center; color: var(--gray); font-weight: 500; position: relative; z-index: 1; }
-        .step-icon { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--gray); background-color: white; display: flex; justify-content: center; align-items: center; color: var(--gray); margin-bottom: 5px; transition: all 0.3s; }
-        .step.active .step-icon { border-color: var(--primary); background-color: var(--primary); color: white; }
-        .step.active .step-label { color: var(--primary); }
-        .step.completed .step-icon { border-color: var(--success); background-color: var(--success); color: white; animation: pop 0.3s ease-out; }
-        .step-label { font-size: 0.75rem; }
-        /* Estilos para o Acordeão */
-        .accordion-item { border-bottom: 1px solid var(--primary); }
-        .accordion-item:last-child { border-bottom: none; }
-        .accordion-header { background: none; border: none; width: 100%; text-align: left; padding: 12px 5px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--primary-dark); }
-        .accordion-header::after { font-family: "Font Awesome 6 Free"; content: '\f078'; /* chevron-down */ font-weight: 900; transition: transform 0.3s ease; }
-        .accordion-header.active::after { transform: rotate(180deg); }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        .accordion-content-inner { padding: 5px 5px 15px; line-height: 1.8; }
-        .accordion-content-inner ul { list-style-position: inside; padding-left: 5px; }
-        .accordion-content-inner li + li { margin-top: 5px; }
-        body.dark-theme { --light: #334155; --dark: #f1f5f9; --border-color: #475569; background-color: #0f172a; }
-        body.dark-theme .card, body.dark-theme .modal-content, body.dark-theme .criterio, body.dark-theme .questao, body.dark-theme .info-avaliado, body.dark-theme .declaracao-container, body.dark-theme .resumo-pontuacao, body.dark-theme .stepper-container { background-color: #1e293b; border-color: var(--border-color); }
-        body.dark-theme input, body.dark-theme select, body.dark-theme textarea { background-color: #334155; border-color: #475569; color: var(--dark); }
-        body.dark-theme .instructions-panel, body.dark-theme .review-container { background-color: var(--light); border-color: var(--primary); color: var(--dark); }
-        body.dark-theme .review-item span { color: white; background-color: var(--primary); }
-        body.dark-theme .questao.invalid-question { background-color: #5f2a2a; }
-        body.dark-theme .opcao.selecionada .valor-texto { color: #f0fdf4; }
-        body.dark-theme .accordion-header { color: var(--dark); }
-        .required-asterisk { color: var(--danger); }
-        .btn:focus, .opcao:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1); }
-        .input-error-flash { border-color: var(--danger) !important; animation: shake-horizontal 0.4s cubic-bezier(.455,.03,.515,.955) both; }
-        #toastContainer { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 15px 20px; border-radius: var(--border-radius); color: white; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
-        .toast.toast-success { background-color: var(--success); }
-        .toast.toast-info { background-color: var(--primary); }
-        /* MODIFICAÇÃO: Adicionada classe de cor para a notificação de erro */
-        .toast.toast-error { background-color: var(--danger); }
-        .toast.toast-hiding { animation: fadeOut 0.5s ease-out forwards; }
-        @media (max-width: 768px) {
-            .opcoes-avaliacao { grid-template-columns: repeat(2, 1fr); }
-            .header-content, .card-header { flex-direction: column; gap: 10px; align-items: flex-start; }
-            .info-avaliado { grid-template-columns: 1fr; }
-            .stepper-container { flex-wrap: wrap; }
-        }
+        /* --- Responsividade para Telas Pequenas --- */
         @media (max-width: 480px) {
-            .logo h1 { font-size: 1.2rem; line-height: 1.3; }
-            .header-content { padding: 10px 0; }
-            .container { padding: 10px; }
-            .card { padding: 15px; }
-            .modal-content { width: 95%; margin: 10px; padding: 20px; }
-            .modal-buttons { flex-direction: column; gap: 10px; }
-            .btn { width: 100%; justify-content: center; }
-            #toastContainer { right: 10px; left: 10px; top: 10px; }
+            .container {
+                padding: 30px 25px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .icon {
+                font-size: 3rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
         }
-        @media (max-width: 360px) {
-            .opcoes-avaliacao { grid-template-columns: 1fr; }
-            .logo h1 { font-size: 1rem; }
-        }
-        #successSection { text-align: center; }
-        #successIcon {
-            font-size: 5rem;
-            color: var(--success);
-            margin-bottom: 20px;
-            display: inline-block;
-            animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .success-message { font-size: 1.1rem; color: var(--gray); margin: 20px 0; }
-        .final-score-container { margin: 25px 0; background-color: var(--primary-light); padding: 20px; border-radius: var(--border-radius); border: 1px solid var(--primary); }
-        .final-score-container p { font-size: 1.2rem; font-weight: 600; margin: 0 0 10px 0; color: var(--primary-dark); }
-        #finalScore { font-size: 3rem; font-weight: 700; color: var(--primary); }
-        #successSection .btn { margin-top: 10px; }
+
     </style>
 </head>
 <body>
-    <script>
-        // --- SCRIPT DE BLOQUEIO POR PRAZO ---
-        const dataEncerramento = new Date('2025-10-22T00:00:00-03:00'); // Meia-noite de 21 para 22 de Outubro
-        const dataAtual = new Date();
-    
-        if (dataAtual >= dataEncerramento) {
-            document.body.innerHTML = `
-                <style>
-                    body { display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background-color: #f0f2f5; margin: 0; }
-                    .container { text-align: center; padding: 40px; background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-                    h1 { color: #d9534f; }
-                    p { color: #333; }
-                </style>
-                <div class="container">
-                    <h1>Prazo Encerrado</h1>
-                    <p>O período para preenchimento da avaliação de desempenho foi finalizado em 21 de outubro de 2025.</p>
-                    <p>Em caso de dúvidas, entre em contato com o setor responsável.</p>
-                </div>
-            `;
-        }
-        // --- FIM DO SCRIPT ---
-    </script>
-    <header>
-        <div class="container header-content">
-            <div class="logo" aria-label="Sistema de Avaliação de Desempenho">
-                <i class="fas fa-shield-alt fa-2x" aria-hidden="true"></i>
-                <h1>Sistema de Avaliação de Desempenho - AutoAvaliação - GCM Salvador</h1>
-            </div>
-            <div id="userInfo" class="user-info hidden">
-                <span id="userName"></span>
-                <button id="themeToggle" class="btn btn-secondary" aria-label="Alternar tema claro/escuro" style="background-color: transparent; border: 1px solid white;">
-                    <i class="fas fa-moon" aria-hidden="true"></i>
-                </button>
-                <button id="btnLogout" class="btn btn-danger" aria-label="Sair do sistema">
-                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sair
-                </button>
-            </div>
+
+    <div class="container">
+        <div class="icon">
+            <i class="fas fa-power-off"></i>
         </div>
-    </header>
-
-    <main class="container">
-        <section id="loginSection" class="card" aria-labelledby="loginTitle">
-            <h2 id="loginTitle">Acesso Restrito</h2>
-            <div class="instructions-panel" role="region" aria-labelledby="instrTitle">
-                <h3 id="instrTitle"><i class="fas fa-info-circle" aria-hidden="true"></i> Orientações sobre a Autoavaliação</h3>
-                <div class="accordion">
-                    <div class="accordion-item">
-                        <button class="accordion-header">Requisito Legal e Período</button>
-                        <div class="accordion-content">
-                            <div class="accordion-content-inner">
-                                <ul>
-                                    <li><strong>Requisito Legal:</strong> Conforme a <strong>Lei Municipal nº 9.640/2022</strong>, a Avaliação de Desempenho é um requisito fundamental para o seu desenvolvimento na carreira.</li>
-                                    <li><strong>Período para Avaliar:</strong> Sua autoavaliação estará disponível para preenchimento entre os dias <strong>02 e 21 de outubro</strong>.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <button class="accordion-header">Acesso ao Sistema</button>
-                        <div class="accordion-content">
-                            <div class="accordion-content-inner">
-                                <ul>
-                                    <li><strong>Picos de Acesso:</strong> É esperado um grande volume de acessos nos primeiros e últimos dias do prazo. Caso o sistema apresente <strong>lentidão ou erro genérico</strong>, por favor, tente novamente em um horário de menor movimento.</li>
-                                    <li><strong>Acesso Inválido:</strong> Se a mensagem for especificamente <strong>'matrícula ou senha inválida'</strong>, isso não significa um problema de acesso simultâneo, mas sim um provável erro de digitação. Por favor, verifique os dados com atenção e tente novamente.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                     <div class="accordion-item">
-                        <button class="accordion-header">Casos Específicos</button>
-                        <div class="accordion-content">
-                            <div class="accordion-content-inner">
-                                <ul>
-                                     <li><strong>Servidores Cedidos e Inspetor Geral:</strong> Conforme o <strong>Decreto nº 38.473/2024 (Arts. 30 e 31)</strong>, os servidores cedidos e o Inspetor Geral realizam apenas a autoavaliação, com peso de <strong>100%</strong> na nota final.</li>
-                                     <li><strong>Mandato Classista (Sindicato):</strong> Conforme o <strong>Art. 32 do Decreto nº 38.473/2024</strong>, servidores afastados para mandato classista estão <strong>dispensados</strong> da avaliação, sem prejuízo à carreira.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <button class="accordion-header">Servidores Inaptos e Afastamentos</button>
-                        <div class="accordion-content">
-                            <div class="accordion-content-inner">
-                                <ul>
-                                    <li><strong>Servidores Inaptos:</strong> De acordo com o <strong>Art. 47 da Lei nº 9.640/2022</strong>, servidores em afastamentos como <strong>Licença para Tratar de Interesses Particulares</strong> ou <strong>Licença Saúde (superior a 60 dias)</strong> ficam inaptos para este ciclo.</li>
-                                    <li><strong>Afastamentos que NÃO Impedem:</strong> Períodos de <strong>Férias</strong>, <strong>Licença-Prêmio</strong> e <strong>Licença Maternidade/Adoção</strong> não impedem sua participação.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <button class="accordion-header">Instruções Finais</button>
-                        <div class="accordion-content">
-                            <div class="accordion-content-inner">
-                                <ul>
-                                    <li><strong>Seja Honesto(a) e Criterioso(a):</strong> Esta é uma oportunidade para refletir sobre seu próprio desempenho.</li>
-                                    <li><strong>Revisão Final:</strong> Antes de finalizar, uma tela de revisão será exibida. Confira todas as suas respostas com atenção.</li>
-                                    <li><strong>Ação Definitiva:</strong> Lembre-se, sua autoavaliação, uma vez enviada, <strong>não poderá ser editada</strong>.</li>
-                                    <li><strong>Publicação do Resultado:</strong> O resultado final será publicado em Diário Oficial do Município, conforme o <strong>Art. 43 da Lei nº 9.640/2022</strong>.</li>
-                                    <li><strong>Suporte:</strong> Em caso de dúvidas sobre o processo, entre em contato com o setor responsável.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="loginAlert" class="alert alert-error hidden" role="alert"></div>
-            <div class="form-group">
-                <label for="username">Matrícula: <span class="required-asterisk" aria-hidden="true">*</span></label>
-                <input type="text" id="username" name="username" placeholder="Digite sua matrícula SIGP" aria-required="true" autocomplete="username" required inputmode="numeric">
-            </div>
-            <div class="form-group">
-                <label for="password">Senha (CPF Somente Números): <span class="required-asterisk" aria-hidden="true">*</span></label>
-                <div class="password-wrapper">
-                    <input type="password" id="password" name="password" placeholder="Digite seu CPF (apenas números)" aria-required="true" autocomplete="current-password" required inputmode="numeric">
-                    <i class="fas fa-eye" id="togglePassword" aria-label="Mostrar/ocultar senha"></i>
-                </div>
-            </div>
-            <button id="loginButton" class="btn btn-primary" type="button" aria-label="Entrar no sistema"><i class="fas fa-sign-in-alt" aria-hidden="true"></i> Entrar</button>
-            <div id="loginLoading" class="hidden" style="text-align: center; margin-top: 15px;">
-                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);" aria-hidden="true"></i>
-                <p style="margin-top: 10px;">Validando credenciais...</p>
-            </div>
-        </section>
-
-        <section id="evaluationSection" class="card avaliacao-form hidden" aria-labelledby="evaluationTitle" aria-describedby="stepper">
-            <div class="card-header">
-                <h2 id="evaluationTitle">Avaliação de Desempenho - <span id="anoAvaliacao"></span></h2>
-                <button id="logoutButtonEval" class="btn btn-secondary" aria-label="Sair da avaliação" type="button">
-                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sair
-                </button>
-            </div>
-            
-            <div id="stepper" class="stepper-container" role="navigation" aria-label="Navegação entre critérios"></div>
-            
-            <div class="info-avaliado" role="region" aria-label="Informações do avaliado">
-                <p><b>Nome:</b> <strong id="nome"></strong></p>
-                <p><b>Matrícula:</b> <strong id="matricula"></strong></p>
-                <p><b>Admissão:</b> <strong id="admissao"></strong></p>
-                <p><b>Graduação:</b> <strong id="posto"></strong></p>
-                <p><b>Cargo:</b> <strong id="cargo"></strong></p>
-                <p><b>Lotação:</b> <strong id="lotacao"></strong></p>
-            </div>
-            <div id="avaliacaoAlert" class="alert alert-error hidden" role="alert"></div>
-            <form id="formAvaliacao" onsubmit="return false;"></form>
-            <div class="resumo-pontuacao">
-                <h3>Resumo de Pontuação</h3>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <small>Progresso: <span id="progressText">0%</span></small>
-                    <small><span id="answeredCount">0</span>/<span id="totalQuestions">18</span> questões</small>
-                </div>
-                <div class="progress-bar">
-                    <div id="progressBar" class="progress" style="width: 0%"></div>
-                </div>
-                <p>Pontuação Atual: <strong id="pontuacaoAtual">0,0 / 25 pts</strong></p>
-                <p>Desempenho: <strong id="faixaDesempenho"></strong></p>
-            </div>
-            <div id="declarationBoxWrapper" class="hidden"> <div class="declaracao-container" id="declarationBox">
-                    <h3>Declaração de Veracidade</h3>
-                    <div class="declaracao-box">
-                        <input type="checkbox" id="declaracaoCiente" aria-describedby="declaracaoText">
-                        <label for="declaracaoCiente" id="declaracaoText">
-                            Eu, <strong><span id="nomeDeclaracao"></span></strong>, matrícula nº <strong><span id="matriculaDeclaracao"></span></strong>, 
-                            declaro, sob minha responsabilidade, que todas as informações prestadas nesta avaliação são verdadeiras e correspondem à realidade.
-                        </label>
-                    </div>
-                    <small style="color: var(--gray); font-style: italic; display: block; margin-top: 5px;">
-                        Campo obrigatório para envio da avaliação
-                    </small>
-                </div>
-            </div>
-
-            <div id="paginationControls" style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; justify-content: space-between;">
-                <button type="button" id="prevButton" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Anterior</button>
-                <button type="button" id="nextButton" class="btn btn-primary">Próximo <i class="fas fa-arrow-right"></i></button>
-                <button type="button" id="sendButton" class="btn btn-success hidden" aria-label="Enviar avaliação"><i class="fas fa-check-circle" aria-hidden="true"></i> Enviar Avaliação</button>
-            </div>
-        </section>
-
-        <section id="successSection" class="card hidden" aria-live="polite">
-            <i id="successIcon" class="fas fa-check-circle" aria-hidden="true"></i>
-            <div class="alert alert-success"><h2>Avaliação Enviada com Sucesso!</h2></div>
-            <p class="success-message">Sua auto-avaliação foi registrada em nosso sistema.</p>
-            <div class="final-score-container">
-                <p>Pontuação Final:</p>
-                <span id="finalScore">0,0</span>
-            </div>
-            <p class="success-message">Você pode baixar uma cópia do seu comprovante em PDF.</p>
-            <a href="#" id="pdfLink" target="_blank" class="btn btn-primary" style="text-decoration: none;" aria-label="Baixar comprovante em PDF">
-                <i class="fas fa-file-pdf" aria-hidden="true"></i> Baixar Comprovante
-            </a>
-            <button id="logoutButtonSuccess" class="btn btn-secondary" type="button">Sair</button>
-        </section>
-
-        <section id="alreadySubmittedSection" class="card hidden">
-            <div class="alert alert-warning"><h2>Avaliação já Concluída</h2></div>
-            <p>Nosso sistema indica que você já enviou sua auto-avaliação para o período atual.</p>
-            <p>Em caso de dúvidas, entre em contato com o setor responsável.</p>
-            <button id="logoutButtonSubmitted" class="btn btn-secondary" type="button">Sair</button>
-        </section>
-    </main>
-    
-    <div id="reviewModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
-        <div class="modal-content" style="max-width: 700px;">
-            <h3 id="reviewModalTitle">Revisão Final da Avaliação</h3>
-            <p>Confira suas respostas. Após o envio, a avaliação não poderá ser alterada.</p>
-            <div id="reviewContent" class="review-container"></div>
-            <div class="modal-buttons" style="margin-top: 20px;">
-                <button id="modalCloseReview" class="btn btn-secondary" type="button"><i class="fas fa-edit" aria-hidden="true"></i> Voltar e Corrigir</button>
-                <button id="modalConfirmReview" class="btn btn-success" type="button"><i class="fas fa-check" aria-hidden="true"></i> Confirmar e Enviar</button>
-            </div>
-        </div>
+        
+        <h1>Sistema Offline</h1>
+        
+        <p>O sistema está temporariamente indisponível.</p>
+        <p>Estamos trabalhando para normalizar o acesso o mais rápido possível.</p>
     </div>
 
-    <div id="confirmationModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirmationModalTitle">
-        <div class="modal-content">
-            <h3 id="confirmationModalTitle">Confirmar Envio</h3>
-            <p>Sua pontuação final calculada é de <span id="modalScore"></span> pontos.</p>
-            <p>Deseja confirmar o envio da sua avaliação?</p>
-            <div class="modal-buttons">
-                <button id="modalCancel" class="btn btn-secondary" type="button"><i class="fas fa-times" aria-hidden="true"></i> Cancelar</button>
-                <button id="modalConfirm" class="btn btn-success" type="button"><i class="fas fa-check" aria-hidden="true"></i> Confirmar Envio</button>
-            </div>
-        </div>
-    </div>
-
-    <button id="backToTopBtn" class="btn btn-primary" style="position: fixed; bottom: 20px; right: 20px; display: none; border-radius: 50%; width: 50px; height: 50px; justify-content: center; z-index: 150;" title="Voltar ao topo">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-    
-    <div id="toastContainer"></div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const config = {
-                WEBAPP_URL: "https://script.google.com/macros/s/AKfycby8hpyN8wIDjKHbAT4YToirgoh1-KkjjEY-F0QmI59ub3SVRqo23bjkgssYKAX2OP07/exec",
-            };
-        
-            const sections = [
-                { id: 'produtividade', title: 'Produtividade', scaleType: 'A', questions: [ { id: 'c1', text: '1- Procura novos conhecimentos visando o aperfeiçoamento profissional e a melhoria contínua dos processos de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c2', text: '2- Coloca-se à disposição da chefia e dos demais colegas para a realização de novas tarefas, além das suas atribuições de rotina.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c3', text: '3- É hábil em identificar soluções para problemas e/ou situações inusitadas, em tempo hábil.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c4', text: '4- Zela pelo preparo profissional, mantendo os conhecimentos e a aptidão física e mental em níveis adequados ao exercício da função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c5', text: '5- Participa de cursos e atividades de aperfeiçoamento ou atualização profissional, dentro ou fora do serviço.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'responsabilidade', title: 'Responsabilidade', scaleType: 'A', questions: [ { id: 'c6', text: '6- É comprometido com seu trabalho, cumprindo suas tarefas com qualidade, nos prazos estabelecidos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c7', text: '7- Cumpre normas e regulamentos estabelecidos, inclusive quanto ao uso dos uniformes e equipamentos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c8', text: '8- Respeita a hierarquia, a disciplina, a cooperação, o espírito de corpo e a lealdade para com a instituição.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c9', text: '9- Mantém sigilo sobre assuntos internos da Instituição dos quais tenha conhecimento em razão do cargo ou função.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c10', text: '10- Auxilia colegas de trabalho, mantendo um ambiente de cooperação e harmonia.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'pontualidade', title: 'Pontualidade', scaleType: 'B', questions: [ { id: 'c11', text: '11- Cumpre o horário de trabalho, evitando atrasos na chegada e na saída para o intervalo.', values: ['1.0', '2.0', '3.0', '4.0', '5.0'] } ] },
-                { id: 'assiduidade', title: 'Assiduidade', scaleType: 'A', questions: [ { id: 'c12', text: '12- Comparece regularmente ao local de trabalho.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c13', text: '13- Comunica previamente à chefia imediata, sempre que possível, as suas eventuais ausências.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c14', text: '14- Evita ausentar-se do trabalho para tratar de assuntos particulares, sem o prévio conhecimento da chefia imediata.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c15', text: '15- Mantém postura colaboradora, contribuindo para o bom andamento do serviço e para o alcance dos objetivos.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] }, { id: 'c16', text: '16- Cuida da apresentação pessoal, utilizando uniforme e equipamentos adequados, limpos e bem conservados.', values: ['0.2', '0.4', '0.6', '0.8', '1.0'] } ] },
-                { id: 'equipamentos', title: 'Equipamentos', scaleType: 'C', questions: [ { id: 'c17', text: '17- Zela pelos equipamentos de trabalho (viaturas, armamentos, EPIs, etc.), utilizando-os de forma adequada e segura.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] }, { id: 'c18', text: '18- Domina tecnologias e ferramentas necessárias para o exercício de suas atribuições.', values: ['0.5', '1.0', '1.5', '2.0', '2.5'] } ] }
-            ];
-            const TOTAL_QUESTIONS = sections.reduce((acc, section) => acc + section.questions.length, 0);
-
-            const scaleLabels = {
-                A: ['Abaixo do Esperado', 'Regular', 'Bom', 'Muito Bom', 'Excelente'],
-                B: ['Abaixo do Esperado', 'Regular', 'Bom', 'Muito Bom', 'Excelente'],
-                C: ['Abaixo do Esperado', 'Regular', 'Bom', 'Muito Bom', 'Excelente']
-            };
-        
-            const dom = {
-                login: { section: document.getElementById('loginSection'), user: document.getElementById('username'), pass: document.getElementById('password'), button: document.getElementById('loginButton'), alert: document.getElementById('loginAlert'), togglePass: document.getElementById('togglePassword'), loading: document.getElementById('loginLoading') },
-                eval: { section: document.getElementById('evaluationSection'), form: document.getElementById('formAvaliacao'), sendButton: document.getElementById('sendButton'), declarationBoxWrapper: document.getElementById('declarationBoxWrapper'), declarationCheck: document.getElementById('declaracaoCiente'), alert: document.getElementById('avaliacaoAlert'), stepper: document.getElementById('stepper') },
-                success: { section: document.getElementById('successSection'), finalScore: document.getElementById('finalScore'), pdfLink: document.getElementById('pdfLink'), logoutButton: document.getElementById('logoutButtonSuccess') },
-                submitted: { section: document.getElementById('alreadySubmittedSection'), logoutButton: document.getElementById('logoutButtonSubmitted') },
-                userInfo: { container: document.getElementById('userInfo'), name: document.getElementById('userName') },
-                logoutButtonEval: document.getElementById('logoutButtonEval'),
-                progressBar: document.getElementById('progressBar'),
-                pontuacaoAtual: document.getElementById('pontuacaoAtual'),
-                faixaDesempenho: document.getElementById('faixaDesempenho'),
-                progressText: document.getElementById('progressText'),
-                answeredCount: document.getElementById('answeredCount'),
-                totalQuestions: document.getElementById('totalQuestions'),
-                modal: { review: document.getElementById('reviewModal'), confirmation: document.getElementById('confirmationModal'), score: document.getElementById('modalScore'), confirmBtn: document.getElementById('modalConfirm'), cancelBtn: document.getElementById('modalCancel'), closeReviewBtn: document.getElementById('modalCloseReview'), confirmReviewBtn: document.getElementById('modalConfirmReview') },
-                pagination: { prevButton: document.getElementById('prevButton'), nextButton: document.getElementById('nextButton') }
-            };
-        
-            let currentUser = null;
-            let isFormDirty = false;
-            let currentPageIndex = 0;
-            const pageIds = sections.map(s => s.id);
-
-            // --- FUNÇÕES HELPER ---
-            function showToast(message, type = 'info', duration = 4000) {
-                const toastContainer = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = `toast toast-${type}`;
-                const icons = { success: 'fa-check-circle', info: 'fa-info-circle', error: 'fa-exclamation-circle' };
-                toast.innerHTML = `<i class="fas ${icons[type] || 'fa-info-circle'}"></i> ${message}`;
-                toastContainer.appendChild(toast);
-                setTimeout(() => {
-                    toast.classList.add('toast-hiding');
-                    toast.addEventListener('animationend', () => toast.remove());
-                }, duration);
-            }
-
-            function showAlert(el, msg, type) { el.innerHTML = msg; el.className = `alert alert-${type}`; el.classList.remove('hidden'); }
-            function hideAlert(el) { el.classList.add('hidden'); }
-            
-            function animateCounter(element, finalValue, duration = 1500) {
-                let start = 0;
-                const end = parseFloat(finalValue) || 0;
-                let startTime = null;
-
-                function animation(currentTime) {
-                    if (startTime === null) startTime = currentTime;
-                    const progress = Math.min((currentTime - startTime) / duration, 1);
-                    const currentValue = progress * end;
-                    element.textContent = currentValue.toFixed(1).replace('.', ',');
-                    if (progress < 1) {
-                        requestAnimationFrame(animation);
-                    }
-                }
-                requestAnimationFrame(animation);
-            }
-
-            // --- GERAÇÃO DO FORMULÁRIO E COMPONENTES ---
-            function generateFormHTML() {
-                let html = '';
-                sections.forEach(section => {
-                    html += `<div class="criterio" id="criterio-${section.id}"><h3>${section.title}</h3>`;
-                    section.questions.forEach(q => {
-                        html += `<div class="questao" id="questao-${q.id}"><p>${q.text}</p><div class="opcoes-avaliacao" role="radiogroup" aria-labelledby="pergunta-${q.id}">`;
-                        const labels = scaleLabels[section.scaleType];
-                        q.values.forEach((val, index) => { 
-                            const label = labels[index] || '';
-                            html += `<div class="opcao" role="radio" aria-checked="false" tabindex="0" data-value="${val}" aria-label="${label} - ${val.replace('.',',')} pontos">
-                                        <span class="valor-numerico">${val.replace('.',',')}</span>
-                                        <span class="valor-texto">${label}</span>
-                                     </div>`; 
-                        });
-                        html += `</div><input type="hidden" id="${q.id}"></div>`;
-                    });
-                    html += `</div>`;
-                });
-                dom.eval.form.innerHTML = html;
-                addOptionListeners();
-            }
-
-            function generateStepper() {
-                let html = '';
-                sections.forEach((section, index) => {
-                    html += `<div class="step" id="step-${section.id}" data-target="#criterio-${section.id}" style="cursor: pointer;">
-                                <div class="step-icon">${index + 1}</div>
-                                <div class="step-label">${section.title}</div>
-                             </div>`;
-                });
-                dom.eval.stepper.innerHTML = html;
-                addStepperNavigation();
-            }
-            
-            // --- LÓGICA DE NAVEGAÇÃO E INTERAÇÃO ---
-            function addStepperNavigation() {
-                document.querySelectorAll('.step').forEach((step, index) => {
-                    step.addEventListener('click', function() {
-                        if(index < currentPageIndex) {
-                            currentPageIndex = index;
-                            showPage(currentPageIndex);
-                        } else if (index > currentPageIndex) {
-                            if (validateCurrentPage()) {
-                                currentPageIndex = index;
-                                showPage(currentPageIndex);
-                            } else {
-                                showToast('Responda todas as questões desta página para avançar.', 'error', 3000);
-                            }
-                        }
-                    });
-                });
-            }
-            
-            function addOptionListeners() {
-                document.querySelectorAll('.opcoes-avaliacao .opcao').forEach(opcao => {
-                    opcao.addEventListener('click', function() {
-                        const value = this.getAttribute('data-value');
-                        const hiddenInput = this.closest('.questao').querySelector('input[type=hidden]');
-                        const questaoDiv = this.closest('.questao');
-                        if (hiddenInput) {
-                            hiddenInput.value = value;
-                            hiddenInput.dispatchEvent(new Event('change')); 
-                        }
-                        this.parentNode.querySelectorAll('.opcao').forEach(op => {
-                            op.classList.remove('selecionada'); op.setAttribute('aria-checked', 'false');
-                        });
-                        this.classList.add('selecionada');
-                        this.setAttribute('aria-checked', 'true');
-                        if(questaoDiv) {
-                           questaoDiv.classList.add('questao-respondida');
-                           questaoDiv.classList.remove('invalid-question');
-                        }
-                        calculateScore();
-                    });
-                    opcao.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); } });
-                });
-            }
-        
-            function showSection(sectionToShow) {
-                [dom.login.section, dom.eval.section, dom.success.section, dom.submitted.section].forEach(s => s.classList.add('hidden'));
-                if (sectionToShow) sectionToShow.classList.remove('hidden');
-                
-                const mainUserInfo = document.getElementById('userInfo');
-                if (sectionToShow !== dom.login.section) {
-                    mainUserInfo.classList.remove('hidden');
-                    document.getElementById('btnLogout').onclick = logout;
-                } else {
-                    mainUserInfo.classList.add('hidden');
-                }
-            }
-        
-            // --- LÓGICA DE LOGIN E SUBMISSÃO ---
-            async function login() {
-                hideAlert(dom.login.alert);
-                const btn = dom.login.button;
-                if (!dom.login.user.value || !dom.login.pass.value) return showAlert(dom.login.alert, 'Preencha todos os campos.', 'error');
-                btn.disabled = true; 
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
-                dom.login.loading.classList.remove('hidden');
-                
-                try {
-                    const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "login", matricula: dom.login.user.value, senha: dom.login.pass.value }) });
-                    const result = await response.json();
-                    if (result.success) {
-                        currentUser = result.user;
-                        populateUserInfo(currentUser);
-                        showSection(dom.eval.section);
-                        currentPageIndex = 0;
-                        showPage(currentPageIndex);
-                        showToast(`Bem-vindo(a), ${currentUser.nome.split(' ')[0]}!`, 'success');
-                    } else {
-                        if (result.error === 'ALREADY_SUBMITTED') {
-                            showSection(dom.submitted.section);
-                        } else {
-                            let errorMessage = result.error;
-                            if (errorMessage && (errorMessage.includes('inválida') || errorMessage.includes('inválido'))) {
-                                errorMessage = "<strong>Matrícula ou Senha Inválida</strong><br><br>Primeiramente, verifique se os dados foram digitados corretamente.<br><br>Se os dados estiverem corretos, o acesso pode não ser permitido por você se enquadrar em uma das seguintes situações:<br><ul style='text-align: left; margin-top: 10px; margin-left: 20px;'><li style='margin-bottom: 5px;'><strong>Servidores Inaptos (Art. 47 da Lei nº 9.640/2022):</strong> Afastamento por Licença para Tratar de Interesses Particulares ou Licença Saúde por período superior a 60 dias.</li><li><strong>Servidores Dispensados (Art. 32 do Decreto nº 38.473/2024):</strong> Afastamento para exercício de mandato classista (sindicato).</li></ul><br>Consulte as orientações no início da página para mais detalhes.";
-                            }
-                            showAlert(dom.login.alert, errorMessage, 'error');
-                        }
-                    }
-                } catch (error) {
-                    showAlert(dom.login.alert, "Erro de conexão. Verifique sua internet.", 'error');
-                } finally {
-                    btn.disabled = false; 
-                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
-                    dom.login.loading.classList.add('hidden');
-                }
-            }
-        
-            async function submitEvaluation() {
-                hideModal(dom.modal.confirmation);
-                const totalScore = calculateScore();
-                const btn = dom.eval.sendButton;
-                btn.disabled = true; 
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-        
-                const answers = {};
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) answers["criterio" + i] = document.getElementById(`c${i}`).value || null;
-        
-                const submissionData = {
-                    matricula: currentUser.matricula, nome: currentUser.nome, graduacao: currentUser.posto,
-                    pontuacao: totalScore, respostas: answers, declaracaoCiente: dom.eval.declarationCheck.checked
-                };
-                
-                try {
-                    isFormDirty = false;
-                    const response = await fetch(config.WEBAPP_URL, { method: "POST", body: JSON.stringify({ action: "salvarResposta", resposta: submissionData }) });
-                    const result = await response.json();
-                    if (result.success) {
-                        animateCounter(dom.success.finalScore, totalScore);
-                        dom.success.pdfLink.href = result.pdfUrl || '#';
-                        if (!result.pdfUrl) dom.success.pdfLink.classList.add('hidden');
-                        showSection(dom.success.section);
-                    } else {
-                        showAlert(dom.eval.alert, "Erro ao enviar: " + result.error, 'error');
-                    }
-                } catch (error) {
-                    showAlert(dom.eval.alert, "Erro de conexão ao enviar. Tente novamente.", 'error');
-                } finally {
-                    btn.disabled = false; 
-                    btn.innerHTML = '<i class="fas fa-check-circle"></i> Enviar Avaliação';
-                }
-            }
-        
-            function logout() {
-                showToast('Logout efetuado com sucesso.', 'info');
-                currentUser = null; isFormDirty = false;
-                dom.login.user.value = ''; dom.login.pass.value = '';
-                hideAlert(dom.login.alert);
-                showSection(dom.login.section);
-                if (dom.eval.form.reset) dom.eval.form.reset();
-                document.querySelectorAll('.opcao.selecionada').forEach(op => op.classList.remove('selecionada'));
-                document.querySelectorAll('.questao-respondida').forEach(q => q.classList.remove('questao-respondida'));
-                document.querySelectorAll('input[type=hidden]').forEach(input => input.value = '');
-                dom.eval.declarationCheck.checked = false;
-                document.title = 'Avaliação de Desempenho - GCM';
-                calculateScore();
-            }
-        
-            function populateUserInfo(user) {
-                dom.userInfo.name.textContent = user.nome;
-                ["nome", "matricula", "posto", "cargo", "lotacao"].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.textContent = user[id];
-                });
-                document.getElementById("nomeDeclaracao").textContent = user.nome;
-                document.getElementById("matriculaDeclaracao").textContent = user.matricula;
-                document.getElementById("admissao").textContent = new Date(user.admissao).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-                document.getElementById("anoAvaliacao").textContent = new Date().getFullYear();
-            }
-        
-            // --- CÁLCULO DE PONTUAÇÃO E ATUALIZAÇÃO DE UI ---
-            function calculateScore() {
-                let sum = 0, answeredCount = 0;
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-                    const input = document.getElementById(`c${i}`);
-                    if (input && input.value) { sum += parseFloat(input.value); answeredCount++; }
-                }
-                
-                const finalScore = parseFloat(sum.toFixed(1));
-                const percentage = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
-                
-                dom.progressText.textContent = `${percentage}%`;
-                dom.answeredCount.textContent = answeredCount;
-                dom.totalQuestions.textContent = TOTAL_QUESTIONS;
-                dom.pontuacaoAtual.textContent = `${finalScore.toString().replace('.', ',')} / 25 pts`;
-                
-                const scorePercentage = (finalScore / 25.0) * 100;
-                dom.progressBar.style.width = scorePercentage + '%';
-                
-                let performanceText = "Abaixo do Esperado";
-                let color = 'var(--danger)';
-                if (scorePercentage >= 91) { performanceText = "Excelente"; color = 'var(--success)'; }
-                else if (scorePercentage >= 82) { performanceText = "Muito Bom"; color = 'var(--success)'; }
-                else if (scorePercentage >= 73) { performanceText = "Bom"; color = 'var(--success)'; }
-                else if (scorePercentage >= 64) { performanceText = "Regular"; color = 'var(--primary)'; }
-                
-                dom.progressBar.style.backgroundColor = color;
-                if (dom.faixaDesempenho.textContent !== performanceText) {
-                    dom.faixaDesempenho.classList.remove('text-fade-in');
-                    void dom.faixaDesempenho.offsetWidth; // Trigger reflow
-                    dom.faixaDesempenho.textContent = performanceText;
-                    dom.faixaDesempenho.classList.add('text-fade-in');
-                }
-                
-                if (answeredCount > 0 && !dom.eval.section.classList.contains('hidden')) document.title = `(${answeredCount}/${TOTAL_QUESTIONS}) Avaliação`;
-                else document.title = 'Avaliação de Desempenho - GCM';
-
-                sections.forEach(section => {
-                    const isCompleted = section.questions.every(q => document.getElementById(q.id).value);
-                    document.getElementById(`step-${section.id}`).classList.toggle('completed', isCompleted);
-                });
-
-                return finalScore;
-            }
-        
-            // --- VALIDAÇÃO E PAGINAÇÃO ---
-            function validateForm() {
-                let isFormValid = true;
-                document.querySelectorAll('.invalid-question, .invalid').forEach(el => el.classList.remove('invalid-question', 'invalid'));
-                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-                    if (!document.getElementById(`c${i}`).value) {
-                        isFormValid = false;
-                        document.getElementById(`questao-c${i}`).classList.add('invalid-question');
-                    }
-                }
-                if (!dom.eval.declarationCheck.checked) {
-                    isFormValid = false;
-                    dom.eval.declarationBoxWrapper.querySelector('.declaracao-container').classList.add('invalid');
-                }
-                return isFormValid;
-            }
-
-            function validateCurrentPage() {
-                let isPageValid = true;
-                sections[currentPageIndex].questions.forEach(q => {
-                    const questaoDiv = document.getElementById(`questao-${q.id}`);
-                    if (!document.getElementById(q.id).value) {
-                        isPageValid = false;
-                        questaoDiv.classList.add('invalid-question');
-                    } else {
-                        questaoDiv.classList.remove('invalid-question');
-                    }
-                });
-                return isPageValid;
-            }
-
-            function showPage(index) {
-                document.querySelectorAll('.criterio').forEach(c => c.classList.remove('active-page'));
-                document.getElementById(`criterio-${pageIds[index]}`).classList.add('active-page');
-
-                dom.pagination.prevButton.disabled = index === 0;
-                const isLastPage = index === pageIds.length - 1;
-                dom.pagination.nextButton.classList.toggle('hidden', isLastPage);
-                dom.eval.sendButton.classList.toggle('hidden', !isLastPage);
-                dom.eval.declarationBoxWrapper.classList.toggle('hidden', !isLastPage);
-
-                document.querySelectorAll('.step.active').forEach(s => s.classList.remove('active'));
-                document.getElementById(`step-${pageIds[index]}`).classList.add('active');
-
-                const title = document.querySelector(`#criterio-${pageIds[index]} h3`);
-                if(title) title.focus({ preventScroll: true });
-                window.scrollTo(0, dom.eval.section.offsetTop);
-            }
-
-            // --- MODAIS ---
-            function showModal(modalElement) {
-                modalElement.classList.add('visible');
-                const focusableElements = modalElement.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                const firstElement = focusableElements[0];
-                if (firstElement) firstElement.focus();
-            }
-
-            function hideModal(modalElement) {
-                modalElement.classList.remove('visible');
-            }
-
-            function showReview() {
-                const reviewContent = document.getElementById('reviewContent');
-                reviewContent.innerHTML = ''; 
-                sections.forEach(section => {
-                    const sectionTitle = document.createElement('h4');
-                    sectionTitle.textContent = section.title;
-                    sectionTitle.style.marginTop = '10px';
-                    reviewContent.appendChild(sectionTitle);
-
-                    section.questions.forEach(q => {
-                        const questaoTexto = q.text;
-                        const respostaValor = document.getElementById(q.id).value;
-                        if(respostaValor) {
-                            const item = document.createElement('div');
-                            item.className = 'review-item';
-                            item.innerHTML = `<p>${questaoTexto}</p><p>Sua nota: <span>${respostaValor.replace('.',',')}</span></p>`;
-                            reviewContent.appendChild(item);
-                        }
-                    });
-                });
-                showModal(dom.modal.review);
-            }
-
-            // --- INICIALIZAÇÃO E EVENT LISTENERS GLOBAIS ---
-            generateFormHTML();
-            generateStepper();
-            
-            dom.login.button.addEventListener("click", login);
-            
-            dom.eval.sendButton.addEventListener("click", () => {
-                if (!validateForm()) {
-                    showAlert(dom.eval.alert, "Responda todas as questões e marque a declaração de veracidade.", 'error');
-                    const firstInvalid = document.querySelector('.invalid-question, .invalid');
-                    if(firstInvalid) {
-                        const invalidCriterio = firstInvalid.closest('.criterio');
-                        const invalidIndex = pageIds.findIndex(id => `criterio-${id}` === invalidCriterio.id);
-                        if (invalidIndex !== -1) { currentPageIndex = invalidIndex; showPage(currentPageIndex); }
-                    }
-                } else {
-                    hideAlert(dom.eval.alert);
-                    showReview();
-                }
-            });
-
-            dom.pagination.nextButton.addEventListener('click', () => {
-                if (validateCurrentPage()) {
-                    if (currentPageIndex < pageIds.length - 1) { currentPageIndex++; showPage(currentPageIndex); }
-                } else {
-                    showToast('Por favor, responda todas as questões para avançar.', 'error', 3000);
-                }
-            });
-            dom.pagination.prevButton.addEventListener('click', () => { if (currentPageIndex > 0) { currentPageIndex--; showPage(currentPageIndex); } });
-            
-            dom.modal.confirmBtn.addEventListener("click", submitEvaluation);
-            dom.modal.cancelBtn.addEventListener("click", () => hideModal(dom.modal.confirmation));
-            dom.modal.closeReviewBtn.addEventListener('click', () => hideModal(dom.modal.review));
-            dom.modal.confirmReviewBtn.addEventListener('click', () => {
-                hideModal(dom.modal.review);
-                const totalScore = calculateScore();
-                dom.modal.score.textContent = totalScore.toString().replace('.', ',');
-                showModal(dom.modal.confirmation);
-            });
-
-            // Lógica do acordeão
-            document.querySelectorAll('.accordion-header').forEach(button => {
-                button.addEventListener('click', () => {
-                    const content = button.nextElementSibling;
-                    button.classList.toggle('active');
-                    if(content.style.maxHeight) {
-                        content.style.maxHeight = null;
-                    } else {
-                        content.style.maxHeight = content.scrollHeight + "px";
-                    }
-                });
-            });
-
-            const filterNumericInput = (event) => {
-                const inputElement = event.target;
-                const originalValue = inputElement.value;
-                const sanitizedValue = originalValue.replace(/[^0-9]/g, '');
-                if (originalValue !== sanitizedValue) {
-                    inputElement.classList.add('input-error-flash');
-                    setTimeout(() => { inputElement.classList.remove('input-error-flash'); }, 500);
-                }
-                inputElement.value = sanitizedValue;
-            };
-            dom.login.user.addEventListener('input', filterNumericInput);
-            dom.login.pass.addEventListener('input', filterNumericInput);
-
-            // Restante dos event listeners (logout, etc.)
-            [dom.logoutButtonEval, dom.success.logoutButton, dom.submitted.logoutButton, document.getElementById('btnLogout')].forEach(btn => btn && btn.addEventListener('click', logout));
-            
-            // Lógica para visualizar senha
-            dom.login.togglePass.addEventListener('click', function() {
-                const isPassword = dom.login.pass.type === 'password';
-                dom.login.pass.type = isPassword ? 'text' : 'password';
-                this.classList.toggle('fa-eye');
-                this.classList.toggle('fa-eye-slash');
-            });
-
-            // Lógica para Modo Escuro/Claro
-            const themeToggleBtn = document.getElementById('themeToggle');
-            const themeIcon = themeToggleBtn.querySelector('i');
-
-            const applyTheme = (theme) => {
-                if (theme === 'dark') {
-                    document.body.classList.add('dark-theme');
-                    themeIcon.classList.replace('fa-moon', 'fa-sun');
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    themeIcon.classList.replace('fa-sun', 'fa-moon');
-                }
-            };
-
-            themeToggleBtn.addEventListener('click', () => {
-                const newTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
-                localStorage.setItem('theme', newTheme);
-                applyTheme(newTheme);
-            });
-
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                applyTheme('dark');
-            }
-
-            showSection(dom.login.section);
-            calculateScore();
-        });
-    </script>
 </body>
 </html>
