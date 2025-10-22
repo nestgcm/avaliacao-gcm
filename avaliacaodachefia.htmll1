@@ -62,7 +62,6 @@
             padding: 40px;
             text-align: center;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            /* MUDANÇA: Destaque azul (institucional), não mais verde (sucesso) */
             border-top: 8px solid var(--primary);
             animation: fadeIn 0.6s ease-out forwards;
         }
@@ -71,7 +70,6 @@
             width: 90px;
             height: 90px;
             margin: 0 auto 25px auto;
-            /* MUDANÇA: Cor do ícone azul, não mais verde */
             background-color: var(--primary);
             color: white;
             border-radius: 50%;
