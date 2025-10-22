@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCM Salvador - Avaliação Encerrada</title>
+    <title>GCM Salvador - Prazo Encerrado</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,6 @@
             --primary: #1a56db;
             --primary-dark: #0e2e71;
             --success: #10b981;
-            --success-light: #f0fdf4;
             --light: #f3f4f6;
             --dark: #1f2937;
             --gray: #555e6b;
@@ -63,7 +62,8 @@
             padding: 40px;
             text-align: center;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            border-top: 8px solid var(--success);
+            /* MUDANÇA: Destaque azul (institucional), não mais verde (sucesso) */
+            border-top: 8px solid var(--primary);
             animation: fadeIn 0.6s ease-out forwards;
         }
 
@@ -71,7 +71,8 @@
             width: 90px;
             height: 90px;
             margin: 0 auto 25px auto;
-            background-color: var(--success);
+            /* MUDANÇA: Cor do ícone azul, não mais verde */
+            background-color: var(--primary);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -142,7 +143,6 @@
             color: #fff;
         }
         
-        /* Cores diferentes para cada ícone */
         .step-icon.one { background-color: var(--primary); }
         .step-icon.two { background-color: var(--success); }
         .step-icon.three { background-color: var(--gray); }
@@ -185,15 +185,15 @@
     <div class="container">
         
         <div class="icon-container">
-            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-stop-circle"></i>
         </div>
 
-        <h1>Etapa Concluída!</h1>
+        <h1>Prazo Encerrado</h1>
         
         <p class="lead">
-            O período para a <strong>Autoavaliação</strong> e <strong>Avaliação de Chefia</strong>
-            foi finalizado em <strong>21 de outubro de 2025</strong>[cite: 61].
-            Agradecemos sua participação!
+            O período para a <strong>Autoavaliação</strong> e <strong>Avaliação de Chefia</strong> (Portaria 158/2025)
+            foi finalizado em <strong>21 de outubro de 2025</strong>.
+            <br><strong>Não é mais possível realizar o preenchimento.</strong>
         </p>
 
         <div class="timeline-card">
@@ -205,7 +205,7 @@
                     <strong>1. Apuração dos Dados</strong>
                     <p>
                         A comissão fará a tabulação e homologação dos resultados
-                        entre <strong>22/10 e 31/10/25</strong>[cite: 61].
+                        entre <strong>22/10 e 31/10/25</strong>.
                     </p>
                 </div>
             </div>
@@ -216,7 +216,7 @@
                     <strong>2. Publicação Oficial</strong>
                     <p>
                         Acompanhe o Diário Oficial! O resultado homologado será publicado
-                        entre <strong>01/11 e 06/11/25</strong>[cite: 61].
+                        entre <strong>01/11 e 06/11/25</strong>.
                     </p>
                 </div>
             </div>
@@ -227,7 +227,7 @@
                     <strong>3. Pedido de Reconsideração</strong>
                     <p>
                         O período para solicitar a reconsideração do resultado será
-                        de <strong>07/11 a 16/11/25</strong>[cite: 61].
+                        de <strong>07/11 a 16/11/25</strong>.
                     </p>
                 </div>
             </div>
