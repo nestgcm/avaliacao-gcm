@@ -17,21 +17,18 @@
             --primary: #1a56db;
             --primary-dark: #0e2e71;
             --success: #10b981;
+            --success-light: #f0fdf4;
             --light: #f3f4f6;
             --dark: #1f2937;
+            --gray: #555e6b;
             --border-color: #e5e7eb;
+            --border-radius: 8px;
             --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
         }
 
         @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         @keyframes pop {
@@ -53,7 +50,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Fundo em gradiente com as cores institucionais */
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
             color: var(--dark);
             padding: 20px;
@@ -61,9 +57,9 @@
 
         .container {
             width: 100%;
-            max-width: 550px;
+            max-width: 600px;
             background-color: #ffffff;
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             padding: 40px;
             text-align: center;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -72,8 +68,8 @@
         }
 
         .icon-container {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             margin: 0 auto 25px auto;
             background-color: var(--success);
             color: white;
@@ -86,67 +82,80 @@
             animation-delay: 0.2s;
             opacity: 0; /* Começa invisível para a animação */
         }
-        
-        /* Ícone do Brasão da GCM */
-        .gcm-logo {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
 
         h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
             color: var(--dark);
             margin-bottom: 10px;
         }
 
-        h2 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: var(--success); /* Mensagem motivacional em verde */
-            margin-bottom: 20px;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: #555;
+        p.lead {
+            font-size: 1.15rem;
+            color: var(--gray);
             line-height: 1.7;
             margin-bottom: 25px;
         }
-
-        .footer-message {
-            font-size: 0.9rem;
-            color: #777;
+        
+        p.lead strong {
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        /* Card de Próximas Etapas */
+        .next-steps-card {
+            background-color: var(--success-light);
+            border: 1px solid var(--success);
+            border-radius: var(--border-radius);
+            padding: 20px;
             margin-top: 25px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 20px;
+            text-align: left;
+        }
+        
+        .next-steps-card h3 {
+            color: var(--success);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .next-steps-card h3 i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .next-steps-card p {
+            font-size: 0.95rem;
+            color: var(--dark);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .next-steps-card p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .footer-logo {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-top: 30px;
         }
 
         @media (max-width: 480px) {
             .container {
                 padding: 30px 25px;
             }
-            
             h1 {
-                font-size: 1.7rem;
+                font-size: 1.8rem;
             }
-
-            h2 {
-                font-size: 1.3rem;
-            }
-            
-            .icon-container {
-                width: 80px;
-                height: 80px;
-                font-size: 2.5rem;
-            }
-
-            p {
+            p.lead {
                 font-size: 1rem;
             }
         }
-
     </style>
 </head>
 <body>
@@ -157,20 +166,30 @@
             <i class="fas fa-check-circle"></i>
         </div>
 
-        <h1>Prazo Encerrado</h1>
+        <h1>Etapa Concluída!</h1>
         
-        <h2>Etapa Concluída com Sucesso!</h2>
-        
-        <p>
-            O período para preenchimento da Avaliação de Desempenho foi finalizado.
-            Agradecemos a sua participação e empenho nesta fase fundamental
-            para o desenvolvimento da nossa instituição.
+        <p class="lead">
+            O período para a <strong>Autoavaliação</strong> e <strong>Avaliação de Chefia</strong>, 
+            conforme a Portaria 158/2025, foi finalizado em <strong>21 de outubro de 2025</strong>.
         </p>
 
-        <div class="footer-message">
-             <i class="fas fa-shield-alt gcm-logo"></i><br>
-            Acompanhe os comunicados oficiais para informações sobre as próximas etapas e a publicação dos resultados.
-            <br><strong>Guarda Civil Municipal de Salvador</strong>
+        <div class="next-steps-card">
+            <h3><i class="fas fa-tasks"></i>O que vem agora?</h3>
+            <p>
+                <strong>APURAÇÃO DOS DADOS:</strong> 
+                Entre <strong>22/10 e 31/10/25</strong>, a Comissão de Avaliação fará a tabulação 
+                e homologação de todos os resultados.
+            </p>
+            <p>
+                <strong>PUBLICAÇÃO OFICIAL:</strong>
+                Acompanhe a publicação dos resultados homologados no Diário Oficial do Município,
+                prevista para o período de <strong>01/11 a 06/11/25</strong>.
+            </p>
+        </div>
+        
+        <div class="footer-logo">
+            <i class="fas fa-shield-alt"></i>
+            <p style="font-size: 0.9rem; color: var(--gray); margin-top: 10px;">Guarda Civil Municipal de Salvador</p>
         </div>
     </div>
 
